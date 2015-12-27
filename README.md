@@ -2,8 +2,6 @@
 
 **Code Gawker** is a NetBeans IDE plug-in that displays selected source code in a separate top-level customizable window. It can be used by an instructor of a programming class for making easy side-by-side comparisons of code fragments from different source files or from different parts of the same source file. 
 
-<h4>Usage</h4>
-
 Use the mouse to highlight a code fragment to be displayed:
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Image of Highlighted Source Code](screenshots/highlight.png)
@@ -12,19 +10,19 @@ Create a window containing the selected fragment by clicking on the <strong>Code
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Image of Selecting Code Gawker](screenshots/menu.png)
 
-Alternatively, right click in the editor window and select **Code Gawker** from the context menu:
+Or right click in the editor window and select **Code Gawker** from the context menu:
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Image of Selecting Code Gawker](screenshots/menu2.png)
 
-A top-level window is created containing the highlighted text:
+A top-level window will be created containing the highlighted text with the name of the source file in the title bar:
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Image of Code Gawker Window](screenshots/window.png)
 
-The **Code Gawker** window provides several options through a context menu:
+The **Code Gawker** window provides several options through its own context menu:
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <img src="screenshots/alwaysontop.png" width = "600" alt="options">
 
-Selects Colors for a dialog to set the background and foreground colors:
+For example, select Colors for a dialog to set the background and foreground colors:
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Image of Color Dialog](screenshots/colors2.png)
 
