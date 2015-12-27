@@ -6,7 +6,9 @@ Use the mouse to highlight a code fragment to be displayed:
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Image of Highlighted Source Code](screenshots/highlight.png)
 
+<p>
 Create a window containing the selected fragment by clicking on the <strong>Code Gawker</strong> icon in the IDE's menu bar or by selecting **Code Gawker** from the View menu:
+</p>
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Image of Selecting Code Gawker](screenshots/menu.png)
 
@@ -20,7 +22,7 @@ A top-level window will be created containing the highlighted text with the name
 
 The **Code Gawker** window provides several options through its own context menu:
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <img src="screenshots/alwaysontop.png" width = "600" alt="options">
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Image of Code Gawker Options](screenshots/alwaysontop.png)
 
 For example, select Colors for a dialog to set the background and foreground colors:
 
