@@ -6,7 +6,9 @@
 
 First, the user highlights a code fragment to be displayed:
 
+```
 <img align="center" src="screenshots/highlight.png" width = "600" alt="highlight source code">
+```
 
 The user can create a window containing the fragment by clicking on the <strong>Code Gawker</strong> icon in the IDE's menu bar, or by selecting <strong>Code Gawker</strong> from the View menu:
 
