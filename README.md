@@ -1,14 +1,14 @@
 # Code Gawker
 
-**Code Gawker** is a NetBeans IDE plug-in that displays selected source code in a separate top-level customizable window. 
-
-It can be used by an instructor of a programming class for making easy side-by-side comparisons of code fragments from different source files or from different parts of the same source file. 
+**Code Gawker** is a NetBeans IDE plug-in that displays selected source code in a separate top-level customizable window. It can be used by an instructor of a programming class for making easy side-by-side comparisons of code fragments from different source files or from different parts of the same source file. 
 
 <h4>Usage</h4>
 
 1. Use the mouse to highlight a code fragment to be displayed:
 
+<blockquote>
 ![Image of Highlighted Source Code](screenshots/highlight.png)
+</blockquote>
 
 2. Create a window containing the selected fragment by clicking on the <strong>Code Gawker</strong> icon in the IDE's menu bar or by selecting **Code Gawker** from the View menu:
 
