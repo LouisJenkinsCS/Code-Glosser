@@ -32,10 +32,12 @@ For example, select Colors for a dialog to set the background and foreground col
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Image of Color Dialog](screenshots/colors.png)
 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Image of Window with New Colors](screenshots/colors2.png)
+
 <br>
 Change the font size by resizing the window. The code fragment will always span the height of the window, and its width will be adjusted to fit the text precisely. 
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Image of Resized Window](screenshots/colors2.png)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Image of Resized Window](screenshots/resize.png)
 
 <br>
 See the <a href="https://github.com/dcoles-bloomu/code-gawker/wiki">**Code Gawker** wiki</a> for implementation details and possible future enhancements.
