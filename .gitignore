@@ -2,12 +2,12 @@
 # Created by https://www.gitignore.io/api/netbeans,java
 
 ### NetBeans ###
-nbproject/private/
-build/
-nbbuild/
-dist/
-nbdist/
-.nb-gradle/
+**/nbproject/private/
+**/build/
+**/nbbuild/
+**/dist/
+**/nbdist/
+**/.nb-gradle/
 
 
 ### Java ###
