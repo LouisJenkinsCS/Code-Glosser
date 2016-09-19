@@ -1,6 +1,7 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: true
-OpenIDE-Module: edu.bloomu.codegawker
-OpenIDE-Module-Localizing-Bundle: edu/bloomu/codegawker/Bundle.properties
+OpenIDE-Module: edu.bloomu.codeglosser
+OpenIDE-Module-Layer: edu/bloomu/codeglosser/layer.xml
+OpenIDE-Module-Localizing-Bundle: edu/bloomu/codeglosser/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.0
 
