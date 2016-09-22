@@ -1,6 +1,6 @@
 package edu.bloomu.codeglosser;
 
-import java.awt.Color;
+import org.jsoup.Jsoup;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.Point;
@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -18,7 +17,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter;
@@ -26,8 +24,24 @@ import javax.swing.text.Highlighter.Highlight;
 import javax.swing.text.Highlighter.HighlightPainter;
 import org.openide.util.Exceptions;
 import de.java2html.Java2Html;
+import de.java2html.javasource.JavaSourceType;
 import javax.swing.JTextPane;
 import de.java2html.options.JavaSourceConversionOptions;
+import de.java2html.options.JavaSourceStyleEntry;
+import de.java2html.util.RGB;
+import java.awt.Color;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import javax.swing.JOptionPane;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.Element;
+import javax.swing.text.ElementIterator;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLDocument;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 /**
  * This class enables text to be glossed with highlights and associated comments. The
@@ -43,6 +57,43 @@ import de.java2html.options.JavaSourceConversionOptions;
  * @author Drue Coles
  */
 public class GlossableTextArea extends JTextPane {
+    
+    private static final String cssText = ".note {\n" +
+                                    "  display: inline;\n" +
+                                    "  position: relative;\n" +
+                                    "  border-bottom: 1px dotted #0000FF\n" +
+                                    "}\n" +
+                                    "\n" +
+                                    ".note:hover:after {\n" +
+                                    "  background: #333;\n" +
+                                    "  background: rgba(0,0,0,.8);\n" +
+                                    "  border-radius: 5px;\n" +
+                                    "  bottom: 26px;\n" +
+                                    "  white-space: pre-wrap;\n" +
+                                    "  color: #fff;\n" +
+                                    "  content: attr(msg);\n" +
+                                    "  left: 20%;\n" +
+                                    "  padding: 5px 15px;\n" +
+                                    "  position: absolute;\n" +
+                                    "  z-index: 98;\n" +
+                                    "  width:500px;\n" +
+                                    "  display:block;\n" +
+                                    "  word-wrap: normal;\n" +
+                                    "}\n" +
+                                    "\n" +
+                                    ".note:hover:before{\n" +
+                                    "  border:solid;\n" +
+                                    "  border-color: #333 transparent;\n" +
+                                    "  border-width: 6px 6px 0 6px;\n" +
+                                    "  bottom: 20px;\n" +
+                                    "  content: \"\";\n" +
+                                    "  left: 50%;\n" +
+                                    "  position: absolute;\n" +
+                                    "  display:block;\n" +
+                                    "  z-index: 99;\n" +
+                                    "}";
+    
+    public String ReadOnlyHTML;
 
     private static final Color backgroundColor = new Color(240, 230, 230);    
     
@@ -70,10 +121,17 @@ public class GlossableTextArea extends JTextPane {
     public GlossableTextArea(GlossedDocument glossedDocument) {
         this.glossedDocument = glossedDocument;
         JavaSourceConversionOptions options = JavaSourceConversionOptions.getDefault();
+        options.getStyleTable().put(JavaSourceType.KEYWORD, new JavaSourceStyleEntry(RGB.BLUE, true, false));
+        options.getStyleTable().put(JavaSourceType.STRING, new JavaSourceStyleEntry(new RGB(206, 133, 0)));
+        options.getStyleTable().put(JavaSourceType.LINE_NUMBERS, new JavaSourceStyleEntry(RGB.BLACK));
+        options.getStyleTable().put(JavaSourceType.NUM_CONSTANT, new JavaSourceStyleEntry(RGB.BLACK));
+        options.setAddLineAnchors(true);
         options.setShowLineNumbers(true);
+        options.getStyleTable().put(JavaSourceType.CODE_TYPE, new JavaSourceStyleEntry(RGB.BLUE));
         String text = Java2Html.convertToHtml(glossedDocument.getText(), options);
+        System.err.println(text);
         setContentType("text/html");
-        setText("<html style='width:100%;height:100%;'> <body>" + text + "</body></html>");
+        setText((ReadOnlyHTML = "<html style='width:100%;height:100%;'> <style>" + cssText + "</style> <body>" + text + "</body></html>"));
         setFont(font);
         setMargin(new Insets(5, 5, 5, 5));
         setEditable(false);
@@ -219,14 +277,53 @@ class Listener extends MouseAdapter {
     JPopupMenu popup;
     GlossableTextArea glossableTextArea;
     boolean mouseButtonDown = false;
+    
+    /**
+    * Returns all elements of a particular tag name.
+    *
+    * @param tagName The tag name of the elements to return (e.g., HTML.Tag.DIV).
+    * @param document The HTML document to find tags in.
+    * @return The set of all elements in the HTML document having the specified tag name.
+    */
+    public static Element[] getElementsByTagName(HTML.Tag tagName, HTMLDocument document)
+    {
+        List<Element> elements = new ArrayList<Element>();
+
+        for (ElementIterator iterator = new ElementIterator(document); iterator.next() != null;)
+        {
+            Element currentEl = iterator.current();
+
+            AttributeSet attributes = currentEl.getAttributes();
+
+            HTML.Tag currentTagName = (HTML.Tag) attributes.getAttribute(StyleConstants.NameAttribute);
+
+            if (currentTagName == tagName)
+            {
+                elements.add(iterator.current());
+            } else if (currentTagName == HTML.Tag.CONTENT) {
+                for (Enumeration<?> e = attributes.getAttributeNames(); e.hasMoreElements();)
+                {
+                    if (tagName == e.nextElement())
+                    {
+                        elements.add(iterator.current());
+                        break;
+                    }
+                }
+            }
+        }
+
+        return elements.toArray(new Element[0]);
+    }
 
     Listener(GlossableTextArea glossableTextArea) {
         this.glossableTextArea = glossableTextArea;
         popup = new JPopupMenu();
         JMenuItem writeMenuItem = new JMenuItem("Show all comments");
         JMenuItem saveMenuItem = new JMenuItem("Save all comments");
+        JMenuItem addNote = new JMenuItem("Add Note");
         popup.add(writeMenuItem);
         popup.add(saveMenuItem);
+        popup.add(addNote);
 
         writeMenuItem.addActionListener((ActionEvent e) -> {
 
@@ -234,6 +331,77 @@ class Listener extends MouseAdapter {
 
         saveMenuItem.addActionListener((ActionEvent e) -> {
 
+        });
+        
+        addNote.addActionListener((event) -> {
+            try {
+                int start = glossableTextArea.getSelectionStart();
+                int end = glossableTextArea.getSelectionEnd();
+                
+                Document d = Jsoup.parse(glossableTextArea.ReadOnlyHTML);
+                
+                boolean isDigit = false;
+                for (int i = 0;;i++) {
+                    if (!isDigit && Character.isDigit(glossableTextArea.getText(start-i, 1).charAt(0))) {
+                        isDigit = true;
+                    } else if (isDigit && !Character.isDigit(glossableTextArea.getText(start-i, 1).charAt(0))) {
+                        start -= (i-1);
+                        break;
+                    }
+                }
+                
+                for (int i = 0;;i++) {
+                    if (!isDigit && Character.isDigit(glossableTextArea.getText(start-i, 1).charAt(0))) {
+                        isDigit = true;
+                    } else if (isDigit && !Character.isDigit(glossableTextArea.getText(start-i, 1).charAt(0))) {
+                        end += (i-i);
+                        break;
+                    }
+                }
+                
+                String lineNo = "";
+                for (int i = 0;;i++) {
+                    try {
+                        Integer.parseInt(glossableTextArea.getText(start+i, 1));
+                        lineNo += glossableTextArea.getText(start+i, 1);
+                    } catch (BadLocationException | NumberFormatException ex) {
+                        if (lineNo.isEmpty()) {
+                            throw new RuntimeException("Could not find line number!Start: " +
+                                    start + ";End: " + end + ";Text: " + glossableTextArea.getText(start, start+i));
+                        }
+                        break;
+                    }
+                }
+                
+                
+                
+                String text = glossableTextArea.getText(start, end-start);
+                Elements e = d.getElementsContainingOwnText(text);
+                System.err.println(e.toString());
+                
+                
+                HTMLDocument doc = (HTMLDocument) glossableTextArea.getDocument();                
+                Element[] elems = getElementsByTagName(HTML.Tag.A, doc);
+                Element startElem = elems[Integer.parseInt(lineNo)], endElem = elems[Integer.parseInt(lineNo)+1];
+                
+                if (endElem == null || startElem == null) {
+                    throw new RuntimeException("Could not find specified elements!Start Obj: " +
+                            startElem + "Start Line: " + Integer.parseInt(lineNo));
+                }
+                doc.insertAfterEnd(startElem, "<p class=\"note\" msg=\"Example Text!!!\">");
+                doc.insertBeforeStart(endElem, "</p>");
+                
+                try {
+                    JOptionPane.showMessageDialog(null, "Selected:\n" + glossableTextArea.getText(start, end-start) +
+                            "\n\n\nHTML:\n", "Debug", JOptionPane.PLAIN_MESSAGE, null);
+                } catch (BadLocationException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            } catch (BadLocationException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
         });
 
         popup.addSeparator();
@@ -264,13 +432,13 @@ class Listener extends MouseAdapter {
             popup.show(e.getComponent(), e.getX(), e.getY());
             return;
         }
-        int start = glossableTextArea.getSelectionStart();
-        int end = glossableTextArea.getSelectionEnd();
-        if (start != end) {
-            glossableTextArea.addHighlight(start, end);
-            glossableTextArea.setSelectionStart(end);
-            glossableTextArea.setSelectionEnd(end);
-        }
+//        int start = glossableTextArea.getSelectionStart();
+//        int end = glossableTextArea.getSelectionEnd();
+//        if (start != end) {
+//            glossableTextArea.addHighlight(start, end);
+//            glossableTextArea.setSelectionStart(end);
+//            glossableTextArea.setSelectionEnd(end);
+//        }
     }
 
     @Override
@@ -300,11 +468,11 @@ class Listener extends MouseAdapter {
             mouseButtonDown = true;
         }
     }
-
-    @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        if (mouseButtonDown) {
-            glossableTextArea.zoom(e.getWheelRotation());
-        }
-    }
+//
+//    @Override
+//    public void mouseWheelMoved(MouseWheelEvent e) {
+//        if (mouseButtonDown) {
+//            glossableTextArea.zoom(e.getWheelRotation());
+//        }
+//    }
 }

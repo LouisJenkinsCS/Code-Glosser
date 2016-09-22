@@ -70,6 +70,10 @@
                 <runtime-relative-path>ext/java2html.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/java2html.jar</binary-origin>
             </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/jsoup-1.9.2.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jsoup-1.9.2.jar</binary-origin>
+            </class-path-extension>
         </data>
     </configuration>
 </project>
