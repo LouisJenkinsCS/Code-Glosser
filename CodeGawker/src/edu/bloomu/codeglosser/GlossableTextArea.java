@@ -29,26 +29,12 @@ import javax.swing.JTextPane;
 import de.java2html.options.JavaSourceConversionOptions;
 import de.java2html.options.JavaSourceStyleEntry;
 import de.java2html.util.RGB;
-import edu.bloomu.codeglosser.Model.NoteManager;
+import edu.bloomu.codeglosser.Controller.NoteManager;
+import edu.bloomu.codeglosser.Controller.NotepadView;
 import edu.bloomu.codeglosser.Model.Note;
+import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import java.awt.Color;
-import java.awt.FlowLayout;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.Element;
-import javax.swing.text.ElementIterator;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.html.HTML;
-import javax.swing.text.html.HTMLDocument;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
+import javax.swing.text.Document;
 
 /**
  * This class enables text to be glossed with highlights and associated comments. The
@@ -63,7 +49,7 @@ import org.jsoup.select.Elements;
  *
  * @author Drue Coles
  */
-public class GlossableTextArea extends JTextPane {
+public class GlossableTextArea extends JTextPane implements NotepadView {
     
     private static final String cssText = ".note {\n" +
                                     "  display: inline;\n" +
@@ -103,21 +89,20 @@ public class GlossableTextArea extends JTextPane {
     public String ReadOnlyHTML;
     
     private final HashMap<Point, Highlight> map = new HashMap<>();
-
+    
     // Highlighter and painter
     private final Highlighter highlighter = getHighlighter();
     private Color highlightColor = new Color(255, 255, 0, 150);
     private final HighlightPainter painter = new DefaultHighlightPainter(highlightColor);
     private Color selectedHighlightColor = new Color(20, 220, 60);
-    private final NoteManager controller;
+    private NoteManager controller;
     
     /**
      * Creates an unglossed text area.
      *
      * @param text the text to be glossed
      */
-    public GlossableTextArea(NoteManager controller, String txt) {
-        this.controller = controller;
+    public GlossableTextArea(Document doc) {
         JavaSourceConversionOptions options = JavaSourceConversionOptions.getDefault();
         options.getStyleTable().put(JavaSourceType.KEYWORD, new JavaSourceStyleEntry(RGB.BLUE, true, false));
         options.getStyleTable().put(JavaSourceType.STRING, new JavaSourceStyleEntry(new RGB(206, 133, 0)));
@@ -126,7 +111,7 @@ public class GlossableTextArea extends JTextPane {
 //        options.setAddLineAnchors(true);
 //        options.setShowLineNumbers(true);
         options.getStyleTable().put(JavaSourceType.CODE_TYPE, new JavaSourceStyleEntry(RGB.BLUE));
-        String text = Java2Html.convertToHtml(txt, options);
+        String text = Java2Html.convertToHtml(DocumentHelper.getText(doc), options);
         System.err.println(text);
         setContentType("text/html");
         setText((ReadOnlyHTML = "<html style='width:100%;height:100%;'> <style>" + cssText + "</style> <body>" + text + "</body></html>"));
@@ -136,6 +121,10 @@ public class GlossableTextArea extends JTextPane {
         Listener listener = new Listener(this);
         addMouseListener(listener);
         addMouseWheelListener(listener);
+    }
+    
+    public void setController(NoteManager manager) {
+        this.controller = manager;
     }
 
     /**
@@ -184,6 +173,7 @@ public class GlossableTextArea extends JTextPane {
         
         if (controller.isValidPosition(start, end)) {
             controller.createNote(start, end);
+            controller.showNote(start, end);
             Highlight highlight = null;
             try {
                 highlight = (Highlight) highlighter.addHighlight(start, end, painter);
@@ -221,6 +211,29 @@ public class GlossableTextArea extends JTextPane {
         // TODO: Write save code.    
     }
 
+    @Override
+    public void addMarkup(int start, int end) {
+        Highlight highlight = null;
+        try {
+            highlight = (Highlight) highlighter.addHighlight(start, end, painter);
+        } catch (BadLocationException ex) {
+            Logger.getLogger(GlossableTextArea.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        map.put(new Point(start, end), highlight);
+    }
+
+    @Override
+    public void removeMarkup(int start, int end) {
+        Point p = new Point(getSelectionStart(), getSelectionEnd());
+        Highlight highlight = map.get(p);
+        if (highlight != null) {
+            map.remove(p);
+            highlighter.removeHighlight(highlight);
+            setSelectionStart(0);
+            setSelectionEnd(0);
+        }
+    }
+
 }
 
 /**
@@ -237,31 +250,34 @@ class Listener extends MouseAdapter {
     Listener(GlossableTextArea glossableTextArea) {
         this.glossableTextArea = glossableTextArea;
         popup = new JPopupMenu();
-        JMenuItem writeMenuItem = new JMenuItem("Show all comments");
-        JMenuItem saveMenuItem = new JMenuItem("Save all comments");
+        JMenuItem showSelectedComment = new JMenuItem("Show selected comment");
+        JMenuItem deleteSelectedComment = new JMenuItem("Delete selected comment");
         JMenuItem addNote = new JMenuItem("Add Note");
-        popup.add(writeMenuItem);
-        popup.add(saveMenuItem);
+        popup.add(showSelectedComment);
+        popup.add(deleteSelectedComment);
         popup.add(addNote);
 
-        writeMenuItem.addActionListener((ActionEvent e) -> {
-
+        showSelectedComment.addActionListener((ActionEvent e) -> {
+            NoteManager controller = glossableTextArea.getController();
+            int start = glossableTextArea.getSelectionStart();
+            int end = glossableTextArea.getSelectionEnd();
+            controller.showNote(start, end);
         });
 
-        saveMenuItem.addActionListener((ActionEvent e) -> {
-
+        deleteSelectedComment.addActionListener((ActionEvent e) -> {
+            NoteManager controller = glossableTextArea.getController();
+            int start = glossableTextArea.getSelectionStart();
+            int end = glossableTextArea.getSelectionEnd();
+            controller.deleteNote(start, end);
         });
         
         addNote.addActionListener((event) -> {
+            NoteManager controller = glossableTextArea.getController();
             int start = glossableTextArea.getSelectionStart();
             int end = glossableTextArea.getSelectionEnd();
-            glossableTextArea.getController().createNote(start, end);
-            if (start != end) {
-                SwingUtilities.invokeLater(() -> {
-                    glossableTextArea.addHighlight(start, end);
-                    glossableTextArea.setSelectionStart(end);
-                    glossableTextArea.setSelectionEnd(end);
-                });
+            if (start != end && controller.isValidPosition(start, end)) {
+                controller.createNote(start, end);
+                controller.showNote(start, end);
             }
             glossableTextArea.getController().debug();
         });
@@ -271,7 +287,10 @@ class Listener extends MouseAdapter {
         popup.add(removeMenuItem);
 
         removeMenuItem.addActionListener((ActionEvent e) -> {
-            glossableTextArea.removeHighlight();
+            NoteManager controller = glossableTextArea.getController();
+            int start = glossableTextArea.getSelectionStart();
+            int end = glossableTextArea.getSelectionEnd();
+            controller.deleteNote(start, end);
         });
 
         JMenuItem saveAndExitMenuItem = new JMenuItem("Save and exit");
@@ -312,7 +331,7 @@ class Listener extends MouseAdapter {
 
         // Double click: select current highlight and open comment editor
         if (e.getClickCount() == 2 && !e.isConsumed()) {
-            e.consume();
+//            e.consume();
 //            glossableTextArea.selectHighlight();
 //            CommentEditorTopComponent ceTopComponent 
 //                    = new CommentEditorTopComponent(glossableTextArea.getGlossedDocument());

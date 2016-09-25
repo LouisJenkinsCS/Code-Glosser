@@ -1,6 +1,6 @@
 package edu.bloomu.codeglosser;
 
-import edu.bloomu.codeglosser.Model.NoteManager;
+import edu.bloomu.codeglosser.Controller.NoteManager;
 import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import edu.bloomu.codeglosser.View.NoteDescriptorPane;
 import java.awt.BorderLayout;
@@ -29,18 +29,20 @@ public class GlossableTopComponent extends TopComponent {
     private static final char SYM = '\u2691'; // flag
 
     public GlossableTopComponent(Document doc) {
-//        GlossedDocument gDoc = new GlossedDocument(txt);
-        // Initialize NoteManager...
-        NoteManager manager = NoteManager.getInstance(DocumentHelper.getDocumentName(doc));
+        nDescrPane = new NoteDescriptorPane();
         setDisplayName(DocumentHelper.getDocumentName(doc) + ".html");
         setLayout(new BorderLayout());        
-        gTextArea = new GlossableTextArea(manager, DocumentHelper.getText(doc));
+        gTextArea = new GlossableTextArea(doc);
         JScrollPane scrollPane = new JScrollPane(gTextArea);
-        JScrollPane spane = new JScrollPane(nDescrPane = new NoteDescriptorPane());
+        JScrollPane spane = new JScrollPane(nDescrPane);
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, spane);
         split.setOneTouchExpandable(true);
         split.setDividerLocation(.5);
         split.setResizeWeight(.5);
         add(split, BorderLayout.CENTER);
+        // Initialize NoteManager...
+        NoteManager.setNoteView(nDescrPane);
+        NoteManager.setNotepadView(gTextArea);
+        gTextArea.setController(NoteManager.getInstance(DocumentHelper.getDocumentName(doc)));
     }
 }

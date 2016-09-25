@@ -5,24 +5,20 @@
  */
 package edu.bloomu.codeglosser.View;
 
+import edu.bloomu.codeglosser.Controller.NoteView;
 import edu.bloomu.codeglosser.Model.Note;
 
 /**
  *
  * @author Louis
  */
-public class NoteDescriptorPane extends javax.swing.JPanel {
+public class NoteDescriptorPane extends javax.swing.JPanel implements NoteView {
 
     /**
      * Creates new form NoteDescriptorPane
      */
     public NoteDescriptorPane() {
         initComponents();
-    }
-    
-    public void setNote(Note note) {
-        this.noteName.setText(note.getId());
-        this.noteMsg.setText(note.getMsg());
     }
 
     /**
@@ -230,4 +226,10 @@ public class NoteDescriptorPane extends javax.swing.JPanel {
     private javax.swing.JTextField textFont;
     private javax.swing.JTextField textSize;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void display(Note note) {
+        this.noteName.setText(note.getId());
+        this.noteMsg.setText(note.getMsg());
+    }
 }
