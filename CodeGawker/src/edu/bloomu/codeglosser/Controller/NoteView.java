@@ -13,4 +13,5 @@ import edu.bloomu.codeglosser.Model.Note;
  */
 public interface NoteView {    
     void display(Note note);
+    void clear();
 }

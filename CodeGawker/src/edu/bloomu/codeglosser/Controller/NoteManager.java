@@ -52,9 +52,11 @@ public final class NoteManager {
     }
     
     private final HashMap<String, Note> notes;
+    private Note currentNote;
 
     private NoteManager() {
         notes = new HashMap<>();
+        currentNote = null;
     }
 
     public Optional<Note> getNote(int start, int end) {
@@ -90,6 +92,10 @@ public final class NoteManager {
         if (note != null) {
             NOTEPAD_VIEW.removeMarkup(note.getStart(), note.getEnd());
             notes.remove(id);
+            if (note == currentNote) {
+                currentNote = null;
+                NOTE_VIEW.clear();
+            }
         }
     }
     
@@ -107,6 +113,13 @@ public final class NoteManager {
     }
     
     public void showNote(int start, int end) {
-        getNote(start, end).ifPresent(NOTE_VIEW::display);
+        getNote(start, end).ifPresent((note) -> {
+            currentNote = note;
+            NOTE_VIEW.display(note);
+        });
+    }
+    
+    public Optional<Note> currentNote() {
+        return Optional.ofNullable(currentNote);
     }
 }
