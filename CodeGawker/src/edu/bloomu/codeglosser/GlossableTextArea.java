@@ -34,6 +34,7 @@ import edu.bloomu.codeglosser.Controller.NotepadView;
 import edu.bloomu.codeglosser.Model.Note;
 import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import java.awt.Color;
+import java.util.stream.Stream;
 import javax.swing.text.Document;
 
 /**
@@ -234,6 +235,27 @@ public class GlossableTextArea extends JTextPane implements NotepadView {
         }
     }
 
+    @Override
+    public void setMarkupColor(Color color) {
+        Stream.of(highlighter.getHighlights())
+                .map((h) -> new Point(h.getStartOffset(), h.getEndOffset()))
+                .filter((p) -> {
+                    Note n = controller.currentNote().get();
+                    return p.x == n.getStart() && p.y == n.getEnd();
+                })
+                .findFirst()
+                .ifPresent((p) -> {
+                   highlighter.removeHighlight(map.remove(p));
+                   HighlightPainter hp = new DefaultHighlightPainter(color);
+                    try {
+                        Highlight h = (Highlight) highlighter.addHighlight(p.x, p.y, hp);
+                        map.put(p, h);
+                    } catch (BadLocationException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                });
+    }
+
 }
 
 /**
@@ -331,15 +353,10 @@ class Listener extends MouseAdapter {
 
         // Double click: select current highlight and open comment editor
         if (e.getClickCount() == 2 && !e.isConsumed()) {
-//            e.consume();
-//            glossableTextArea.selectHighlight();
-//            CommentEditorTopComponent ceTopComponent 
-//                    = new CommentEditorTopComponent(glossableTextArea.getGlossedDocument());
-//            String s = "	✍";
-//            ceTopComponent.setDisplayName(s);
-//            ceTopComponent.setToolTipText("Enter comments about selected code.");
-//            ceTopComponent.open();
-//            ceTopComponent.requestActive();            
+            e.consume();
+            NoteManager controller = glossableTextArea.getController();
+            controller.getNote(glossableTextArea.getSelectionStart())
+                    .ifPresent((note) -> controller.showNote(note.getStart(), note.getEnd()));
         }
     }
 

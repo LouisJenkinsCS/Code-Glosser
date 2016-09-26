@@ -7,6 +7,7 @@ package edu.bloomu.codeglosser.Controller;
 
 import edu.bloomu.codeglosser.Model.Note;
 import edu.bloomu.codeglosser.Model.NoteFactory;
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -119,7 +120,18 @@ public final class NoteManager {
         });
     }
     
+    public Optional<Note> getNote(int offset) {
+        return notes.values()
+                .stream()
+                .filter((note) -> offset >= note.getStart() && offset <= note.getEnd())
+                .findFirst();
+    }
+    
     public Optional<Note> currentNote() {
         return Optional.ofNullable(currentNote);
+    }
+    
+    public void setHighlightColor(Color c) {
+        NOTEPAD_VIEW.setMarkupColor(c);
     }
 }

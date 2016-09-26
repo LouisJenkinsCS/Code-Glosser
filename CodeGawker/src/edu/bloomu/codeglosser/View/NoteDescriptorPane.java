@@ -8,6 +8,8 @@ package edu.bloomu.codeglosser.View;
 import edu.bloomu.codeglosser.Controller.NoteManager;
 import edu.bloomu.codeglosser.Controller.NoteView;
 import edu.bloomu.codeglosser.Model.Note;
+import java.awt.Color;
+import javax.swing.JColorChooser;
 
 /**
  *
@@ -16,6 +18,7 @@ import edu.bloomu.codeglosser.Model.Note;
 public class NoteDescriptorPane extends javax.swing.JPanel implements NoteView {
     
     private NoteManager controller;
+    private Note note;
     
     /**
      * Creates new form NoteDescriptorPane
@@ -35,8 +38,17 @@ public class NoteDescriptorPane extends javax.swing.JPanel implements NoteView {
     private void initComponents() {
 
         jPanel3 = new javax.swing.JPanel();
+        jPopupMenu1 = new javax.swing.JPopupMenu();
+        jPopupMenu2 = new javax.swing.JPopupMenu();
+        jPopupMenu3 = new javax.swing.JPopupMenu();
+        jPopupMenu4 = new javax.swing.JPopupMenu();
         jLayeredPane1 = new javax.swing.JLayeredPane();
         tabs = new javax.swing.JTabbedPane();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        labelHighlightColor = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        labelTextColor = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -49,9 +61,6 @@ public class NoteDescriptorPane extends javax.swing.JPanel implements NoteView {
         textFont = new javax.swing.JTextField();
         buttonSubmit = new javax.swing.JButton();
         buttonReset = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        labelColor = new javax.swing.JLabel();
         noteName = new javax.swing.JLabel();
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -64,6 +73,61 @@ public class NoteDescriptorPane extends javax.swing.JPanel implements NoteView {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 100, Short.MAX_VALUE)
         );
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(NoteDescriptorPane.class, "NoteDescriptorPane.jLabel4.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(labelHighlightColor, org.openide.util.NbBundle.getMessage(NoteDescriptorPane.class, "NoteDescriptorPane.labelHighlightColor.text")); // NOI18N
+        labelHighlightColor.setToolTipText(org.openide.util.NbBundle.getMessage(NoteDescriptorPane.class, "NoteDescriptorPane.labelHighlightColor.toolTipText")); // NOI18N
+        labelHighlightColor.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                labelHighlightColorMouseClicked(evt);
+            }
+        });
+
+        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(NoteDescriptorPane.class, "NoteDescriptorPane.jLabel6.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(labelTextColor, org.openide.util.NbBundle.getMessage(NoteDescriptorPane.class, "NoteDescriptorPane.labelTextColor.text")); // NOI18N
+        labelTextColor.setToolTipText(org.openide.util.NbBundle.getMessage(NoteDescriptorPane.class, "NoteDescriptorPane.labelTextColor.toolTipText")); // NOI18N
+        labelTextColor.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                labelTextColorMouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(labelHighlightColor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(labelTextColor, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(545, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(labelHighlightColor))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(labelTextColor, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(178, Short.MAX_VALUE))
+        );
+
+        tabs.addTab(org.openide.util.NbBundle.getMessage(NoteDescriptorPane.class, "NoteDescriptorPane.jPanel2.TabConstraints.tabTitle"), jPanel2); // NOI18N
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(NoteDescriptorPane.class, "NoteDescriptorPane.jLabel2.text")); // NOI18N
@@ -95,6 +159,11 @@ public class NoteDescriptorPane extends javax.swing.JPanel implements NoteView {
         });
 
         org.openide.awt.Mnemonics.setLocalizedText(buttonReset, org.openide.util.NbBundle.getMessage(NoteDescriptorPane.class, "NoteDescriptorPane.buttonReset.text")); // NOI18N
+        buttonReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonResetActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -110,14 +179,16 @@ public class NoteDescriptorPane extends javax.swing.JPanel implements NoteView {
                         .addComponent(jScrollPane1)
                         .addContainerGap())
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(textSize, javax.swing.GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(textFont, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(textSize, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(textFont)))
+                        .addGap(403, 403, 403)
                         .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(buttonSubmit)
@@ -127,24 +198,25 @@ public class NoteDescriptorPane extends javax.swing.JPanel implements NoteView {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane1)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(41, 41, 41)
-                        .addComponent(jLabel2)))
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(5, 5, 5)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+                        .addGap(42, 42, 42))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel1)
                             .addComponent(textSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(textFont, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel3)))
-                .addGap(42, 42, 42)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(textFont, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(buttonSubmit)
                     .addComponent(buttonReset))
@@ -152,39 +224,6 @@ public class NoteDescriptorPane extends javax.swing.JPanel implements NoteView {
         );
 
         tabs.addTab(org.openide.util.NbBundle.getMessage(NoteDescriptorPane.class, "NoteDescriptorPane.jPanel1.TabConstraints.tabTitle"), jPanel1); // NOI18N
-
-        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(NoteDescriptorPane.class, "NoteDescriptorPane.jLabel4.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(labelColor, org.openide.util.NbBundle.getMessage(NoteDescriptorPane.class, "NoteDescriptorPane.labelColor.text")); // NOI18N
-        labelColor.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                labelColorMousePressed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(labelColor, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(343, Short.MAX_VALUE))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(labelColor))
-                .addContainerGap(206, Short.MAX_VALUE))
-        );
-
-        tabs.addTab(org.openide.util.NbBundle.getMessage(NoteDescriptorPane.class, "NoteDescriptorPane.jPanel2.TabConstraints.tabTitle"), jPanel2); // NOI18N
 
         noteName.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         noteName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -206,7 +245,7 @@ public class NoteDescriptorPane extends javax.swing.JPanel implements NoteView {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jLayeredPane1Layout.createSequentialGroup()
                 .addComponent(noteName)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabs))
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -223,17 +262,30 @@ public class NoteDescriptorPane extends javax.swing.JPanel implements NoteView {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void labelColorMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_labelColorMousePressed
-        // TODO: Invoke Color Chooser
-    }//GEN-LAST:event_labelColorMousePressed
-
     private void buttonSubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSubmitActionPerformed
-        controller.currentNote()
-                .ifPresent((note) -> {
-                    note.setMsg(noteMsg.getText());
-                    // TODO: Set other fields
-                });
+        note.setMsg(noteMsg.getText());
     }//GEN-LAST:event_buttonSubmitActionPerformed
+
+    private void buttonResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonResetActionPerformed
+        display(note);
+    }//GEN-LAST:event_buttonResetActionPerformed
+
+    private void labelHighlightColorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_labelHighlightColorMouseClicked
+        Color c = JColorChooser.showDialog(null, "Highlighter Color...", note.getHighlightColor());
+        if (c != null) {
+            note.setHighlightColor(c);
+            controller.setHighlightColor(c);
+            display(note);
+        }
+    }//GEN-LAST:event_labelHighlightColorMouseClicked
+
+    private void labelTextColorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_labelTextColorMouseClicked
+        Color c = JColorChooser.showDialog(null, "Text Color...", note.getTextColor());
+        if (c != null) {
+            note.setTextColor(c);
+            display(note);
+        }
+    }//GEN-LAST:event_labelTextColorMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -243,14 +295,20 @@ public class NoteDescriptorPane extends javax.swing.JPanel implements NoteView {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPopupMenu jPopupMenu1;
+    private javax.swing.JPopupMenu jPopupMenu2;
+    private javax.swing.JPopupMenu jPopupMenu3;
+    private javax.swing.JPopupMenu jPopupMenu4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JLabel labelColor;
+    private javax.swing.JLabel labelHighlightColor;
+    private javax.swing.JLabel labelTextColor;
     private javax.swing.JTextArea noteMsg;
     private javax.swing.JLabel noteName;
     private javax.swing.JTabbedPane tabs;
@@ -260,13 +318,19 @@ public class NoteDescriptorPane extends javax.swing.JPanel implements NoteView {
 
     @Override
     public void display(Note note) {
+        this.note = note;
         this.tabs.setVisible(true);
         this.noteName.setText(note.getId());
         this.noteMsg.setText(note.getMsg());
+        Color c = note.getHighlightColor();
+        this.labelHighlightColor.setText("(" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + ")");
+        c = note.getTextColor();
+        this.labelTextColor.setText("(" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + ")");
     }
 
     @Override
     public void clear() {
+        this.note = null;
         this.noteName.setText("None Selected");
         this.tabs.setVisible(false);
     }
