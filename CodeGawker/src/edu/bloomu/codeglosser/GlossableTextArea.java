@@ -1,20 +1,12 @@
 package edu.bloomu.codeglosser;
 
-import org.jsoup.Jsoup;
-import java.awt.Font;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.text.BadLocationException;
@@ -22,7 +14,6 @@ import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
 import javax.swing.text.Highlighter.HighlightPainter;
-import org.openide.util.Exceptions;
 import de.java2html.Java2Html;
 import de.java2html.javasource.JavaSourceType;
 import javax.swing.JTextPane;
@@ -32,10 +23,29 @@ import de.java2html.util.RGB;
 import edu.bloomu.codeglosser.Controller.NoteManager;
 import edu.bloomu.codeglosser.Controller.NotepadView;
 import edu.bloomu.codeglosser.Model.Note;
+import edu.bloomu.codeglosser.Utils.Bounds;
 import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import java.awt.Color;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.swing.JOptionPane;
 import javax.swing.text.Document;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.ConsoleAppender;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.builder.api.AppenderComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
+import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
 
 /**
  * This class enables text to be glossed with highlights and associated comments. The
@@ -51,6 +61,27 @@ import javax.swing.text.Document;
  * @author Drue Coles
  */
 public class GlossableTextArea extends JTextPane implements NotepadView {
+    
+    static {
+        ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory.newConfigurationBuilder();
+        builder.setStatusLevel(Level.ERROR);
+        builder.setConfigurationName("BuilderTest");
+        builder.add(builder.newFilter("ThresholdFilter", Filter.Result.ACCEPT, Filter.Result.NEUTRAL)
+            .addAttribute("level", Level.DEBUG));
+        AppenderComponentBuilder appenderBuilder = builder.newAppender("Stdout", "CONSOLE").addAttribute("target",
+            ConsoleAppender.Target.SYSTEM_OUT);
+        appenderBuilder.add(builder.newLayout("PatternLayout")
+            .addAttribute("pattern", "%d [%t] %-5level: %msg%n%throwable"));
+        appenderBuilder.add(builder.newFilter("MarkerFilter", Filter.Result.DENY, Filter.Result.NEUTRAL)
+            .addAttribute("marker", "FLOW"));
+        builder.add(appenderBuilder);
+        builder.add(builder.newLogger("org.apache.logging.log4j", Level.DEBUG)
+            .add(builder.newAppenderRef("Stdout")).addAttribute("additivity", false));
+        builder.add(builder.newRootLogger(Level.ERROR).add(builder.newAppenderRef("Stdout")));
+        LoggerContext ctx = Configurator.initialize(builder.build());
+    }
+    
+    private final static Logger logger = LogManager.getLogger(GlossableTextArea.class);
     
     private static final String cssText = ".note {\n" +
                                     "  display: inline;\n" +
@@ -89,7 +120,7 @@ public class GlossableTextArea extends JTextPane implements NotepadView {
     
     public String ReadOnlyHTML;
     
-    private final HashMap<Point, Highlight> map = new HashMap<>();
+    private final HashMap<Point, ArrayList<Highlight>> highlightMap = new HashMap<>();
     
     // Highlighter and painter
     private final Highlighter highlighter = getHighlighter();
@@ -165,34 +196,13 @@ public class GlossableTextArea extends JTextPane implements NotepadView {
     }
 
     /**
-     * Adds a highlight and comment.
-     *
-     * @param start starting position of highlight
-     * @param end ending position of highlight
-     */
-    public void addHighlight(int start, int end) {
-        
-        if (controller.isValidPosition(start, end)) {
-            controller.createNote(start, end);
-            controller.showNote(start, end);
-            Highlight highlight = null;
-            try {
-                highlight = (Highlight) highlighter.addHighlight(start, end, painter);
-            } catch (BadLocationException ex) {
-                Logger.getLogger(GlossableTextArea.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            map.put(new Point(start, end), highlight);
-        }
-    }
-
-    /**
      * Removes the currently selected highlight and comment.
      */
     public void removeHighlight() {
         Point p = new Point(getSelectionStart(), getSelectionEnd());
-        Highlight highlight = map.get(p);
+        ArrayList<Highlight> highlight = highlightMap.get(p);
         if (highlight != null) {
-            map.remove(p);
+            highlightMap.remove(p);
             controller.deleteNote(p.x, p.y);
             setSelectionStart(0);
             setSelectionEnd(0);
@@ -205,7 +215,7 @@ public class GlossableTextArea extends JTextPane implements NotepadView {
     public void removeAllHighlights() {
         highlighter.removeAllHighlights();
         controller.deleteAllNotes();
-        map.clear();
+        highlightMap.clear();
     }
     
     public void saveGlossedDocument() {
@@ -213,47 +223,93 @@ public class GlossableTextArea extends JTextPane implements NotepadView {
     }
 
     @Override
-    public void addMarkup(int start, int end) {
-        Highlight highlight = null;
+    public void addMarkup(Bounds ...bounds) {
+        // TODO: FIX
+        ArrayList<Highlight> highlighters = new ArrayList<>();
         try {
-            highlight = (Highlight) highlighter.addHighlight(start, end, painter);
+            String text = getText(start, end-start);
+            logger.trace("Selected: {Begin: " + start + ",End: " + end + "}\nText: " + text);
+            StringCharacterIterator iter = new StringCharacterIterator(text);
+            int startOffset = 0, endOffset = 0;
+            for (char c = iter.current(); c != CharacterIterator.DONE; c = iter.next()) {
+                // Stop up to newline character
+                if (c == '\n') {
+                    // Minus newline character.
+                    endOffset--;
+                    
+                    // Find last character before this reported newline...
+                    StringCharacterIterator tmp = (StringCharacterIterator) iter.clone();
+                    for (char ch = tmp.current(); Character.isSpaceChar(ch); ch = tmp.previous()) {
+                        endOffset--;
+                    }
+                    
+                    logger.trace("Newline Character at: " + start + endOffset);
+                    if (endOffset != 0) {
+                        highlighters.add((Highlight) highlighter.addHighlight(start + startOffset, start + endOffset, painter));
+                    }
+                    char ch;
+
+                    // Consume any spaces or tabs after newline
+                    while((ch = iter.next()) != CharacterIterator.DONE && !Character.isLetterOrDigit(ch)) {
+                        endOffset++;
+                    }
+                    
+
+                    if (ch == CharacterIterator.DONE) {
+                        break;
+                    }
+
+                    // Update start offset.
+                    startOffset = endOffset;
+                    logger.trace("Continuing at: " + start + startOffset);
+                } else {
+                    endOffset++;
+                }
+            }
+            // Only false when we are skipping ahead past newline characters
+            if (startOffset < endOffset) {
+                logger.trace("Added highlighter at: {Start: " + (start + startOffset) + ",End: " + (start + endOffset));
+                highlighters.add((Highlight) highlighter.addHighlight(start + startOffset, start + endOffset, painter));
+            }
         } catch (BadLocationException ex) {
-            Logger.getLogger(GlossableTextArea.class.getName()).log(Level.SEVERE, null, ex);
+            logger.catching(ex);
         }
-        map.put(new Point(start, end), highlight);
+        highlightMap.put(new Point(start, end), highlighters);
     }
 
     @Override
     public void removeMarkup(int start, int end) {
         Point p = new Point(getSelectionStart(), getSelectionEnd());
-        Highlight highlight = map.get(p);
+        ArrayList<Highlight> highlight = highlightMap.remove(p);
         if (highlight != null) {
-            map.remove(p);
-            highlighter.removeHighlight(highlight);
-            setSelectionStart(0);
-            setSelectionEnd(0);
+            highlight.forEach(highlighter::removeHighlight);
         }
     }
 
     @Override
     public void setMarkupColor(Color color) {
-        Stream.of(highlighter.getHighlights())
-                .map((h) -> new Point(h.getStartOffset(), h.getEndOffset()))
-                .filter((p) -> {
-                    Note n = controller.currentNote().get();
-                    return p.x == n.getStart() && p.y == n.getEnd();
-                })
-                .findFirst()
-                .ifPresent((p) -> {
-                   highlighter.removeHighlight(map.remove(p));
-                   HighlightPainter hp = new DefaultHighlightPainter(color);
+        // Remove selected highlights from map
+        Note n = controller.currentNote().get();
+        Point p = new Point(n.getStart(), n.getEnd());
+        highlightMap.remove(p);
+        
+        // Update list of selected highlights
+        highlightMap.put(p, (ArrayList<Highlight>) Stream.of(highlighter.getHighlights())
+                // Get all Highlights within the selected range
+                .filter((h) -> h.getStartOffset() >= p.x && h.getEndOffset() <= p.y)
+                // Intermediate Step: Remove the old highlights from parent object
+                .peek(highlighter::removeHighlight)
+                // Create new highlights from old highlights
+                .map((h) -> {
+                    HighlightPainter hp = new DefaultHighlightPainter(color);
                     try {
-                        Highlight h = (Highlight) highlighter.addHighlight(p.x, p.y, hp);
-                        map.put(p, h);
+                        return (Highlight) highlighter.addHighlight(h.getStartOffset(), h.getEndOffset(), hp);
                     } catch (BadLocationException ex) {
-                        Exceptions.printStackTrace(ex);
+                        throw new IllegalStateException("Unable to find highlight position: {" + h.getStartOffset() + "," + h.getEndOffset() + "}\n" + ex.getMessage());
                     }
-                });
+                })
+                // Collect new highlights to add to map.
+                .collect(Collectors.toList()));
     }
 
 }
@@ -288,9 +344,7 @@ class Listener extends MouseAdapter {
 
         deleteSelectedComment.addActionListener((ActionEvent e) -> {
             NoteManager controller = glossableTextArea.getController();
-            int start = glossableTextArea.getSelectionStart();
-            int end = glossableTextArea.getSelectionEnd();
-            controller.deleteNote(start, end);
+            controller.deleteCurrentNote();
         });
         
         addNote.addActionListener((event) -> {
@@ -305,14 +359,12 @@ class Listener extends MouseAdapter {
         });
 
         popup.addSeparator();
-        JMenuItem removeMenuItem = new JMenuItem("Remove selected highlight");
-        popup.add(removeMenuItem);
+        JMenuItem deleteAllNotesItem = new JMenuItem("Delete all notes");
+        popup.add(deleteAllNotesItem);
 
-        removeMenuItem.addActionListener((ActionEvent e) -> {
+        deleteAllNotesItem.addActionListener((ActionEvent e) -> {
             NoteManager controller = glossableTextArea.getController();
-            int start = glossableTextArea.getSelectionStart();
-            int end = glossableTextArea.getSelectionEnd();
-            controller.deleteNote(start, end);
+            controller.deleteAllNotes();
         });
 
         JMenuItem saveAndExitMenuItem = new JMenuItem("Save and exit");
@@ -323,7 +375,7 @@ class Listener extends MouseAdapter {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-               glossableTextArea.saveGlossedDocument();
+                JOptionPane.showMessageDialog(null, "Not implemented!", "Saving and Restoring State", JOptionPane.PLAIN_MESSAGE);
             }
         });
     }
@@ -362,8 +414,9 @@ class Listener extends MouseAdapter {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON2) {
+        if (e.isPopupTrigger()) {
             mouseButtonDown = true;
+            popup.show(e.getComponent(), e.getX(), e.getY());
         }
     }
 //

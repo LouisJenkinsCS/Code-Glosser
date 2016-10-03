@@ -7,6 +7,15 @@
             <standalone/>
             <module-dependencies>
                 <dependency>
+                    <code-name-base>org.jdesktop.beansbinding</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.26.1.121</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.netbeans.modules.editor.lib2</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -71,8 +80,28 @@
                 <binary-origin>release/modules/ext/java2html.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/log4j-api-2.6.2.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/log4j-api-2.6.2.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/reactive-streams-1.0.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/reactive-streams-1.0.0.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/log4j-core-2.6.2.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/log4j-core-2.6.2.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/jsoup-1.9.2.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jsoup-1.9.2.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/rxjava-2.0.0-RC3.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/rxjava-2.0.0-RC3.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/guava-19.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/guava-19.0.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

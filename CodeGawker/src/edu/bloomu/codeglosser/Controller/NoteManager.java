@@ -7,15 +7,19 @@ package edu.bloomu.codeglosser.Controller;
 
 import edu.bloomu.codeglosser.Model.Note;
 import edu.bloomu.codeglosser.Model.NoteFactory;
+import edu.bloomu.codeglosser.Utils.Bounds;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Optional;
+import org.apache.logging.log4j.*;
 
 /**
  *
  * @author Louis
  */
 public final class NoteManager {
+    
+    private final static Logger logger = LogManager.getLogger(NoteManager.class);
     // One NoteManager per File
     private static final HashMap<String, NoteManager> MAPPED_INSTANCES = new HashMap<>();
     
@@ -64,7 +68,7 @@ public final class NoteManager {
         return notes
                 .values()
                 .stream()
-                .filter((note) -> note.getStart() == start && note.getEnd() == end)
+                .filter((note) -> note.inRange(start, end))
                 .findFirst();
     }
     
@@ -77,21 +81,30 @@ public final class NoteManager {
     }
     
     public void debug() {
-        notes
+        logger.debug(notes
                 .entrySet()
                 .stream()
-                .sorted((entry1, entry2) -> entry1.getValue().getStart() - entry2.getValue().getStart())
-                .forEach((entry) -> System.err.println("Key:" + entry.getKey() + ";Value:" + entry.getValue()));
+                .sorted((entry1, entry2) -> entry1.getValue().getRange().compareTo(entry2.getValue().getRange()))
+                .map((e) -> "Key: " + e.getKey() + ", Value: " + e.getValue())
+                .reduce("Notes: {", (s1, s2) -> s1 + "\n\t" + s2)
+                .concat("\n}")
+        );
     }
     
     public void deleteNote(int start, int end) {
         getNote(start, end).map(Note::getId).ifPresent(this::deleteNote);
     }
     
+    public void deleteCurrentNote() {
+        if (currentNote != null) {
+            deleteNote(currentNote.getId());
+        }
+    }
+    
     public void deleteNote(String id) {
         Note note = notes.get(id);
         if (note != null) {
-            NOTEPAD_VIEW.removeMarkup(note.getStart(), note.getEnd());
+            NOTEPAD_VIEW.removeMarkup(note.getRange());
             notes.remove(id);
             if (note == currentNote) {
                 currentNote = null;
@@ -103,14 +116,21 @@ public final class NoteManager {
     public void deleteAllNotes() {
         notes.values()
                 .stream()
-                .forEach((note) -> NOTEPAD_VIEW.removeMarkup(note.getStart(), note.getEnd()));
+                // TODO: Flatmap
+                .map(Note::getRange)
+                .forEach(NOTEPAD_VIEW::removeMarkup);
         notes.clear();
     }
     
     public void createNote(int start, int end) {
-        Note note = NoteFactory.createNote(start, end);
+        createNote(Bounds.of(start, end));
+    }
+    
+    public void createNote(Bounds bounds) {
+        Note note = NoteFactory.createNote(bounds);
+        // TODO: Bounds -> [Bounds]
         notes.put(note.getId(), note);
-        NOTEPAD_VIEW.addMarkup(start, end);
+        NOTEPAD_VIEW.addMarkup(bounds);
     }
     
     public void showNote(int start, int end) {
@@ -123,7 +143,7 @@ public final class NoteManager {
     public Optional<Note> getNote(int offset) {
         return notes.values()
                 .stream()
-                .filter((note) -> offset >= note.getStart() && offset <= note.getEnd())
+                .filter((note) -> note.inRange(offset, offset))
                 .findFirst();
     }
     

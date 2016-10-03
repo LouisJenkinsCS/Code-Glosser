@@ -3,12 +3,16 @@ package edu.bloomu.codeglosser;
 import edu.bloomu.codeglosser.Controller.NoteManager;
 import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import edu.bloomu.codeglosser.View.NoteDescriptorPane;
+import edu.bloomu.codeglosser.View.NotePad;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
+import java.io.File;
+import java.net.URL;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Document;
 import org.openide.windows.TopComponent;
 
@@ -24,16 +28,18 @@ import org.openide.windows.TopComponent;
 @TopComponent.Registration(mode = "glossEditor", openAtStartup = false)
 public class GlossableTopComponent extends TopComponent {
 
-    private final GlossableTextArea gTextArea;
+    private final NotePad nPad;
     private final NoteDescriptorPane nDescrPane;
     private static final char SYM = '\u2691'; // flag
+    
 
     public GlossableTopComponent(Document doc) {
+        doc.putProperty(DefaultEditorKit.EndOfLineStringProperty, "\r\n");
         nDescrPane = new NoteDescriptorPane();
         setDisplayName(DocumentHelper.getDocumentName(doc) + ".html");
         setLayout(new BorderLayout());        
-        gTextArea = new GlossableTextArea(doc);
-        JScrollPane scrollPane = new JScrollPane(gTextArea);
+        nPad = new NotePad();
+        JScrollPane scrollPane = new JScrollPane(nPad);
         JScrollPane spane = new JScrollPane(nDescrPane);
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, spane);
         split.setOneTouchExpandable(true);
@@ -42,9 +48,10 @@ public class GlossableTopComponent extends TopComponent {
         add(split, BorderLayout.CENTER);
         // Initialize NoteManager...
         NoteManager.setNoteView(nDescrPane);
-        NoteManager.setNotepadView(gTextArea);
+        NoteManager.setNotepadView(nPad);
+        nPad.setText(DocumentHelper.getText(doc));
         NoteManager manager = NoteManager.getInstance(DocumentHelper.getDocumentName(doc));
-        gTextArea.setController(manager);
+//        nPad.setController(manager);
         nDescrPane.setController(manager);
     }
 }

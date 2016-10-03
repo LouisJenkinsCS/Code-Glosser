@@ -5,6 +5,7 @@
  */
 package edu.bloomu.codeglosser.Model;
 
+import edu.bloomu.codeglosser.Utils.Bounds;
 import edu.bloomu.codeglosser.Utils.IdentifierGenerator;
 
 /**
@@ -14,7 +15,7 @@ import edu.bloomu.codeglosser.Utils.IdentifierGenerator;
 public final class NoteFactory {
     private static long notes;
     
-    public static Note createNote(int start, int end) {
-        return new Note(null, IdentifierGenerator.generateIdentifier("Note"), start, end);
+    public static Note createNote(Bounds ...bounds) {
+        return new Note(null, IdentifierGenerator.generateIdentifier("Note"), bounds);
     }
 }

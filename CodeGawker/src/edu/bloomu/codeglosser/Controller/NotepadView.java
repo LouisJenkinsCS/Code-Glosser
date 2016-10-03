@@ -5,6 +5,7 @@
  */
 package edu.bloomu.codeglosser.Controller;
 
+import edu.bloomu.codeglosser.Utils.Bounds;
 import java.awt.Color;
 
 /**
@@ -12,7 +13,7 @@ import java.awt.Color;
  * @author Louis
  */
 public interface NotepadView {
-    void addMarkup(int start, int end);
-    void removeMarkup(int start, int end);
+    void addMarkup(Bounds ...bounds);
+    void removeMarkup(Bounds ...bounds);
     void setMarkupColor(Color color);
 }

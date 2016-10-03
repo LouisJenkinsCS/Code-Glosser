@@ -1,11 +1,15 @@
 package edu.bloomu.codeglosser;
 
+import edu.bloomu.codeglosser.Controller.NoteManager;
+import io.reactivex.Observable;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.netbeans.api.editor.EditorRegistry;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -33,6 +37,7 @@ import org.openide.awt.ActionRegistration;
 })
 public class CodeGlosserActionListener implements ActionListener {
 
+    private final static Logger log = LogManager.getLogger(CodeGlosserActionListener.class);
     /**
      * Create a copy of the Java source file in the editor window of most recent focus.
      * Save in gloss folder (create if necessary), which is a top-level folder of the
@@ -42,12 +47,20 @@ public class CodeGlosserActionListener implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        log.trace("This is a Trace");
+        log.debug("This is a Debug");
+        log.info("This is an Info");
+        log.warn("This is a Warn");
+        log.error("This is an Error");
+        log.fatal("This is a Fatal");
+        Observable.fromArray(new Integer[]{1, 2, 3});
         JTextComponent jtc = EditorRegistry.lastFocusedComponent();
         if (jtc == null) {
             JOptionPane.showMessageDialog(null, "Source file must be open in editor.");
             return;
         }
+        
+        
         
         GlossableTopComponent gTopComponent = new GlossableTopComponent(jtc.getDocument());
         gTopComponent.open();
