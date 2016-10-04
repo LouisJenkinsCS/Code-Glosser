@@ -40,7 +40,7 @@
           <Properties>
             <Property name="contentType" type="java.lang.String" value="text/html" noResource="true"/>
             <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="edu/bloomu/codeglosser/View/Bundle.properties" key="NotePad.textCode.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="edu/bloomu/codeglosser/View/Bundle.properties" key="NotePadView.textCode.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
         </Component>

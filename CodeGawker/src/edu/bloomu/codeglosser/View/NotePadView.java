@@ -8,22 +8,22 @@ package edu.bloomu.codeglosser.View;
 import edu.bloomu.codeglosser.Controller.NotepadView;
 import edu.bloomu.codeglosser.Utils.Bounds;
 import java.awt.Color;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
+import java.util.logging.Logger;
 
 
 /**
  *
  * @author Louis
  */
-public class NotePad extends javax.swing.JPanel implements NotepadView {
-
+public class NotePadView extends javax.swing.JPanel implements NotepadView {
+    
+    private static final Logger LOG = Logger.getLogger(NotePadView.class.getName());
+    
     /**
      * Creates new form NotePad
      */
-    public NotePad() {
+    public NotePadView() {
+        LOG.fine("Initialized...");
         initComponents();
         textCode.setEditable(false);
     }
@@ -48,7 +48,7 @@ public class NotePad extends javax.swing.JPanel implements NotepadView {
         textCode = new javax.swing.JTextPane();
 
         textCode.setContentType("text/html"); // NOI18N
-        textCode.setToolTipText(org.openide.util.NbBundle.getMessage(NotePad.class, "NotePad.textCode.toolTipText")); // NOI18N
+        textCode.setToolTipText(org.openide.util.NbBundle.getMessage(NotePadView.class, "NotePadView.textCode.toolTipText")); // NOI18N
         jScrollPane3.setViewportView(textCode);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

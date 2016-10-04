@@ -18,6 +18,7 @@ import org.openide.windows.TopComponent;
  * @author Drue Coles
  */
 public class EditorPanel extends JPanel {    
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(EditorPanel.class.getName());
     private static final Font defaultFont = new Font(Font.SERIF, Font.PLAIN, 24);
     private final JScrollPane scrollPane;
     private final JTextArea textArea;

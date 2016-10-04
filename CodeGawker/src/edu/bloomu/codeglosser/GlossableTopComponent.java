@@ -3,7 +3,7 @@ package edu.bloomu.codeglosser;
 import edu.bloomu.codeglosser.Controller.NoteManager;
 import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import edu.bloomu.codeglosser.View.NoteDescriptorPane;
-import edu.bloomu.codeglosser.View.NotePad;
+import edu.bloomu.codeglosser.View.NotePadView;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
@@ -27,8 +27,10 @@ import org.openide.windows.TopComponent;
 )
 @TopComponent.Registration(mode = "glossEditor", openAtStartup = false)
 public class GlossableTopComponent extends TopComponent {
+    
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(GlossableTopComponent.class.getName());
 
-    private final NotePad nPad;
+    private final NotePadView nPad;
     private final NoteDescriptorPane nDescrPane;
     private static final char SYM = '\u2691'; // flag
     
@@ -38,7 +40,7 @@ public class GlossableTopComponent extends TopComponent {
         nDescrPane = new NoteDescriptorPane();
         setDisplayName(DocumentHelper.getDocumentName(doc) + ".html");
         setLayout(new BorderLayout());        
-        nPad = new NotePad();
+        nPad = new NotePadView();
         JScrollPane scrollPane = new JScrollPane(nPad);
         JScrollPane spane = new JScrollPane(nDescrPane);
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, spane);

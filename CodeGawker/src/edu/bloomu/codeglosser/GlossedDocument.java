@@ -13,7 +13,8 @@ import javax.swing.text.Document;
  * @author Drue Coles
  */
 public class GlossedDocument implements Serializable {
-
+    
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(GlossedDocument.class.getName());
     private final Document document;
     private final ArrayList<CommentData> list = new ArrayList<>();
 

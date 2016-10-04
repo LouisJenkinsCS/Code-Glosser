@@ -29,6 +29,7 @@ import org.openide.util.NbBundle.Messages;
 })
 public final class CommentEditorTopComponent extends TopComponent {
 
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(CommentEditorTopComponent.class.getName());
     private final GlossedDocument glossedDocument;
     private final static String FILENAME = "name.gl";
 

@@ -5,6 +5,8 @@ import io.reactivex.Observable;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
@@ -36,8 +38,16 @@ import org.openide.awt.ActionRegistration;
             position = 1, separatorAfter = 2)
 })
 public class CodeGlosserActionListener implements ActionListener {
-
-    private final static Logger log = LogManager.getLogger(CodeGlosserActionListener.class);
+    
+    private static final java.util.logging.LogManager logManager = java.util.logging.LogManager.getLogManager();
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(CodeGlosserActionListener.class.getName());
+    static {
+                try {
+                        logManager.readConfiguration(CodeGlosserActionListener.class.getResourceAsStream("logging.properties"));
+                } catch (IOException exception) {
+                        LOGGER.log(Level.SEVERE, "Error in loading configuration",exception);
+                }
+        }
     /**
      * Create a copy of the Java source file in the editor window of most recent focus.
      * Save in gloss folder (create if necessary), which is a top-level folder of the
@@ -47,12 +57,7 @@ public class CodeGlosserActionListener implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        log.trace("This is a Trace");
-        log.debug("This is a Debug");
-        log.info("This is an Info");
-        log.warn("This is a Warn");
-        log.error("This is an Error");
-        log.fatal("This is a Fatal");
+        LOGGER.fine("Logger Initialized...");
         Observable.fromArray(new Integer[]{1, 2, 3});
         JTextComponent jtc = EditorRegistry.lastFocusedComponent();
         if (jtc == null) {

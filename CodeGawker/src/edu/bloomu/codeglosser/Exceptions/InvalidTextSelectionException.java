@@ -3,15 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.bloomu.codeglosser.Model;
+package edu.bloomu.codeglosser.Exceptions;
 
 /**
  *
  * @author Louis
- * 
- * Model for the the NotePad view.
  */
-public class Code {
-    // Backing of actual code.
-    String text;
+public class InvalidTextSelectionException extends Exception {
+    
 }

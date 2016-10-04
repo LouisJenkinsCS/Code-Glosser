@@ -10,6 +10,7 @@ package edu.bloomu.codeglosser.Utils;
  * @author Louis
  */
 public class Bounds implements Comparable<Bounds> {
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(Bounds.class.getName());
     private int start;
     private int end;
     
