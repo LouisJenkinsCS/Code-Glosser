@@ -1,6 +1,7 @@
 package edu.bloomu.codeglosser;
 
 import edu.bloomu.codeglosser.Controller.NoteManager;
+import edu.bloomu.codeglosser.Controller.NotePadController;
 import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import edu.bloomu.codeglosser.View.NoteDescriptorPane;
 import edu.bloomu.codeglosser.View.NotePadView;
@@ -30,7 +31,7 @@ public class GlossableTopComponent extends TopComponent {
     
     private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(GlossableTopComponent.class.getName());
 
-    private final NotePadView nPad;
+    private final NotePadController nPad;
     private final NoteDescriptorPane nDescrPane;
     private static final char SYM = '\u2691'; // flag
     
@@ -40,8 +41,8 @@ public class GlossableTopComponent extends TopComponent {
         nDescrPane = new NoteDescriptorPane();
         setDisplayName(DocumentHelper.getDocumentName(doc) + ".html");
         setLayout(new BorderLayout());        
-        nPad = new NotePadView();
-        JScrollPane scrollPane = new JScrollPane(nPad);
+        nPad = new NotePadController();
+        JScrollPane scrollPane = new JScrollPane(nPad.getView());
         JScrollPane spane = new JScrollPane(nDescrPane);
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, spane);
         split.setOneTouchExpandable(true);
@@ -50,8 +51,8 @@ public class GlossableTopComponent extends TopComponent {
         add(split, BorderLayout.CENTER);
         // Initialize NoteManager...
         NoteManager.setNoteView(nDescrPane);
-        NoteManager.setNotepadView(nPad);
-        nPad.setText(DocumentHelper.getText(doc));
+        NoteManager.setNotepadView(nPad.getView());
+        nPad.setModelText(DocumentHelper.getText(doc));
         NoteManager manager = NoteManager.getInstance(DocumentHelper.getDocumentName(doc));
 //        nPad.setController(manager);
         nDescrPane.setController(manager);

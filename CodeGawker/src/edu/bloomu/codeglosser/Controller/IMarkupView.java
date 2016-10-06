@@ -12,7 +12,7 @@ import java.awt.Color;
  *
  * @author Louis
  */
-public interface NotepadView {
+public interface IMarkupView {
     void addMarkup(Bounds ...bounds);
     void removeMarkup(Bounds ...bounds);
     void setMarkupColor(Color color);

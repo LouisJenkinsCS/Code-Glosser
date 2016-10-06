@@ -3,9 +3,6 @@
 <filesystem>
     <folder name="Windows2">
         <folder name="Modes">
-            <folder name="editor">
-                <file name="CommentEditorTopComponent.wstcref" url="CommentEditorTopComponentWstcref.xml"/>
-            </folder>
             <file name="glossEditor_hidden"/>
         </folder>
     </folder>

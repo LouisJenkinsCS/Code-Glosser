@@ -24,13 +24,13 @@ public final class NoteManager {
     private static final HashMap<String, NoteManager> MAPPED_INSTANCES = new HashMap<>();
     
     private static NoteView NOTE_VIEW;
-    private static NotepadView NOTEPAD_VIEW;
+    private static IMarkupView NOTEPAD_VIEW;
     
     public static void setNoteView(NoteView nView) {
         NOTE_VIEW = nView;
     }
     
-    public static void setNotepadView(NotepadView npView) {
+    public static void setNotepadView(IMarkupView npView) {
         NOTEPAD_VIEW = npView;
     }
     

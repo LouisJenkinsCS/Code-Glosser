@@ -22,7 +22,8 @@ public class NotePadController {
     }
     
     public void setModelText(String txt) {
-        
+        model.setText(txt);
+        view.setText(model.toHTML());
     }
 
     public NotePadView getView() {

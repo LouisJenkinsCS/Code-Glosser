@@ -39,15 +39,7 @@ import org.openide.awt.ActionRegistration;
 })
 public class CodeGlosserActionListener implements ActionListener {
     
-    private static final java.util.logging.LogManager logManager = java.util.logging.LogManager.getLogManager();
     private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(CodeGlosserActionListener.class.getName());
-    static {
-                try {
-                        logManager.readConfiguration(CodeGlosserActionListener.class.getResourceAsStream("logging.properties"));
-                } catch (IOException exception) {
-                        LOGGER.log(Level.SEVERE, "Error in loading configuration",exception);
-                }
-        }
     /**
      * Create a copy of the Java source file in the editor window of most recent focus.
      * Save in gloss folder (create if necessary), which is a top-level folder of the
@@ -58,7 +50,6 @@ public class CodeGlosserActionListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         LOGGER.fine("Logger Initialized...");
-        Observable.fromArray(new Integer[]{1, 2, 3});
         JTextComponent jtc = EditorRegistry.lastFocusedComponent();
         if (jtc == null) {
             JOptionPane.showMessageDialog(null, "Source file must be open in editor.");

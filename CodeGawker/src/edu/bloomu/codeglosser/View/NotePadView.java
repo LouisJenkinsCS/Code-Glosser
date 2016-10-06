@@ -5,19 +5,45 @@
  */
 package edu.bloomu.codeglosser.View;
 
-import edu.bloomu.codeglosser.Controller.NotepadView;
 import edu.bloomu.codeglosser.Utils.Bounds;
 import java.awt.Color;
+import java.util.HashMap;
 import java.util.logging.Logger;
+import edu.bloomu.codeglosser.Controller.IMarkupView;
+import edu.bloomu.codeglosser.Controller.NoteManager;
+import edu.bloomu.codeglosser.Controller.NotePadController;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.Highlight;
 
 
 /**
  *
  * @author Louis
  */
-public class NotePadView extends javax.swing.JPanel implements NotepadView {
+public class NotePadView extends javax.swing.JPanel implements IMarkupView {
     
     private static final Logger LOG = Logger.getLogger(NotePadView.class.getName());
+    
+    private final PublishSubject<Bounds> onShowSelection = PublishSubject.create();
+    private final PublishSubject<Bounds> onDeleteSelection = PublishSubject.create();
+    private final PublishSubject<Bounds> onCreateSelection = PublishSubject.create();
+    
+    private final Highlighter highlighter;
+    private final HashMap<Bounds, Highlight> hMap = new HashMap<>();
+    private NotePadController controller;
+    
+    private final JPopupMenu popup = new JPopupMenu();
     
     /**
      * Creates new form NotePad
@@ -25,16 +51,101 @@ public class NotePadView extends javax.swing.JPanel implements NotepadView {
     public NotePadView() {
         LOG.fine("Initialized...");
         initComponents();
+        highlighter = textCode.getHighlighter();
         textCode.setEditable(false);
-    }
-    
-    public void setText(String code) {
-        // Count line breaks
-        textCode.setText(code.replaceAll("\r?\n", "<br>"));
-    }
-    
-    
+        initializePopup();
+        textCode.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    popup.show(e.getComponent(), e.getX(), e.getY());
+                }
+                
+                // Double click: select current highlight and open comment editor
+                if (e.getClickCount() == 2 && !e.isConsumed()) {
+                    LOG.info("Double Click!");
+                }
+            }
 
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    popup.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }     
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    popup.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
+    }
+    
+    private void initializePopup() {
+        LOG.finer("Initializing PopupMenu...");
+        JMenuItem showSelectedComment = new JMenuItem("Show selected comment");
+        JMenuItem deleteSelectedComment = new JMenuItem("Delete selected comment");
+        JMenuItem addNote = new JMenuItem("Add Note");
+        popup.add(showSelectedComment);
+        popup.add(deleteSelectedComment);
+        popup.add(addNote);
+
+        showSelectedComment.addActionListener((e) -> {
+            LOG.info(e.paramString());
+        });
+
+        deleteSelectedComment.addActionListener((e) -> {
+            LOG.info(e.paramString());
+        });
+        
+        addNote.addActionListener((e) -> {
+            LOG.info(e.paramString());
+        });
+
+        popup.addSeparator();
+        JMenuItem deleteAllNotesItem = new JMenuItem("Delete all notes");
+        popup.add(deleteAllNotesItem);
+
+        deleteAllNotesItem.addActionListener((e) -> {
+            LOG.info(e.paramString());
+        });
+
+        JMenuItem saveAndExitMenuItem = new JMenuItem("Save and exit");
+        popup.addSeparator();
+        popup.add(saveAndExitMenuItem);
+
+        saveAndExitMenuItem.addActionListener((e) -> {
+            LOG.info(e.paramString());
+        });
+    }
+    
+    public void setText(String str) {
+        LOG.info("Text changed...");
+        LOG.info(str);
+        // Count line breaks
+        textCode.setText("<html style='width:100%;height:100%;'> <body>" + str + "</body></html>");
+    }
+    
+    public void setController(NotePadController controller) {
+        LOG.finer("Controller set...");
+        this.controller = controller;
+    }
+
+    public Observable<Bounds> onShowSelection() {
+        return onShowSelection;
+    }
+    
+    public Observable<Bounds> onDeleteSelection() {
+        return onDeleteSelection;
+    }
+    
+    public Observable<Bounds> onCreateSelection() {
+        return onCreateSelection;
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

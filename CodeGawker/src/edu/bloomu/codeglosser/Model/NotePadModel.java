@@ -155,7 +155,6 @@ public class NotePadModel {
         options.getStyleTable().put(JavaSourceType.LINE_NUMBERS, new JavaSourceStyleEntry(RGB.BLACK));
         options.getStyleTable().put(JavaSourceType.NUM_CONSTANT, new JavaSourceStyleEntry(RGB.BLACK));
         options.getStyleTable().put(JavaSourceType.CODE_TYPE, new JavaSourceStyleEntry(RGB.BLUE));
-        return Java2Html.convertToHtmlPage(text, options);
-    }
-    
+        return Java2Html.convertToHtml(text, options);
+    }    
 }
