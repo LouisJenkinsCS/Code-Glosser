@@ -12,13 +12,11 @@ import de.java2html.options.JavaSourceStyleEntry;
 import de.java2html.util.RGB;
 import edu.bloomu.codeglosser.Exceptions.InvalidTextSelectionException;
 import edu.bloomu.codeglosser.Utils.Bounds;
-import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 /**
  *
@@ -30,9 +28,10 @@ public class NotePadModel {
     
     private static final Logger LOG = Logger.getLogger(NotePadModel.class.getName());
     private String text = "";
+    private String title = "";
 
     public NotePadModel() {
-        LOG.finest("Initialized...");
+        LOG.info("Initialized...");
     }
     
     /**
@@ -46,13 +45,16 @@ public class NotePadModel {
      * @param end Ending offset of the note.
      * @return Array of segmented bounds.
      */
-    public Collection<Bounds> segmentRange(int start, int end) throws InvalidTextSelectionException {
+    public Collection<Bounds> segmentRange(Bounds range) throws InvalidTextSelectionException {
+        int start = range.getStart();
+        int end = range.getEnd();
         if (start == end) {
             LOG.warning("Nothing was selected...");
             throw new InvalidTextSelectionException();
         }
         
-        LOG.fine("Offsets: " + start + " to " + end);
+        LOG.info("Offsets: " + start + " to " + end);
+        LOG.info("[Phase 1] Text: \"" + text.substring(start, end) + "\"");
         StringCharacterIterator iter = new StringCharacterIterator(text.substring(start, end));
         
         // Segment highlighting based on newline character
@@ -65,6 +67,8 @@ public class NotePadModel {
                 start++;
             }
             
+            
+            
             // If we actually skipped over the 'end', it's invalid.
             if (start > end) {
                 LOG.warning("Skipped over all selected text without finding" +
@@ -73,68 +77,42 @@ public class NotePadModel {
             }
         }
         
+        LOG.info("[Phase 2] Text: \"" + text.substring(start, end) + "\"");
         Collection<Bounds> bounds = new ArrayList<>();
         // Find everything up to newline character.
-        int offset = start;
+        int whiteSpaceOffset = start;
+        int currOffset = start;
+        char ch = iter.current();
         while (true) {
-            char ch = iter.current();
-            // Consume everything up to a white space, and look-ahead to see if
-            // there are other characters left; if there are no other letters then
-            // this line is finished.
-            while (!Character.isSpaceChar(ch) && ch != CharacterIterator.DONE) {
-                ch = iter.next();
-                offset++;
-            }
-            
-            // Error: Reached EOF
-            if (ch == CharacterIterator.DONE) {
-                LOG.warning("While scanning for white space, found EOF...");
-                throw new InvalidTextSelectionException();
-            }
-            // Terminate: Reached 'end'
-            else if (start >= end) {
-                bounds.add(Bounds.of(start, offset));
-                break;
-            }
-            
-            // Don't want to update official offset as we want to discard end
-            // white spaces...
-            int tmpOffset = offset;
-            // Check if there is another character on this line...
-            while (Character.isSpaceChar(ch) && ch != CharacterIterator.DONE && ch != '\r' || ch != '\n') {
-                ch = iter.next();
-                tmpOffset++;
-            }
-            
-            // Error: Reached EOF
-            if (ch == CharacterIterator.DONE) {
-                LOG.warning("While scanning for new line, found EOF...");
-                throw new InvalidTextSelectionException();
-            }
-            // Terminate: Reached 'end'
-            else if (start >= end) {
-                bounds.add(Bounds.of(start, offset));
-                break;
-            }
-            
-            // Handle current state based on if we come across newline or not.
             switch (ch) {
-                // Windows: Carriage Returns are two characters, '\r\n'
+                case ' ':
+                case '\t':
+                    whiteSpaceOffset = currOffset;
+                    break;
                 case '\r':
-                    // Consume '\r'
-                    iter.next();
-                    tmpOffset++;
+                    ch = iter.next();
                 case '\n':
-                    bounds.add(Bounds.of(start, offset));
-                    // Consume '\n'
-                    iter.next();
-                    tmpOffset++;
-                    // Update start position for new line...
-                    start = tmpOffset;
-                default:
-                    // Restore offset
-                    offset = tmpOffset;
+                    String orig = text.substring(start, currOffset);
+                    String trimmed = orig.trim();
+                    LOG.info("Chunk: " + trimmed);
+                    bounds.add(Bounds.of(start + (orig.length() - trimmed.length()), currOffset));
+                    start = currOffset + 1;
+                    break;
+                case CharacterIterator.DONE:
+                    LOG.severe("EOF before finish...");
+                    throw new InvalidTextSelectionException();
             }
+            currOffset++;
+            if (currOffset >= end) {
+                if (start != end) {
+                    String orig = text.substring(start, currOffset);
+                    String trimmed = orig.trim();
+                    LOG.info("End: " + trimmed);
+                    bounds.add(Bounds.of(start + (orig.length() - trimmed.length()), currOffset));
+                }
+                break;
+            }
+            ch = iter.next();
         }
         
         return bounds;
@@ -146,6 +124,14 @@ public class NotePadModel {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
     
     public String toHTML() {

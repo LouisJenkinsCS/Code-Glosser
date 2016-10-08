@@ -10,19 +10,16 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.logging.Logger;
 import edu.bloomu.codeglosser.Controller.IMarkupView;
-import edu.bloomu.codeglosser.Controller.NoteManager;
 import edu.bloomu.codeglosser.Controller.NotePadController;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.util.stream.Stream;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
 
@@ -38,6 +35,7 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
     private final PublishSubject<Bounds> onShowSelection = PublishSubject.create();
     private final PublishSubject<Bounds> onDeleteSelection = PublishSubject.create();
     private final PublishSubject<Bounds> onCreateSelection = PublishSubject.create();
+    private final PublishSubject<Object> onPreviewHTML = PublishSubject.create();
     
     private final Highlighter highlighter;
     private final HashMap<Bounds, Highlight> hMap = new HashMap<>();
@@ -49,7 +47,7 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
      * Creates new form NotePad
      */
     public NotePadView() {
-        LOG.fine("Initialized...");
+        LOG.info("Initialized...");
         initComponents();
         highlighter = textCode.getHighlighter();
         textCode.setEditable(false);
@@ -95,6 +93,7 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
 
         showSelectedComment.addActionListener((e) -> {
             LOG.info(e.paramString());
+            onShowSelection.onNext(Bounds.of(textCode.getSelectionStart(), textCode.getSelectionEnd()));
         });
 
         deleteSelectedComment.addActionListener((e) -> {
@@ -103,6 +102,8 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
         
         addNote.addActionListener((e) -> {
             LOG.info(e.paramString());
+            LOG.info("Selected Text: " + textCode.getSelectedText().replaceAll("    ", "\n"));
+            onCreateSelection.onNext(Bounds.of(textCode.getSelectionStart(), textCode.getSelectionEnd()));
         });
 
         popup.addSeparator();
@@ -120,6 +121,10 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
         saveAndExitMenuItem.addActionListener((e) -> {
             LOG.info(e.paramString());
         });
+        
+        JMenuItem previewHTML = new JMenuItem("Preview");
+        previewHTML.addActionListener(onPreviewHTML::onNext);
+        popup.add(previewHTML);
     }
     
     public void setText(String str) {
@@ -146,6 +151,10 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
         return onCreateSelection;
     }
     
+    public Observable<Object> onPreviewHTML() {
+        return onPreviewHTML;
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -155,36 +164,56 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane3 = new javax.swing.JScrollPane();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
         textCode = new javax.swing.JTextPane();
 
-        textCode.setContentType("text/html"); // NOI18N
-        textCode.setToolTipText(org.openide.util.NbBundle.getMessage(NotePadView.class, "NotePadView.textCode.toolTipText")); // NOI18N
-        jScrollPane3.setViewportView(textCode);
+        setLayout(new java.awt.BorderLayout());
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 758, Short.MAX_VALUE))
+        textCode.setEditable(false);
+        textCode.setContentType("text/html"); // NOI18N
+        jScrollPane1.setViewportView(textCode);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 781, Short.MAX_VALUE)
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 592, Short.MAX_VALUE)
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 592, Short.MAX_VALUE)
         );
+
+        add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextPane textCode;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void addMarkup(Bounds ...bounds) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        LOG.info(Stream
+                .of(bounds)
+                .map(Bounds::toString)
+                .reduce("Adding Markups: {", (s1, s2) -> s1 + "\n\t" + s2)
+                .concat("\n}")
+        );
+        Stream.of(bounds)
+                .filter((b) -> b.getStart() != b.getEnd())
+                .forEach((b) -> {
+                    Highlight highlight = null;
+                    try {
+                        highlight = (Highlight) highlighter.addHighlight(b.getStart(), b.getEnd(), new DefaultHighlightPainter(Color.YELLOW));
+                    } catch (BadLocationException ex) {
+                        LOG.throwing(this.getClass().getName(), "addMarkup", ex);
+                    }
+                    hMap.put(b, highlight);
+                });
     }
 
     @Override

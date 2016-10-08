@@ -52,7 +52,7 @@ public class GlossableTopComponent extends TopComponent {
         // Initialize NoteManager...
         NoteManager.setNoteView(nDescrPane);
         NoteManager.setNotepadView(nPad.getView());
-        nPad.setModelText(DocumentHelper.getText(doc));
+        nPad.setModelDocument(doc);
         NoteManager manager = NoteManager.getInstance(DocumentHelper.getDocumentName(doc));
 //        nPad.setController(manager);
         nDescrPane.setController(manager);
