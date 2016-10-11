@@ -22,6 +22,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
+import javax.swing.text.Highlighter.HighlightPainter;
 
 
 /**
@@ -39,7 +40,6 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
     
     private final Highlighter highlighter;
     private final HashMap<Bounds, Highlight> hMap = new HashMap<>();
-    private NotePadController controller;
     
     private final JPopupMenu popup = new JPopupMenu();
     
@@ -63,6 +63,7 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
                 // Double click: select current highlight and open comment editor
                 if (e.getClickCount() == 2 && !e.isConsumed()) {
                     LOG.info("Double Click!");
+                    onShowSelection.onNext(Bounds.of(textCode.getSelectionStart(), textCode.getSelectionEnd()));
                 }
             }
 
@@ -98,6 +99,7 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
 
         deleteSelectedComment.addActionListener((e) -> {
             LOG.info(e.paramString());
+            onDeleteSelection.onNext(Bounds.of(textCode.getSelectionStart(), textCode.getSelectionEnd()));
         });
         
         addNote.addActionListener((e) -> {
@@ -129,14 +131,9 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
     
     public void setText(String str) {
         LOG.info("Text changed...");
-        LOG.info(str);
+        LOG.info(str.trim());
         // Count line breaks
-        textCode.setText("<html style='width:100%;height:100%;'> <body>" + str + "</body></html>");
-    }
-    
-    public void setController(NotePadController controller) {
-        LOG.finer("Controller set...");
-        this.controller = controller;
+        textCode.setText("<html><body> <pre>" + str.trim() + " </pre></body></html>");
     }
 
     public Observable<Bounds> onShowSelection() {
@@ -218,11 +215,33 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
 
     @Override
     public void removeMarkup(Bounds ...bounds) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        LOG.info(Stream
+                .of(bounds)
+                .map(Bounds::toString)
+                .reduce("Removing Markups: {", (s1, s2) -> s1 + "\n\t" + s2)
+                .concat("\n}")
+        );
+        // Remove any highlights within requested bounds
+        Stream.of(hMap.keySet().toArray(new Bounds[hMap.size()]))
+                .filter((b) -> Stream.of(bounds).anyMatch(b::collidesWith))
+                .map(hMap::remove)
+                .forEach(highlighter::removeHighlight);
     }
 
     @Override
-    public void setMarkupColor(Color color) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setMarkupColor(Bounds bounds, Color color) {
+        Stream.of(highlighter.getHighlights())
+                .filter((h) -> Bounds.of(h.getStartOffset(), h.getEndOffset()).collidesWith(bounds))
+                .forEach((h) -> {
+                    Bounds b = Bounds.of(h.getStartOffset(), h.getEndOffset());
+                    highlighter.removeHighlight(h);
+                    HighlightPainter hp = new DefaultHighlightPainter(color);
+                    try {
+                        Highlight h1 = (Highlight) highlighter.addHighlight(b.getStart(), b.getEnd(), hp);
+                        hMap.put(b, h1);
+                    } catch (BadLocationException ex) {
+                        ex.printStackTrace();
+                    }
+                });
     }
 }

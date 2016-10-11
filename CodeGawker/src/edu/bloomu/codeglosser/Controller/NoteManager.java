@@ -23,28 +23,7 @@ public final class NoteManager {
     // One NoteManager per File
     private static final HashMap<String, NoteManager> MAPPED_INSTANCES = new HashMap<>();
     
-    private static NoteView NOTE_VIEW;
-    private static IMarkupView NOTEPAD_VIEW;
-    
-    public static void setNoteView(NoteView nView) {
-        NOTE_VIEW = nView;
-    }
-    
-    public static void setNotepadView(IMarkupView npView) {
-        NOTEPAD_VIEW = npView;
-    }
-    
     public static NoteManager getInstance(String fileName) {
-        // Ensure 'setNoteView' is called before 'getInstance'
-        if (NOTE_VIEW == null) {
-            throw new IllegalStateException("getInstance called before setNoteView!");
-        }
-        
-        // Ensure 'setNotepadView' is called before 'getInstance'
-        if (NOTEPAD_VIEW == null) {
-            throw new IllegalStateException("getInstance called before setNotepadView!");
-        }
-        
         NoteManager manager = MAPPED_INSTANCES.get(fileName);
         
         // If we haven't created a NoteManager for this file already, create a new one.
@@ -64,16 +43,16 @@ public final class NoteManager {
         currentNote = null;
     }
 
-    public Optional<Note> getNote(int start, int end) {
+    public Optional<Note> getNote(Bounds bounds) {
         return notes
                 .values()
                 .stream()
-                .filter((note) -> note.inRange(start, end))
+                .filter((n) -> n.inRange(bounds))
                 .findFirst();
     }
     
-    public boolean isValidPosition(int start, int end) {
-        return !getNote(start, end).isPresent();
+    public boolean isValidPosition(Bounds bounds) {
+        return !getNote(bounds).isPresent();
     }
     
     public Optional<Note> getNote(String id) {
@@ -91,67 +70,28 @@ public final class NoteManager {
         );
     }
     
-    public void deleteNote(int start, int end) {
-        getNote(start, end).map(Note::getId).ifPresent(this::deleteNote);
-    }
-    
-    public void deleteCurrentNote() {
-        if (currentNote != null) {
-            deleteNote(currentNote.getId());
-        }
+    public void deleteNote(Bounds bounds) {
+        getNote(bounds).map(Note::getId).ifPresent(this::deleteNote);
     }
     
     public void deleteNote(String id) {
         Note note = notes.get(id);
         if (note != null) {
-            NOTEPAD_VIEW.removeMarkup(note.getRange());
             notes.remove(id);
             if (note == currentNote) {
                 currentNote = null;
-                NOTE_VIEW.clear();
             }
         }
     }
     
     public void deleteAllNotes() {
-        notes.values()
-                .stream()
-                // TODO: Flatmap
-                .map(Note::getRange)
-                .forEach(NOTEPAD_VIEW::removeMarkup);
         notes.clear();
     }
     
-    public void createNote(int start, int end) {
-        createNote(Bounds.of(start, end));
-    }
-    
-    public void createNote(Bounds bounds) {
+    public Note createNote(Bounds bounds) {
         Note note = NoteFactory.createNote(bounds);
         // TODO: Bounds -> [Bounds]
         notes.put(note.getId(), note);
-        NOTEPAD_VIEW.addMarkup(bounds);
-    }
-    
-    public void showNote(int start, int end) {
-        getNote(start, end).ifPresent((note) -> {
-            currentNote = note;
-            NOTE_VIEW.display(note);
-        });
-    }
-    
-    public Optional<Note> getNote(int offset) {
-        return notes.values()
-                .stream()
-                .filter((note) -> note.inRange(offset, offset))
-                .findFirst();
-    }
-    
-    public Optional<Note> currentNote() {
-        return Optional.ofNullable(currentNote);
-    }
-    
-    public void setHighlightColor(Color c) {
-        NOTEPAD_VIEW.setMarkupColor(c);
+        return note;
     }
 }

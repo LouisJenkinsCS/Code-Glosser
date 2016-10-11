@@ -5,6 +5,7 @@
  */
 package edu.bloomu.codeglosser.View;
 
+import edu.bloomu.codeglosser.Model.Note;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import javax.swing.event.DocumentEvent;
@@ -14,9 +15,10 @@ import javax.swing.event.DocumentListener;
  *
  * @author Louis
  */
-public class PropertyTextArea extends javax.swing.JPanel implements ObservableView<String> {
+public class PropertyTextArea extends javax.swing.JPanel implements ObservableProperty<String> {
     
     PublishSubject<String> textChange = PublishSubject.create();
+    private Note note;
     
     /**
      * Creates new form PropertyTextArea
@@ -45,6 +47,7 @@ public class PropertyTextArea extends javax.swing.JPanel implements ObservableVi
     public void setMessage(String note) {
         this.noteMsg.setText(note);
     }
+    
     
     public void setLabelName(String note) {
         this.textLabel.setText(note);

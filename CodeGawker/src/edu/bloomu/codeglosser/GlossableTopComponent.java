@@ -1,9 +1,10 @@
 package edu.bloomu.codeglosser;
 
+import com.google.common.eventbus.EventBus;
 import edu.bloomu.codeglosser.Controller.NoteManager;
 import edu.bloomu.codeglosser.Controller.NotePadController;
 import edu.bloomu.codeglosser.Utils.DocumentHelper;
-import edu.bloomu.codeglosser.View.NoteDescriptorPane;
+import edu.bloomu.codeglosser.View.NotePropertiesView;
 import edu.bloomu.codeglosser.View.NotePadView;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -32,13 +33,14 @@ public class GlossableTopComponent extends TopComponent {
     private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(GlossableTopComponent.class.getName());
 
     private final NotePadController nPad;
-    private final NoteDescriptorPane nDescrPane;
+    private final NotePropertiesView nDescrPane;
     private static final char SYM = '\u2691'; // flag
+    private final EventBus bus = new EventBus();
     
 
     public GlossableTopComponent(Document doc) {
         doc.putProperty(DefaultEditorKit.EndOfLineStringProperty, "\r\n");
-        nDescrPane = new NoteDescriptorPane();
+        nDescrPane = new NotePropertiesView();
         setDisplayName(DocumentHelper.getDocumentName(doc) + ".html");
         setLayout(new BorderLayout());        
         nPad = new NotePadController();
@@ -49,12 +51,11 @@ public class GlossableTopComponent extends TopComponent {
         split.setDividerLocation(.5);
         split.setResizeWeight(.5);
         add(split, BorderLayout.CENTER);
-        // Initialize NoteManager...
-        NoteManager.setNoteView(nDescrPane);
-        NoteManager.setNotepadView(nPad.getView());
         nPad.setModelDocument(doc);
         NoteManager manager = NoteManager.getInstance(DocumentHelper.getDocumentName(doc));
-//        nPad.setController(manager);
-        nDescrPane.setController(manager);
+        bus.register(nPad);
+        nPad.setEventBus(bus);
+        bus.register(nDescrPane);
+        nDescrPane.setEventBus(bus);
     }
 }

@@ -18,7 +18,7 @@ import javax.swing.event.DocumentListener;
  * Property panel that respects user's updates and will automatically send
  * updates to the backing model via it's observable.
  */
-public class PropertyPanel extends javax.swing.JPanel implements ObservableView<String> {
+public class PropertyPanel extends javax.swing.JPanel implements ObservableProperty<String> {
     
     private PublishSubject<String> textChange = PublishSubject.create();
     
@@ -63,12 +63,13 @@ public class PropertyPanel extends javax.swing.JPanel implements ObservableView<
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        textLabel = new javax.swing.JLabel();
         textField = new javax.swing.JTextField();
-
-        textLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        textLabel = new javax.swing.JLabel();
 
         textField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+
+        textLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(textLabel, org.openide.util.NbBundle.getMessage(PropertyPanel.class, "PropertyPanel.textLabel.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -76,19 +77,19 @@ public class PropertyPanel extends javax.swing.JPanel implements ObservableView<
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(textLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 77, Short.MAX_VALUE)
+                .addComponent(textLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(textField, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(textField, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
+                .addGap(12, 12, 12))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(textLabel)
-                    .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(textField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(textLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 

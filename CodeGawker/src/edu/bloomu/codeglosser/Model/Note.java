@@ -52,10 +52,6 @@ public class Note {
         return getRange().collidesWith(bounds);
     }
     
-    public boolean inRange(int start, int end) {
-        return inRange(Bounds.of(start, end));
-    }
-    
     public Bounds getRange() {
         return Bounds.of(offsets.get(0).getStart(), offsets.get(offsets.size()-1).getEnd());
     }

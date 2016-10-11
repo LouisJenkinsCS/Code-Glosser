@@ -28,7 +28,8 @@ public class Bounds implements Comparable<Bounds> {
     }
     
     public boolean collidesWith(Bounds other) {
-        return other.start <= this.end && other.end >= this.start || other.collidesWith(this); 
+        return (other.start <= this.end && other.end >= this.start)
+                || (this.start <= other.end && this.end >= other.start);
     }
 
     public int getStart() {

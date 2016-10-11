@@ -11,6 +11,6 @@ import io.reactivex.Observable;
  *
  * @author Louis
  */
-public interface ObservableView<T> {
+public interface ObservableProperty<T> {
     Observable<T> observe();
 }

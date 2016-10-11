@@ -15,5 +15,5 @@ import java.awt.Color;
 public interface IMarkupView {
     void addMarkup(Bounds ...bounds);
     void removeMarkup(Bounds ...bounds);
-    void setMarkupColor(Color color);
+    void setMarkupColor(Bounds bounds, Color color);
 }
