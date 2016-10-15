@@ -27,20 +27,20 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
     public NotePropertiesView() {
         initComponents();
         
-        propertyTextExample1.setLabelText("Text Size");
-        propertyTextExample1.observe()
+        propertyTextExample7.setLabelText("Text Size");
+        propertyTextExample7.observe()
                 .throttleLast(1, TimeUnit.SECONDS)
                 .map((str) -> "Text Size Change: " + str)
                 .subscribe(System.out::println);
         
-        propertyTextExample2.setLabelText("Text Font");
-        propertyTextExample2.observe()
+        propertyTextExample8.setLabelText("Text Font");
+        propertyTextExample8.observe()
                 .throttleLast(1, TimeUnit.SECONDS)
                 .map((str) -> "Text Font Change: " + str)
                 .subscribe(System.out::println);
         
-        propertyMessage.setMessage("");
-        propertyMessage.observe()
+        propertyMessage3.setMessage("");
+        propertyMessage3.observe()
                 .throttleLast(1, TimeUnit.SECONDS)
                 .doOnNext((str) -> System.out.println("Note Message Change: " + str))
                 .subscribe((str) -> {
@@ -50,8 +50,8 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
                     }
                 });
         
-        propertyHighlightColor.setPropertyName("Highlight Color");
-        propertyHighlightColor.observe()
+        propertyHighlightColor3.setPropertyName("Highlight Color");
+        propertyHighlightColor3.observe()
                 .doOnNext((c) -> System.out.println("Highlight Color Change: " + c.toString()))
                 .subscribe((c) -> bus.post(MarkupColorChangeEvent.of(note.getRange(), c)));
         clear();
@@ -76,64 +76,85 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
     private void initComponents() {
 
         jLayeredPane1 = new javax.swing.JLayeredPane();
-        noteName = new javax.swing.JLabel();
         propertyArea = new javax.swing.JPanel();
-        propertyMessage = new edu.bloomu.codeglosser.View.PropertyTextArea();
-        propertyTextExample1 = new edu.bloomu.codeglosser.View.PropertyPanel();
-        propertyTextExample2 = new edu.bloomu.codeglosser.View.PropertyPanel();
-        propertyHighlightColor = new edu.bloomu.codeglosser.View.PropertyColor();
+        jInternalFrame4 = new javax.swing.JInternalFrame();
+        noteSelected3 = new edu.bloomu.codeglosser.View.propertyNoteName();
+        propertyHighlightColor3 = new edu.bloomu.codeglosser.View.PropertyColor();
+        propertyMessage3 = new edu.bloomu.codeglosser.View.PropertyTextArea();
+        propertyTextExample7 = new edu.bloomu.codeglosser.View.PropertyPanel();
+        propertyTextExample8 = new edu.bloomu.codeglosser.View.PropertyPanel();
 
-        noteName.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        noteName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        org.openide.awt.Mnemonics.setLocalizedText(noteName, org.openide.util.NbBundle.getMessage(NotePropertiesView.class, "NotePropertiesView.noteName.text")); // NOI18N
-        noteName.setToolTipText(org.openide.util.NbBundle.getMessage(NotePropertiesView.class, "NotePropertiesView.noteName.toolTipText")); // NOI18N
+        jInternalFrame4.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
+        jInternalFrame4.setIconifiable(true);
+        jInternalFrame4.setResizable(true);
+        jInternalFrame4.setTitle(org.openide.util.NbBundle.getMessage(NotePropertiesView.class, "NotePropertiesView.jInternalFrame4.title")); // NOI18N
+        jInternalFrame4.setVisible(true);
+
+        javax.swing.GroupLayout jInternalFrame4Layout = new javax.swing.GroupLayout(jInternalFrame4.getContentPane());
+        jInternalFrame4.getContentPane().setLayout(jInternalFrame4Layout);
+        jInternalFrame4Layout.setHorizontalGroup(
+            jInternalFrame4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(propertyMessage3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(noteSelected3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(propertyTextExample7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(propertyTextExample8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(propertyHighlightColor3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+        );
+        jInternalFrame4Layout.setVerticalGroup(
+            jInternalFrame4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jInternalFrame4Layout.createSequentialGroup()
+                .addComponent(noteSelected3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(propertyMessage3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(propertyTextExample7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(propertyTextExample8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(propertyHighlightColor3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout propertyAreaLayout = new javax.swing.GroupLayout(propertyArea);
         propertyArea.setLayout(propertyAreaLayout);
         propertyAreaLayout.setHorizontalGroup(
             propertyAreaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(propertyAreaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(propertyAreaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(propertyMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(propertyAreaLayout.createSequentialGroup()
-                        .addGroup(propertyAreaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(propertyTextExample1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(propertyTextExample2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(propertyHighlightColor, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                .addGap(0, 0, 0)
+                .addComponent(jInternalFrame4))
         );
         propertyAreaLayout.setVerticalGroup(
             propertyAreaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(propertyAreaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(propertyMessage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(propertyTextExample1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(propertyTextExample2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(propertyHighlightColor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(124, Short.MAX_VALUE))
+                .addComponent(jInternalFrame4)
+                .addContainerGap())
         );
 
-        jLayeredPane1.setLayer(noteName, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        try {
+            jInternalFrame4.setIcon(true);
+        } catch (java.beans.PropertyVetoException e1) {
+            e1.printStackTrace();
+        }
+        try {
+            jInternalFrame4.setMaximum(true);
+        } catch (java.beans.PropertyVetoException e1) {
+            e1.printStackTrace();
+        }
+
         jLayeredPane1.setLayer(propertyArea, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout jLayeredPane1Layout = new javax.swing.GroupLayout(jLayeredPane1);
         jLayeredPane1.setLayout(jLayeredPane1Layout);
         jLayeredPane1Layout.setHorizontalGroup(
             jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(noteName, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
             .addComponent(propertyArea, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jLayeredPane1Layout.setVerticalGroup(
             jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jLayeredPane1Layout.createSequentialGroup()
-                .addComponent(noteName)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(propertyArea, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(0, 0, 0)
+                .addComponent(propertyArea, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(0, 0, 0))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -144,37 +165,62 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addComponent(jLayeredPane1))
+            .addComponent(jLayeredPane1)
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JInternalFrame jInternalFrame1;
+    private javax.swing.JInternalFrame jInternalFrame2;
+    private javax.swing.JInternalFrame jInternalFrame3;
+    private javax.swing.JInternalFrame jInternalFrame4;
     private javax.swing.JLayeredPane jLayeredPane1;
-    private javax.swing.JLabel noteName;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private edu.bloomu.codeglosser.View.propertyNoteName noteSelected;
+    private edu.bloomu.codeglosser.View.propertyNoteName noteSelected1;
+    private edu.bloomu.codeglosser.View.propertyNoteName noteSelected2;
+    private edu.bloomu.codeglosser.View.propertyNoteName noteSelected3;
     private javax.swing.JPanel propertyArea;
     private edu.bloomu.codeglosser.View.PropertyColor propertyHighlightColor;
+    private edu.bloomu.codeglosser.View.PropertyColor propertyHighlightColor1;
+    private edu.bloomu.codeglosser.View.PropertyColor propertyHighlightColor2;
+    private edu.bloomu.codeglosser.View.PropertyColor propertyHighlightColor3;
     private edu.bloomu.codeglosser.View.PropertyTextArea propertyMessage;
+    private edu.bloomu.codeglosser.View.PropertyTextArea propertyMessage1;
+    private edu.bloomu.codeglosser.View.PropertyTextArea propertyMessage2;
+    private edu.bloomu.codeglosser.View.PropertyTextArea propertyMessage3;
     private edu.bloomu.codeglosser.View.PropertyPanel propertyTextExample1;
     private edu.bloomu.codeglosser.View.PropertyPanel propertyTextExample2;
+    private edu.bloomu.codeglosser.View.PropertyPanel propertyTextExample3;
+    private edu.bloomu.codeglosser.View.PropertyPanel propertyTextExample4;
+    private edu.bloomu.codeglosser.View.PropertyPanel propertyTextExample5;
+    private edu.bloomu.codeglosser.View.PropertyPanel propertyTextExample6;
+    private edu.bloomu.codeglosser.View.PropertyPanel propertyTextExample7;
+    private edu.bloomu.codeglosser.View.PropertyPanel propertyTextExample8;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void display(Note note) {
         this.note = note;
-        this.propertyArea.setVisible(true);
-        this.noteName.setText(note.getId());
-        this.propertyMessage.setMessage(note.getMsg());
-        this.propertyHighlightColor.setColor(note.getHighlightColor());
-        
+        this.noteSelected3.setNoteId(note.getId());
+        this.propertyMessage3.setMessage(note.getMsg());
+        this.propertyMessage3.setVisible(true);
+        this.propertyHighlightColor3.setColor(note.getHighlightColor());
+        this.propertyHighlightColor3.setVisible(true);
+        this.propertyTextExample8.setVisible(true);
+        this.propertyTextExample7.setVisible(true);
     }
 
     @Override
     public void clear() {
         this.note = null;
-        this.noteName.setText("None Selected");
-        this.propertyArea.setVisible(false);
+        this.noteSelected3.clear();
+        this.propertyMessage3.setVisible(false);
+        this.propertyHighlightColor3.setVisible(false);
+        this.propertyTextExample8.setVisible(false);
+        this.propertyTextExample7.setVisible(false);
     }
 }

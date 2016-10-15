@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import edu.bloomu.codeglosser.Controller.NoteManager;
 import edu.bloomu.codeglosser.Controller.NotePadController;
 import edu.bloomu.codeglosser.Utils.DocumentHelper;
+import edu.bloomu.codeglosser.View.MarkupView;
 import edu.bloomu.codeglosser.View.NotePropertiesView;
 import edu.bloomu.codeglosser.View.NotePadView;
 import java.awt.BorderLayout;
@@ -32,30 +33,18 @@ public class GlossableTopComponent extends TopComponent {
     
     private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(GlossableTopComponent.class.getName());
 
-    private final NotePadController nPad;
-    private final NotePropertiesView nDescrPane;
     private static final char SYM = '\u2691'; // flag
     private final EventBus bus = new EventBus();
     
 
     public GlossableTopComponent(Document doc) {
         doc.putProperty(DefaultEditorKit.EndOfLineStringProperty, "\r\n");
-        nDescrPane = new NotePropertiesView();
         setDisplayName(DocumentHelper.getDocumentName(doc) + ".html");
-        setLayout(new BorderLayout());        
-        nPad = new NotePadController();
-        JScrollPane scrollPane = new JScrollPane(nPad.getView());
-        JScrollPane spane = new JScrollPane(nDescrPane);
-        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, spane);
-        split.setOneTouchExpandable(true);
-        split.setDividerLocation(.5);
-        split.setResizeWeight(.5);
-        add(split, BorderLayout.CENTER);
-        nPad.setModelDocument(doc);
-        NoteManager manager = NoteManager.getInstance(DocumentHelper.getDocumentName(doc));
-        bus.register(nPad);
-        nPad.setEventBus(bus);
-        bus.register(nDescrPane);
-        nDescrPane.setEventBus(bus);
+        setLayout(new BorderLayout());      
+        MarkupView v = new MarkupView();
+        add(v, BorderLayout.CENTER);
+        NoteManager.getInstance(DocumentHelper.getDocumentName(doc));
+        v.setDocument(doc);
+        v.setEventBus(bus);
     }
 }

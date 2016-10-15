@@ -14,7 +14,7 @@ import javax.swing.JColorChooser;
  *
  * @author Louis
  */
-public class PropertyColor extends javax.swing.JPanel implements ObservableProperty {
+public class PropertyColor extends javax.swing.JPanel implements ObservableProperty<Color> {
     
     PublishSubject<Color> onColorChange = PublishSubject.create();
     

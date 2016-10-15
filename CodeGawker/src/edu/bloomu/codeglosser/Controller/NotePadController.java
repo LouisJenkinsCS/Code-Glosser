@@ -39,8 +39,8 @@ public class NotePadController {
     private final NoteManager manager = NoteManager.getInstance("test.java");
     private EventBus bus;
     
-    public NotePadController() {
-        view = new NotePadView();
+    public NotePadController(NotePadView v) {
+        view = v;
         model = new NotePadModel();
         
         view.onPreviewHTML()
