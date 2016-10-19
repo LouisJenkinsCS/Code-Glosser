@@ -47,6 +47,6 @@ public final class MarkupProject implements ActionListener {
             v.setDirectory(jfc.getSelectedFile());
         }
         
-        JOptionPane.showMessageDialog(null, new NotePropertiesView());
+        JOptionPane.showMessageDialog(null, v);
     }
 }

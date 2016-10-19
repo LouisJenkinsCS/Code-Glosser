@@ -25,13 +25,6 @@ public class PropertyColor extends javax.swing.JPanel implements ObservablePrope
     public PropertyColor() {
         initComponents();
         setColor(Color.YELLOW);
-        labelColor.addActionListener((e) -> {
-            Color c = JColorChooser.showDialog(null, "Highlighter Color...", color);
-            if (c != null) {
-                setColor(c);
-                onColorChange.onNext(c);
-            }
-        });
     }
     
     public void setColor(Color c) {
@@ -66,7 +59,7 @@ public class PropertyColor extends javax.swing.JPanel implements ObservablePrope
         jPanel1 = new javax.swing.JPanel();
         labelName = new javax.swing.JLabel();
         labelRGB = new javax.swing.JLabel();
-        labelColor = new javax.swing.JButton();
+        labelColor = new javax.swing.JLabel();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -86,10 +79,14 @@ public class PropertyColor extends javax.swing.JPanel implements ObservablePrope
         labelRGB.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(labelRGB, org.openide.util.NbBundle.getMessage(PropertyColor.class, "PropertyColor.labelRGB.text")); // NOI18N
 
-        labelColor.setBackground(new java.awt.Color(255, 255, 153));
+        labelColor.setBackground(new java.awt.Color(255, 255, 102));
         org.openide.awt.Mnemonics.setLocalizedText(labelColor, org.openide.util.NbBundle.getMessage(PropertyColor.class, "PropertyColor.labelColor.text")); // NOI18N
-        labelColor.setBorderPainted(false);
         labelColor.setOpaque(true);
+        labelColor.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                labelColorMousePressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -101,25 +98,32 @@ public class PropertyColor extends javax.swing.JPanel implements ObservablePrope
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(labelRGB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(labelColor, javax.swing.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(labelColor, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(labelRGB, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
-                    .addComponent(labelColor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(labelName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(labelRGB, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
+                    .addComponent(labelName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(labelColor, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void labelColorMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_labelColorMousePressed
+        Color c = JColorChooser.showDialog(null, "Highlighter Color...", color);
+        if (c != null) {
+            setColor(c);
+            onColorChange.onNext(c);
+        }
+    }//GEN-LAST:event_labelColorMousePressed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JButton labelColor;
+    private javax.swing.JLabel labelColor;
     private javax.swing.JLabel labelName;
     private javax.swing.JLabel labelRGB;
     // End of variables declaration//GEN-END:variables

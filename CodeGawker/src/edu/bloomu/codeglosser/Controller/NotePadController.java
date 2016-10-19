@@ -7,6 +7,7 @@ package edu.bloomu.codeglosser.Controller;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import edu.bloomu.codeglosser.Events.FileChangeEvent;
 import edu.bloomu.codeglosser.Model.NotePadModel;
 import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import edu.bloomu.codeglosser.Utils.HTMLGenerator;
@@ -15,7 +16,9 @@ import io.reactivex.Observable;
 import java.awt.Desktop;
 import java.io.BufferedOutputStream;
 import edu.bloomu.codeglosser.Utils.Bounds;
-import edu.bloomu.codeglosser.Utils.MarkupColorChangeEvent;
+import edu.bloomu.codeglosser.Events.MarkupColorChangeEvent;
+import edu.bloomu.codeglosser.Events.NoteSelectedChangeEvent;
+import edu.bloomu.codeglosser.Model.Note;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,7 +39,7 @@ public class NotePadController {
     
     private final NotePadView view;
     private final NotePadModel model;
-    private final NoteManager manager = NoteManager.getInstance("test.java");
+    private NoteManager manager;
     private EventBus bus;
     
     public NotePadController(NotePadView v) {
@@ -62,17 +65,20 @@ public class NotePadController {
         view.onCreateSelection()
                 .doOnNext((b) -> LOG.info("onShowSelection: " + b.toString()))
                 .doOnNext(view::addMarkup)
-                .map(manager::createNote)
-                .subscribe((n) -> bus.post(n));
+                .map((b) -> manager.createNote(b))
+                .subscribe((n) -> bus.post(NoteSelectedChangeEvent.of(n)));
         
         view.onDeleteSelection()
                 .doOnNext((b) -> LOG.info("onDeleteSelection: " + b.toString()))
-                .subscribe(view::removeMarkup);
+                .subscribe((b) -> {
+                    view.removeMarkup(b);
+                    manager.deleteNote(b);
+                });
         
         view.onShowSelection()
                 .doOnNext((b) -> LOG.info("onShowSelection: " + b.toString()))
-                .map(manager::getNote)
-                .subscribe((opt) -> opt.ifPresent((n) -> bus.post(n)));
+                .map((b) -> manager.getNote(b))
+                .subscribe((opt) -> opt.ifPresent((n) -> bus.post(NoteSelectedChangeEvent.of(n))));
     }
     
     public void setModelDocument(Document doc) {
@@ -84,6 +90,11 @@ public class NotePadController {
     @Subscribe
     public void highlightColorChange(MarkupColorChangeEvent e) {
         view.setMarkupColor(e.getBounds(), e.getColor());
+    }
+    
+    @Subscribe
+    public void handleFileChange(FileChangeEvent event) {
+        manager = NoteManager.getInstance(event.getFileName());
     }
     
     public void setEventBus(EventBus bus) {

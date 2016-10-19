@@ -3,6 +3,7 @@ package edu.bloomu.codeglosser;
 import com.google.common.eventbus.EventBus;
 import edu.bloomu.codeglosser.Controller.NoteManager;
 import edu.bloomu.codeglosser.Controller.NotePadController;
+import edu.bloomu.codeglosser.Events.FileChangeEvent;
 import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import edu.bloomu.codeglosser.View.MarkupView;
 import edu.bloomu.codeglosser.View.NotePropertiesView;
@@ -46,5 +47,6 @@ public class GlossableTopComponent extends TopComponent {
         NoteManager.getInstance(DocumentHelper.getDocumentName(doc));
         v.setDocument(doc);
         v.setEventBus(bus);
+        bus.post(FileChangeEvent.of(DocumentHelper.getDocumentName(doc)));
     }
 }

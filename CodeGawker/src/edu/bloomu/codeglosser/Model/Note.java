@@ -11,12 +11,15 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.apache.logging.log4j.util.Strings;
 
 /**
  *
  * @author Louis
  */
 public class Note {
+    public static Note DEFAULT = new Note(Strings.EMPTY, "<None Selected>");
+    
     private String msg;
     private String id;
     private List<Bounds> offsets = new ArrayList<>();
@@ -74,8 +77,6 @@ public class Note {
 
     @Override
     public String toString() {
-        return "Note{" + "msg=" + msg + ", id=" + id + ", offsets=" + offsets + ", highlightColor=" + highlightColor + ", textColor=" + textColor + '}';
+        return id;
     }
-    
-    
 }

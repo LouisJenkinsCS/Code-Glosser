@@ -15,7 +15,7 @@ import javax.swing.text.Document;
  */
 public class MarkupView extends javax.swing.JPanel {
     
-    private NotePadController npController;
+    private final NotePadController npController;
     
     /**
      * Creates new form MarkupView

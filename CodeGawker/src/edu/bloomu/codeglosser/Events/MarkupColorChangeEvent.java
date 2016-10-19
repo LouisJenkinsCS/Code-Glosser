@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.bloomu.codeglosser.Utils;
+package edu.bloomu.codeglosser.Events;
 
+import edu.bloomu.codeglosser.Utils.Bounds;
 import java.awt.Color;
 
 /**

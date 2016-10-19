@@ -5,28 +5,64 @@
  */
 package edu.bloomu.codeglosser.View;
 
+import edu.bloomu.codeglosser.Model.Note;
 import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
+import java.util.ArrayList;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
+import javax.swing.AbstractListModel;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 
 /**
  *
  * @author Louis
  */
-public class propertyNoteName extends javax.swing.JPanel implements ObservableProperty<String> {
-
+public class propertyNoteName extends javax.swing.JPanel implements ObservableProperty<Note> {
+    
+    private PublishSubject<Note> onNoteSelection = PublishSubject.create();
+    private static final Logger LOG = Logger.getLogger(propertyNoteName.class.getName());
+    
+    // Kept track of to prevent invoking 'setSelectedItem' and triggering the ActionListener (which would cause an infinite loop)
+    private Note currentNote;
+    
+    
     /**
      * Creates new form propertyNoteName
      */
     public propertyNoteName() {
         initComponents();
         clear();
+        noteSelector.addActionListener(e -> {
+            JComboBox<Note> src = (JComboBox<Note>) e.getSource();
+            Note n = (Note) src.getSelectedItem();
+            if (n != null) {
+                currentNote = n;
+                onNoteSelection.onNext(n);
+            }
+        });
+    }
+    
+    public void update(Note... notes) {
+        Note n = currentNote;
+        clear();
+        Stream.of(notes).forEach(noteSelector::addItem);
+        if (!Stream.of(notes).anyMatch(n::equals)) {
+            noteSelector.setSelectedItem(Note.DEFAULT);
+        }
     }
     
     public void clear() {
-        noteSelector.setSelectedIndex(0);
+        noteSelector.removeAllItems();
+        currentNote = Note.DEFAULT;
+        noteSelector.addItem(currentNote);
     }
     
-    public void setNoteId(String text) {
-        noteSelector.setSelectedItem(text);
+    public void setSelectedNote(Note n) {
+        if (n != currentNote)
+            noteSelector.setSelectedItem(n);
     }
 
     /**
@@ -41,7 +77,6 @@ public class propertyNoteName extends javax.swing.JPanel implements ObservablePr
         noteSelector = new javax.swing.JComboBox<>();
 
         noteSelector.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
-        noteSelector.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None Selected" }));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -56,12 +91,12 @@ public class propertyNoteName extends javax.swing.JPanel implements ObservablePr
     }// </editor-fold>//GEN-END:initComponents
 
     @Override
-    public Observable<String> observe() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Observable<Note> observe() {
+        return onNoteSelection;
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> noteSelector;
+    private javax.swing.JComboBox<Note> noteSelector;
     // End of variables declaration//GEN-END:variables
 }
