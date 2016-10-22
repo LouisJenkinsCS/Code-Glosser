@@ -6,11 +6,13 @@
 package edu.bloomu.codeglosser.Model;
 
 import de.java2html.Java2Html;
+import de.java2html.JavaSourceConversionSettings;
 import de.java2html.javasource.JavaSourceType;
 import de.java2html.options.JavaSourceConversionOptions;
 import de.java2html.options.JavaSourceStyleEntry;
 import de.java2html.util.RGB;
 import edu.bloomu.codeglosser.Exceptions.InvalidTextSelectionException;
+import edu.bloomu.codeglosser.HTML.Java2HTML;
 import edu.bloomu.codeglosser.Utils.Bounds;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
@@ -45,9 +47,9 @@ public class NotePadModel {
      * @param end Ending offset of the note.
      * @return Array of segmented bounds.
      */
-    public Collection<Bounds> segmentRange(Bounds range) throws InvalidTextSelectionException {
-        int start = range.getStart();
-        int end = range.getEnd();
+    public Bounds[] segmentRange(Bounds range) throws InvalidTextSelectionException {
+        int start = range.getStart() - 1;
+        int end = range.getEnd() - 1;
         if (start == end) {
             LOG.warning("Nothing was selected...");
             throw new InvalidTextSelectionException();
@@ -95,7 +97,15 @@ public class NotePadModel {
                     String orig = text.substring(start, currOffset);
                     String trimmed = orig.trim();
                     LOG.info("Chunk: " + trimmed);
-                    bounds.add(Bounds.of(start + (orig.length() - trimmed.length()), currOffset));
+                    int startOffset = 0;
+                    while (orig.charAt(startOffset) != trimmed.charAt(0))
+                        startOffset++;
+                    
+                    int endOffset = 0;
+                    while (orig.charAt(orig.length() - (endOffset + 1)) != trimmed.charAt(trimmed.length()-1))
+                        endOffset++;
+                    
+                    bounds.add(Bounds.of(start + startOffset + 1, (currOffset - (endOffset + 1)) + 2));
                     start = currOffset + 1;
                     break;
                 case CharacterIterator.DONE:
@@ -108,14 +118,23 @@ public class NotePadModel {
                     String orig = text.substring(start, currOffset);
                     String trimmed = orig.trim();
                     LOG.info("End: " + trimmed);
-                    bounds.add(Bounds.of(start + (orig.length() - trimmed.length()), currOffset));
+                    
+                    int startOffset = 0;
+                    while (orig.charAt(startOffset) != trimmed.charAt(0))
+                        startOffset++;
+                    
+                    int endOffset = 0;
+                    while (orig.charAt(orig.length() - (endOffset + 1)) != trimmed.charAt(trimmed.length()-1))
+                        endOffset++;
+                    
+                    bounds.add(Bounds.of(start + startOffset + 1, (currOffset - (endOffset + 1)) + 2));
                 }
                 break;
             }
             ch = iter.next();
         }
         
-        return bounds;
+        return bounds.toArray(new Bounds[bounds.size()]);
     }
 
     public String getText() {
@@ -135,12 +154,13 @@ public class NotePadModel {
     }
     
     public String toHTML() {
-        JavaSourceConversionOptions options = JavaSourceConversionOptions.getDefault();
-        options.getStyleTable().put(JavaSourceType.KEYWORD, new JavaSourceStyleEntry(RGB.BLUE, true, false));
-        options.getStyleTable().put(JavaSourceType.STRING, new JavaSourceStyleEntry(new RGB(206, 133, 0)));
-        options.getStyleTable().put(JavaSourceType.LINE_NUMBERS, new JavaSourceStyleEntry(RGB.BLACK));
-        options.getStyleTable().put(JavaSourceType.NUM_CONSTANT, new JavaSourceStyleEntry(RGB.BLACK));
-        options.getStyleTable().put(JavaSourceType.CODE_TYPE, new JavaSourceStyleEntry(RGB.BLUE));
-        return Java2Html.convertToHtml(text, options);
+//        JavaSourceConversionOptions options = JavaSourceConversionOptions.getDefault();
+//        options.getStyleTable().put(JavaSourceType.KEYWORD, new JavaSourceStyleEntry(RGB.BLUE, true, false));
+//        options.getStyleTable().put(JavaSourceType.STRING, new JavaSourceStyleEntry(new RGB(206, 133, 0)));
+//        options.getStyleTable().put(JavaSourceType.LINE_NUMBERS, new JavaSourceStyleEntry(RGB.BLACK));
+//        options.getStyleTable().put(JavaSourceType.NUM_CONSTANT, new JavaSourceStyleEntry(RGB.BLACK));
+//        options.getStyleTable().put(JavaSourceType.CODE_TYPE, new JavaSourceStyleEntry(RGB.BLUE));
+//        return Java2Html.convertToHtml(text, new JavaSourceConversionSettings(options));
+        return new Java2HTML().translate(text);
     }    
 }

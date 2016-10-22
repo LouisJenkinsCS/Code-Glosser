@@ -7,6 +7,7 @@ package edu.bloomu.codeglosser.View;
 
 import com.google.common.eventbus.EventBus;
 import edu.bloomu.codeglosser.Controller.NotePadController;
+import java.util.logging.Logger;
 import javax.swing.text.Document;
 
 /**
@@ -14,6 +15,9 @@ import javax.swing.text.Document;
  * @author Louis
  */
 public class MarkupView extends javax.swing.JPanel {
+
+    private static final Logger LOG = Logger.getLogger(MarkupView.class.getName());
+    
     
     private final NotePadController npController;
     
@@ -38,6 +42,7 @@ public class MarkupView extends javax.swing.JPanel {
     
     public void setDocument(Document doc) {
         npController.setModelDocument(doc);
+        LOG.info(npController.getText());
     }
     
     /**

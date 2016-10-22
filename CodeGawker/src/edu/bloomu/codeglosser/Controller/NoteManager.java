@@ -105,7 +105,7 @@ public final class NoteManager {
         onChange.onNext(new Object());
     }
     
-    public Note createNote(Bounds bounds) {
+    public Note createNote(Bounds ...bounds) {
         Note note = NoteFactory.createNote(bounds);
         // TODO: Bounds -> [Bounds]
         notes.put(note.getId(), note);

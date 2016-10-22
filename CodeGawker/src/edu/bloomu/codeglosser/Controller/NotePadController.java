@@ -64,6 +64,7 @@ public class NotePadController {
         
         view.onCreateSelection()
                 .doOnNext((b) -> LOG.info("onShowSelection: " + b.toString()))
+                .map(model::segmentRange)
                 .doOnNext(view::addMarkup)
                 .map((b) -> manager.createNote(b))
                 .subscribe((n) -> bus.post(NoteSelectedChangeEvent.of(n)));

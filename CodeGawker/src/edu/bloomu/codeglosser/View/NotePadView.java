@@ -131,9 +131,10 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
     
     public void setText(String str) {
         LOG.info("Text changed...");
-        LOG.info(str.trim());
+//        LOG.info(str.trim());
         // Count line breaks
-        textCode.setText("<html><body> <pre>" + str.trim() + " </pre></body></html>");
+        textCode.setText("<html><head></head><body>" + str.trim() + "</body></html>");
+        LOG.info(textCode.getText());
     }
 
     public Observable<Bounds> onShowSelection() {
