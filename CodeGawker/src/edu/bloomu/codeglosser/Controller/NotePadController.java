@@ -94,6 +94,11 @@ public class NotePadController {
     }
     
     @Subscribe
+    public void noteSelectedChange(NoteSelectedChangeEvent e) {
+        // Implement way to make selected Note brighter.
+    }
+    
+    @Subscribe
     public void handleFileChange(FileChangeEvent event) {
         manager = NoteManager.getInstance(event.getFileName());
     }

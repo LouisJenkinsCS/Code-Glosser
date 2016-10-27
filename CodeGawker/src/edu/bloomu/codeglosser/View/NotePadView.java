@@ -104,6 +104,9 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
         
         addNote.addActionListener((e) -> {
             LOG.info(e.paramString());
+            if (textCode.getSelectedText() == null)
+                return;
+            
             LOG.info("Selected Text: " + textCode.getSelectedText().replaceAll("    ", "\n"));
             onCreateSelection.onNext(Bounds.of(textCode.getSelectionStart(), textCode.getSelectionEnd()));
         });

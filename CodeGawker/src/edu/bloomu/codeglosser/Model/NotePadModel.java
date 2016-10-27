@@ -97,6 +97,9 @@ public class NotePadModel {
                     String orig = text.substring(start, currOffset);
                     String trimmed = orig.trim();
                     LOG.info("Chunk: " + trimmed);
+                    if (trimmed.length() == 0) {
+                        break;
+                    }
                     int startOffset = 0;
                     while (orig.charAt(startOffset) != trimmed.charAt(0))
                         startOffset++;
