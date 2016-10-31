@@ -149,6 +149,10 @@
                 <binary-origin>release/modules/ext/rxjava-2.0.0-RC3.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/json-simple-1.1.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/json-simple-1.1.1.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/guava-19.0.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/guava-19.0.jar</binary-origin>
             </class-path-extension>
