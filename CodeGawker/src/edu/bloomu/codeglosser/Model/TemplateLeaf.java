@@ -28,7 +28,11 @@ public class TemplateLeaf implements TreeViewLeaf {
         this.prefix = (String) data.get(KEY_PREFIX);
         this.title = (String) data.get(KEY_TITLE);
         this.message = (String) data.get(KEY_MESSAGE);
-        this.color = Color.decode((String) data.get(KEY_COLOR));
+        if (data.containsKey(KEY_COLOR)) {
+            this.color = Color.decode((String) data.get(KEY_COLOR));
+        } else { 
+            this.color = Color.YELLOW;
+        }
     }
 
     public String getPrefix() {

@@ -90,7 +90,7 @@ public abstract class Lang2HTML {
                     String str = tmp.toString();
                     DisplayConfig conf = configMap.get(str);
                     if (conf != null) {
-                        LOG.info("Found config for " + str);
+                        LOG.fine("Found config for " + str);
                         buf.append("<font color=\"#");
                         buf.append(String.format("%06X",conf.getColor().getRGB() & 0xFFFFFF));
                         buf.append("\">");

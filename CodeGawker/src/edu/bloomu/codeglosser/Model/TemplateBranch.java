@@ -25,7 +25,7 @@ public class TemplateBranch implements TreeViewBranch {
     private static final Logger LOG = Logger.getLogger(TemplateBranch.class.getName());
     
     private final HashMap<String, TreeViewNode> childrenMap = new HashMap<>();
-    private String title;
+    private final String title;
     
     public TemplateBranch(JSONObject data) {
         LOG.info("Parsing Branch: " + data.toJSONString());
@@ -58,7 +58,7 @@ public class TemplateBranch implements TreeViewBranch {
 
     @Override
     public String toString() {
-        return "TemplateBranch{" + "childrenMap=" + childrenMap + '}';
+        return title;
     }
     
     

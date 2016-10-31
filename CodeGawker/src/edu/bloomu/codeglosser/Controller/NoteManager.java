@@ -7,10 +7,10 @@ package edu.bloomu.codeglosser.Controller;
 
 import edu.bloomu.codeglosser.Model.Note;
 import edu.bloomu.codeglosser.Model.NoteFactory;
+import edu.bloomu.codeglosser.Model.TemplateLeaf;
 import edu.bloomu.codeglosser.Utils.Bounds;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
-import java.awt.Color;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -24,9 +24,11 @@ import org.apache.logging.log4j.*;
  */
 public final class NoteManager {
     
-    PublishSubject onChange = PublishSubject.create();
+    private final PublishSubject onNoteAddOrRemove = PublishSubject.create();
+    private final PublishSubject<Note> onNoteUpdate = PublishSubject.create();
     
-    private final static Logger logger = LogManager.getLogger(NoteManager.class);
+    
+    private final static Logger LOG = LogManager.getLogger(NoteManager.class);
     // One NoteManager per File
     private static final HashMap<String, NoteManager> MAPPED_INSTANCES = new HashMap<>();
     
@@ -42,23 +44,28 @@ public final class NoteManager {
         return manager;
     }
     
-    private final HashMap<String, Note> notes;
+    private final HashMap<String, Note> noteMap;
     private Note currentNote;
     
     private NoteManager() {
-        notes = new HashMap<>();
+        noteMap = new HashMap<>();
         currentNote = null;
     }
     
+    public void setCurrentNote(Note note) {
+        this.currentNote = note;
+    }
+    
     public List<Note> getAllNotes() {
-        return notes.values().stream().collect(Collectors.toList());
+        return noteMap.values().stream().collect(Collectors.toList());
     }
     
     public Optional<Note> getNote(Bounds bounds) {
-        return notes
+        return noteMap
                 .values()
                 .stream()
                 .filter((n) -> n.inRange(bounds))
+                .peek(n -> currentNote = n)
                 .findFirst();
     }
     
@@ -67,11 +74,11 @@ public final class NoteManager {
     }
     
     public Optional<Note> getNote(String id) {
-        return Optional.ofNullable(notes.get(id));
+        return Optional.ofNullable(noteMap.get(id));
     }
     
     public void debug() {
-        logger.debug(notes
+        LOG.debug(noteMap
                 .entrySet()
                 .stream()
                 .sorted((entry1, entry2) -> entry1.getValue().getRange().compareTo(entry2.getValue().getRange()))
@@ -86,30 +93,47 @@ public final class NoteManager {
     }
     
     public void deleteNote(String id) {
-        Note note = notes.get(id);
+        Note note = noteMap.get(id);
         if (note != null) {
-            notes.remove(id);
+            noteMap.remove(id);
             if (note == currentNote) {
                 currentNote = null;
             }
-            onChange.onNext(new Object());
+            onNoteAddOrRemove.onNext(new Object());
         }
     }
     
-    public Observable observe() {
-        return onChange;
+    public Observable observeAddOrRemove() {
+        return onNoteAddOrRemove;
+    }
+    
+    public Observable<Note> observeNoteUpdate() {
+        return onNoteUpdate;
     }
     
     public void deleteAllNotes() {
-        notes.clear();
-        onChange.onNext(new Object());
+        noteMap.clear();
+        onNoteAddOrRemove.onNext(new Object());
+        currentNote = null;
     }
     
     public Note createNote(Bounds ...bounds) {
         Note note = NoteFactory.createNote(bounds);
         // TODO: Bounds -> [Bounds]
-        notes.put(note.getId(), note);
-        onChange.onNext(new Object());
+        noteMap.put(note.getId(), note);
+        onNoteAddOrRemove.onNext(new Object());
+        currentNote = note;
         return note;
+    }
+    
+    public void applyTemplate(TemplateLeaf template) {
+        if (currentNote == null) {
+            LOG.warn("Attempt to apply template when currentNote is null.");
+            return;
+        }
+        
+        currentNote.setMsg(template.getMessage());
+        currentNote.setHighlightColor(template.getColor());
+        onNoteUpdate.onNext(currentNote);
     }
 }

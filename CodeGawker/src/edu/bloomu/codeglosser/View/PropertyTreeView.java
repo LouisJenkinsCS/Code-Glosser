@@ -56,8 +56,10 @@ public class PropertyTreeView extends javax.swing.JPanel implements ObservablePr
                 TreePath selPath = propertyTree.getPathForLocation(e.getX(), e.getY());
                 if(selRow != -1) {
                     if (e.getClickCount() == 2) {
-                        TreeViewLeaf selectedLeaf = (TreeViewLeaf) ((DefaultMutableTreeNode)selPath.getLastPathComponent()).getUserObject();
-                        onLeafSelected.onNext(selectedLeaf);
+                        TreeViewNode selectedNode = (TreeViewNode) ((DefaultMutableTreeNode)selPath.getLastPathComponent()).getUserObject();
+                        if (selectedNode != null && selectedNode instanceof TreeViewLeaf) {
+                            onLeafSelected.onNext((TreeViewLeaf) selectedNode);
+                        }
                     }
                 }
             }

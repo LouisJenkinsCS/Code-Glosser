@@ -5,12 +5,6 @@
  */
 package edu.bloomu.codeglosser.Model;
 
-import de.java2html.Java2Html;
-import de.java2html.JavaSourceConversionSettings;
-import de.java2html.javasource.JavaSourceType;
-import de.java2html.options.JavaSourceConversionOptions;
-import de.java2html.options.JavaSourceStyleEntry;
-import de.java2html.util.RGB;
 import edu.bloomu.codeglosser.Exceptions.InvalidTextSelectionException;
 import edu.bloomu.codeglosser.HTML.Java2HTML;
 import edu.bloomu.codeglosser.Utils.Bounds;
