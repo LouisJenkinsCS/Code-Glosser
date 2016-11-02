@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.logging.Logger;
 import javax.swing.text.Document;
 import org.openide.util.Exceptions;
@@ -48,7 +49,7 @@ public class NotePadController {
         
         view.onPreviewHTML()
                 .subscribe((ignored) -> {
-                    String html = HTMLGenerator.generate(model.getTitle(), model.getText());
+                    String html = HTMLGenerator.generate(model.getTitle(), model.getText(), manager.getAllNotes());
                     try {
                         File f = new File("tmp.html");
                         f.createNewFile();
@@ -70,8 +71,12 @@ public class NotePadController {
                 .subscribe((n) -> bus.post(NoteSelectedChangeEvent.of(n)));
         
         view.onDeleteSelection()
-                .doOnNext((b) -> LOG.info("onDeleteSelection: " + b.toString()))
-                .subscribe((b) -> {
+                .doOnNext(b -> LOG.info("onDeleteSelection: " + b.toString()))
+                .map(b -> manager.getNote(b))
+                .filter(optN -> optN.isPresent())
+                .map(Optional::get)
+                .map(Note::getRange)
+                .subscribe(b -> {
                     view.removeMarkup(b);
                     manager.deleteNote(b);
                 });

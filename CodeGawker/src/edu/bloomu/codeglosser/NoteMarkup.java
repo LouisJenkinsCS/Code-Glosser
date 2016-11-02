@@ -15,6 +15,8 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import javax.swing.text.Document;
@@ -61,7 +63,7 @@ public final class NoteMarkup implements ActionListener {
     }
     
     private void testHTML(Document doc) {
-        String html = HTMLGenerator.generate(DocumentHelper.getDocumentName(doc), DocumentHelper.getText(doc));
+        String html = HTMLGenerator.generate(DocumentHelper.getDocumentName(doc), DocumentHelper.getText(doc), new ArrayList<>());
         try {
             File f = new File("tmp.html");
             f.createNewFile();
