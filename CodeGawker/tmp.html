@@ -41,24 +41,21 @@ import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
-<span class="note" msg="Missing: Summary">/**
- *
- * @author Drue Coles 
- */
-</span>
-public class GlossedDocument implements Serializable {
+<span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Missing Summary">/**
+</span> <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Missing Summary">*
+</span> <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Missing Summary">* @author Drue Coles </span>
+ <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Missing Summary">*/
+</span>public class GlossedDocument implements Serializable { <span>
 
     private final Document document;
-    // Hi
-    private final ArrayList<CommentData> list = new ArrayList<>();
+    <span class="note" style="border-bottom: 1px dotted #ff00ff;" msg="Useless Comment">// Hi
+</span>    private final ArrayList<CommentData> list = new ArrayList<>();
 
-    <span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">public GlossedDocument(Document document) {
-</span>
-        this.document = document;       
-    }
-    
-    <span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">public String getDocumentName() {
-</span>
+    <span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">public GlossedDocument(Document document) {
+</span>        <span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">this.document = document; </span>      
+    <span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">}
+</span>    
+    public String getDocumentName() {
         String name = (String) document.getProperty(Document.TitleProperty);
         int i = name.lastIndexOf(System.getProperty("file.separator"));
         if (i != -1 && i < name.length()) {
@@ -67,19 +64,17 @@ public class GlossedDocument implements Serializable {
         return name;
     }
        
-    <span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">public String getText() {
-</span>
+    public String getText() {
         String text = null;
         try {
             text = document.getText(0, document.getLength());
         } catch (BadLocationException ex) {
-            Logger.getLogger(GlossedDocument.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            <span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Do not swallow exceptions.">Logger.getLogger(GlossedDocument.class.getName()).log(Level.SEVERE, null, ex);
+</span>        }
         return text;
     }
     
-    <span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">public boolean canAddComment(int startPos, int endPos) {
-</span>
+    public boolean canAddComment(int startPos, int endPos) {
         for (CommentData data : list) {
             if (endPos >= data.startPos && startPos <= data.endPos) {
                 return false;
@@ -88,31 +83,27 @@ public class GlossedDocument implements Serializable {
         return true;
     }
     
-    <span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">public void addComment(String comment, int startPos, int endPos) {
-</span>
+    public void addComment(String comment, int startPos, int endPos) {
         list.add(new CommentData(comment, startPos, endPos));
     }
     
-    <span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">public void removeComment(int startPos, int endPos) {
-</span>
+    public void removeComment(int startPos, int endPos) {
         CommentData data = null;
         for (CommentData cData : list) {
             if (cData.startPos == startPos && cData.endPos == endPos) {
                 data = cData;
             }
         }
-        if (data != null) {
-            list.remove(data);
-        }
-    }
+        <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Use blank lines to separate parts of a method that are logically distinct.">if (data != null) {
+</span>            <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Use blank lines to separate parts of a method that are logically distinct.">list.remove(data);
+</span>        <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Use blank lines to separate parts of a method that are logically distinct.">}
+</span>    }
     
-    <span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">public void removeAllComments() {
-</span>
+    public void removeAllComments() {
         list.clear();
     }
     
-    <span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">public Point getCommentRange(int startPos, int endPos) {
-</span>
+    public Point getCommentRange(int startPos, int endPos) {
         for (CommentData data : list) {
             if (endPos >= data.startPos && startPos <= data.endPos) {
                 return new Point(data.startPos, data.endPos);
@@ -121,13 +112,11 @@ public class GlossedDocument implements Serializable {
         return null;
     }
     
-    <span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">public void addEmptyComment(int startPos, int endPos) {
-</span>
+    public void addEmptyComment(int startPos, int endPos) {
         addComment("", startPos, endPos);
     }
     
-    <span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">public void editComment(String comment, int startPos, int endPos) {
-</span>
+    public void editComment(String comment, int startPos, int endPos) {
         for (CommentData data : list) {
             if (data.startPos == startPos && data.endPos == endPos) {
                 data.comment = comment;
@@ -137,15 +126,13 @@ public class GlossedDocument implements Serializable {
    
 }
 
-<span class="note" msg="Each class must have a properly structured doc comment including at least a summary fragment and the author's name (first and last).">class CommentData implements Serializable {
+<span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Each class must have a properly structured doc comment including at least a summary fragment and the author's name (first and last).">class CommentData implements Serializable {
 </span>
-
     String comment;
     final int startPos;
     final int endPos;
 
-    <span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">CommentData(String comment, int startPos, int endPos) {
-</span>
+    CommentData(String comment, int startPos, int endPos) {
         this.startPos = startPos;
         this.endPos = endPos;
         this.comment = "";

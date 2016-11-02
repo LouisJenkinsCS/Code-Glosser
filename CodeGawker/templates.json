@@ -20,25 +20,25 @@
                     "category":true,
                     "title":"Documentation",
                     "body":[
-                        {"title":"Missing Header", "message":"Each class must have a properly structured doc comment including at least a summary fragment and the author's name (first and last).", "color":"#00FF00"},
-                        {"title":"Errors and Warnings", "message":"Document all known errors and deficiencies in the doc comment of the relevant class.", "color":"#00FF00"},
-                        {"title":"Constructors and Methods", "message":"Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.", "color":"#00FF00"},
-                        {"title":"Self-Explanatory Method or Constructor", "message":"If a method is self-explanatory, at-clauses may be omitted from the doc comment.", "color":"#00FF00"},
-                        {"title":"Non-Obvious Code", "message":"Within a method, comments are needed to explain any code whose purpose is not obvious.", "color":"#00FF00"},
-                        {"title":"Non-Obvious Variable Name", "message":"Write a comment to explain the purpose of a variable unless the purpose is obvious from the name.", "color":"#00FF00"}
+                        {"title":"Missing Header", "message":"Each class must have a properly structured doc comment including at least a summary fragment and the author's name (first and last).", "color":"#FF0000"},
+                        {"title":"Errors and Warnings", "message":"Document all known errors and deficiencies in the doc comment of the relevant class.", "color":"#FF0000"},
+                        {"title":"Constructors and Methods", "message":"Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.", "color":"#FF0000"},
+                        {"title":"Self-Explanatory Method or Constructor", "message":"If a method is self-explanatory, at-clauses may be omitted from the doc comment.", "color":"#FF0000"},
+                        {"title":"Non-Obvious Code", "message":"Within a method, comments are needed to explain any code whose purpose is not obvious.", "color":"#FF0000"},
+                        {"title":"Non-Obvious Variable Name", "message":"Write a comment to explain the purpose of a variable unless the purpose is obvious from the name.", "color":"#FF0000"}
                     ]
                 },
                 {
                     "category":true,
                     "title":"Indentation and Whitespace",
                     "body":[
-                        {"title":"Consistent Formatting", "message":"Consistently indent all statements appearing within a block to clarify the logic and flow of control.", "color":"#8968CD"},
-                        {"title":"Consistent Closing Braces", "message":"Line up closing braces of blocks with the keyword owning the block.", "color":"#8968CD"},
-                        {"title":"Code Drift", "message":"Avoid code drift: each line should be at most 100 characters long.", "color":"#8968CD"},
-                        {"title":"Logical Separation", "message":"Use blank lines to separate parts of a method that are logically distinct.", "color":"#8968CD"},
-                        {"title":"Binary Operator", "message":"Leave a space before and after every binary operator.", "color":"#8968CD"},
-                        {"title":"Method and Constructor Formatting", "message":"Leave a blank line after every method and constructor.", "color":"#8968CD"},
-                        {"title":"Excess Blank Lines", "message":"There should be no more than two consecutive blank lines.", "color":"#8968CD"}
+                        {"title":"Consistent Formatting", "message":"Consistently indent all statements appearing within a block to clarify the logic and flow of control.", "color":"#0000FF"},
+                        {"title":"Consistent Closing Braces", "message":"Line up closing braces of blocks with the keyword owning the block.", "color":"#0000FF"},
+                        {"title":"Code Drift", "message":"Avoid code drift: each line should be at most 100 characters long.", "color":"#0000FF"},
+                        {"title":"Logical Separation", "message":"Use blank lines to separate parts of a method that are logically distinct.", "color":"#0000FF"},
+                        {"title":"Binary Operator", "message":"Leave a space before and after every binary operator.", "color":"#0000FF"},
+                        {"title":"Method and Constructor Formatting", "message":"Leave a blank line after every method and constructor.", "color":"#0000FF"},
+                        {"title":"Excess Blank Lines", "message":"There should be no more than two consecutive blank lines.", "color":"#0000FF"}
                     ]
                 },
                 {

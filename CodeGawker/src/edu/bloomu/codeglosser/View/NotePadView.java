@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 import edu.bloomu.codeglosser.Controller.IMarkupView;
 import edu.bloomu.codeglosser.Controller.NotePadController;
+import edu.bloomu.codeglosser.Utils.ColorUtils;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import java.awt.event.MouseAdapter;
@@ -209,7 +210,7 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
                 .forEach((b) -> {
                     Highlight highlight = null;
                     try {
-                        highlight = (Highlight) highlighter.addHighlight(b.getStart(), b.getEnd(), new DefaultHighlightPainter(Color.YELLOW));
+                        highlight = (Highlight) highlighter.addHighlight(b.getStart(), b.getEnd(), new DefaultHighlightPainter(ColorUtils.makeTransparent(Color.YELLOW)));
                     } catch (BadLocationException ex) {
                         LOG.throwing(this.getClass().getName(), "addMarkup", ex);
                     }
@@ -239,7 +240,7 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
                 .forEach((h) -> {
                     Bounds b = Bounds.of(h.getStartOffset(), h.getEndOffset());
                     highlighter.removeHighlight(h);
-                    HighlightPainter hp = new DefaultHighlightPainter(color);
+                    HighlightPainter hp = new DefaultHighlightPainter(ColorUtils.makeTransparent(color));
                     try {
                         Highlight h1 = (Highlight) highlighter.addHighlight(b.getStart(), b.getEnd(), hp);
                         hMap.put(b, h1);

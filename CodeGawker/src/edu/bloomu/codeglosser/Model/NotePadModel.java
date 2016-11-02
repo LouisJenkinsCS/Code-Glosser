@@ -13,6 +13,7 @@ import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Logger;
+import org.apache.logging.log4j.util.Strings;
 
 /**
  *
@@ -114,14 +115,17 @@ public class NotePadModel {
                 if (start != end) {
                     String orig = text.substring(start, currOffset);
                     String trimmed = orig.trim();
+                    if("".equals(trimmed))
+                        break;
+                    
                     LOG.info("End: " + trimmed);
                     
                     int startOffset = 0;
-                    while (orig.charAt(startOffset) != trimmed.charAt(0))
+                    while (trimmed.length() != 0 && orig.charAt(startOffset) != trimmed.charAt(0))
                         startOffset++;
                     
                     int endOffset = 0;
-                    while (orig.charAt(orig.length() - (endOffset + 1)) != trimmed.charAt(trimmed.length()-1))
+                    while (trimmed.length() != 0 && orig.charAt(orig.length() - (endOffset + 1)) != trimmed.charAt(trimmed.length()-1))
                         endOffset++;
                     
                     bounds.add(Bounds.of(start + startOffset + 1, (currOffset - (endOffset + 1)) + 2));

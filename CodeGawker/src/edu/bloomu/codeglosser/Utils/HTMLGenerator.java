@@ -21,9 +21,9 @@ public class HTMLGenerator {
     
     public static String generate(String title, String code, List<Note> notes) {
         StringBuilder builder = new StringBuilder();
-        code.replaceAll("<", "&lt;");
-        code.replaceAll(">", "%gt;");
-        code.replaceAll("&", "&amp;");
+//        code = code.replaceAll("&", "&amp;");
+//        code = code.replaceAll("<", "&lt;");
+//        code = code.replaceAll(">", "&gt;");
         builder
                 .append("<html>")
                 .append("    <head>")
@@ -88,22 +88,26 @@ public class HTMLGenerator {
         
         int offset = 0;
         
-        for (Note n : notes) {            
-            // Add all characters up to next markup...
-            finalCode.append(code.substring(offset, n.getRange().getStart() - 1));
-            
-            // Inject the code for the markup.
-            finalCode.append("<span class=\"note\" msg=\"").append(n.getMsg()).append("\">");
-            
-            // Read in the text in between markups...
-            finalCode.append(code.substring(n.getRange().getStart() - 1, n.getRange().getEnd()));
-            
-            // Inject the end tag for the markup.
-            finalCode.append("</span>");
-            
-            // Update offset for next run.
-            offset = n.getRange().getEnd() - 1;
-            LOG.info("Output Note: " + n.getId() + " with message: " + n.getMsg() + " with new offset: " + offset);
+        for (Note n : notes) {
+            for (Bounds b : n.getOffsets()) {
+                // Add all characters up to next markup...
+                finalCode.append(code.substring(offset, b.getStart() - 1));
+
+                // Inject the code for the markup.
+                String color = String.format("#%02x%02x%02x",
+                        n.getHighlightColor().getRed(), n.getHighlightColor().getGreen(), n.getHighlightColor().getBlue());
+                finalCode.append("<span class=\"note\" style=\"border-bottom: 1px dotted ").append(color).append(";\" msg=\"").append(n.getMsg()).append("\">");
+
+                // Read in the text in between markups...
+                finalCode.append(code.substring(b.getStart() - 1, b.getEnd()));
+
+                // Inject the end tag for the markup.
+                finalCode.append("</span>");
+
+                // Update offset for next run.
+                offset = b.getEnd();
+                LOG.info("Output Note: " + n.getId() + " with message: " + n.getMsg() + " with new offset: " + offset);
+            }
         }
         
         if (offset < code.length()) {
