@@ -41,20 +41,20 @@ import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
-<span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Missing Summary">/**
-</span> <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Missing Summary">*
-</span> <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Missing Summary">* @author Drue Coles </span>
- <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Missing Summary">*/
-</span>public class GlossedDocument implements Serializable { <span>
+/**
+ *
+ * @author Drue Coles 
+ */
+public class GlossedDocument implements Serializable {
 
     private final Document document;
-    <span class="note" style="border-bottom: 1px dotted #ff00ff;" msg="Useless Comment">// Hi
-</span>    private final ArrayList<CommentData> list = new ArrayList<>();
+    // Hi
+    private final ArrayList<CommentData> list = new ArrayList<>();
 
-    <span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">public GlossedDocument(Document document) {
-</span>        <span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">this.document = document; </span>      
-    <span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">}
-</span>    
+    public GlossedDocument(Document document) {
+        this.document = document;       
+    }
+    
     public String getDocumentName() {
         String name = (String) document.getProperty(Document.TitleProperty);
         int i = name.lastIndexOf(System.getProperty("file.separator"));
@@ -69,8 +69,8 @@ import javax.swing.text.Document;
         try {
             text = document.getText(0, document.getLength());
         } catch (BadLocationException ex) {
-            <span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Do not swallow exceptions.">Logger.getLogger(GlossedDocument.class.getName()).log(Level.SEVERE, null, ex);
-</span>        }
+            Logger.getLogger(GlossedDocument.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return text;
     }
     
@@ -94,10 +94,10 @@ import javax.swing.text.Document;
                 data = cData;
             }
         }
-        <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Use blank lines to separate parts of a method that are logically distinct.">if (data != null) {
-</span>            <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Use blank lines to separate parts of a method that are logically distinct.">list.remove(data);
-</span>        <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Use blank lines to separate parts of a method that are logically distinct.">}
-</span>    }
+        if (data != null) {
+            list.remove(data);
+        }
+    }
     
     public void removeAllComments() {
         list.clear();
@@ -112,15 +112,15 @@ import javax.swing.text.Document;
         return null;
     }
     
-    public void addEmptyComment(int startPos, int endPos) {
-        addComment("", startPos, endPos);
+    <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">public void addEmptyComment(int startPos, int endPos) {
+</span>        addComment("", startPos, endPos);
     }
     
-    public void editComment(String comment, int startPos, int endPos) {
-        for (CommentData data : list) {
-            if (data.startPos == startPos && data.endPos == endPos) {
-                data.comment = comment;
-            }
+    <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use lowerCamelCase verbs or verb phrases for method names.">public void editComment(String comment, int startPos, int endPos) {
+</span>        <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use named constants instead of multiple occurrences of the same numerical literal.">for (CommentData data : list) {
+</span>            <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Line up closing braces of blocks with the keyword owning the block.">if (data.startPos == startPos && data.endPos == endPos) {
+</span>                <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">data.comment = comment;
+</span>            }
         }
     }
    

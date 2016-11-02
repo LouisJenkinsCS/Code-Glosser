@@ -85,6 +85,11 @@ public class NotePadController {
                 .doOnNext((b) -> LOG.info("onShowSelection: " + b.toString()))
                 .map((b) -> manager.getNote(b))
                 .subscribe((opt) -> opt.ifPresent((n) -> bus.post(NoteSelectedChangeEvent.of(n))));
+        
+        view.onTripleClick()
+                .doOnNext(offset -> LOG.info("onTripleClick: " + offset))
+                .map(model::getLineBounds)
+                .subscribe(view::setSelection);
     }
     
     public void setModelDocument(Document doc) {

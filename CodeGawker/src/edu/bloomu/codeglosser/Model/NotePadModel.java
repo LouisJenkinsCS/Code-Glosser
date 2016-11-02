@@ -155,13 +155,30 @@ public class NotePadModel {
     }
     
     public String toHTML() {
-//        JavaSourceConversionOptions options = JavaSourceConversionOptions.getDefault();
-//        options.getStyleTable().put(JavaSourceType.KEYWORD, new JavaSourceStyleEntry(RGB.BLUE, true, false));
-//        options.getStyleTable().put(JavaSourceType.STRING, new JavaSourceStyleEntry(new RGB(206, 133, 0)));
-//        options.getStyleTable().put(JavaSourceType.LINE_NUMBERS, new JavaSourceStyleEntry(RGB.BLACK));
-//        options.getStyleTable().put(JavaSourceType.NUM_CONSTANT, new JavaSourceStyleEntry(RGB.BLACK));
-//        options.getStyleTable().put(JavaSourceType.CODE_TYPE, new JavaSourceStyleEntry(RGB.BLUE));
-//        return Java2Html.convertToHtml(text, new JavaSourceConversionSettings(options));
         return new Java2HTML().translate(text);
-    }    
+    }
+    
+    public Bounds getLineBounds(int offset) {
+        int lineStart = offset;
+        int lineEnd = lineStart;
+
+        // Check if we are at the beginning of the line
+        char ch = '\0';
+        if (lineStart != 0) {
+            while (ch != '\n' && lineStart >= 0) {
+                ch = text.charAt(lineStart);
+                lineStart--;
+            }
+            lineStart++;
+        }
+
+        ch = '\0';
+        while (ch != '\n' && lineEnd < text.length()) {
+            ch = text.charAt(lineEnd);
+            lineEnd++;
+        }
+        lineEnd--;
+
+        return Bounds.of(lineStart + 1, lineEnd + 1);
+    }
 }

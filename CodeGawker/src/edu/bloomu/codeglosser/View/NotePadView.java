@@ -24,6 +24,7 @@ import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
 import javax.swing.text.Highlighter.HighlightPainter;
+import org.openide.util.Exceptions;
 
 
 /**
@@ -38,6 +39,7 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
     private final PublishSubject<Bounds> onDeleteSelection = PublishSubject.create();
     private final PublishSubject<Bounds> onCreateSelection = PublishSubject.create();
     private final PublishSubject<Object> onPreviewHTML = PublishSubject.create();
+    private final PublishSubject<Integer> onTripleClick = PublishSubject.create();
     
     private final Highlighter highlighter;
     private final HashMap<Bounds, Highlight> hMap = new HashMap<>();
@@ -65,6 +67,11 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
                 if (e.getClickCount() == 2 && !e.isConsumed()) {
                     LOG.info("Double Click!");
                     onShowSelection.onNext(Bounds.of(textCode.getSelectionStart(), textCode.getSelectionEnd()));
+                }
+                
+                if (e.getClickCount() >= 3 && !e.isConsumed()) {
+                    onTripleClick.onNext(textCode.getSelectionStart());
+                    e.consume();
                 }
             }
 
@@ -155,6 +162,10 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
     
     public Observable<Object> onPreviewHTML() {
         return onPreviewHTML;
+    }
+    
+    public Observable<Integer> onTripleClick() {
+        return onTripleClick;
     }
     
     /**
@@ -248,5 +259,11 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
                         ex.printStackTrace();
                     }
                 });
+    }
+
+    @Override
+    public void setSelection(Bounds bounds) {
+        textCode.setSelectionStart(bounds.getStart());
+        textCode.setSelectionEnd(bounds.getEnd());
     }
 }
