@@ -77,7 +77,7 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
         propertyNoteSelected.observe()
                 .doOnNext((n) -> System.out.println("Note Selection Change: " + n.toString()))
                 .subscribe((n) -> { 
-                    if (n != null && bus != null) {
+                    if (bus != null) {
                         bus.post(NoteSelectedChangeEvent.of(n));
                     }
                 });

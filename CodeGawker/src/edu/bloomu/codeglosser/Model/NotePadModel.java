@@ -43,7 +43,8 @@ public class NotePadModel {
      * @return Array of segmented bounds.
      */
     public Bounds[] segmentRange(Bounds range) throws InvalidTextSelectionException {
-        int start = range.getStart() - 1;
+        int start = range.getStart();
+        start = start == 0 ? start : start - 1;
         int end = range.getEnd() - 1;
         if (start == end) {
             LOG.warning("Nothing was selected...");

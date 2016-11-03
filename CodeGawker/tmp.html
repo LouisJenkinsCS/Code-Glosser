@@ -41,11 +41,11 @@ import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
-/**
- *
- * @author Drue Coles 
- */
-public class GlossedDocument implements Serializable {
+<span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Missing: Summary">/**
+</span> <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Missing: Summary">*
+</span> <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Missing: Summary">* @author Drue Coles </span>
+ <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Missing: Summary">*/
+</span>public class GlossedDocument implements Serializable {
 
     private final Document document;
     // Hi
@@ -64,16 +64,16 @@ public class GlossedDocument implements Serializable {
         return name;
     }
        
-    public String getText() {
-        String text = null;
-        try {
-            text = document.getText(0, document.getLength());
-        } catch (BadLocationException ex) {
-            Logger.getLogger(GlossedDocument.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return text;
-    }
-    
+    <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">public String getText() {
+</span>        <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">String text = null;
+</span>        <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">try {
+</span>            <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">text = document.getText(0, document.getLength());
+</span>        <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">} catch (BadLocationException ex) {
+</span>            <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">Logger.getLogger(GlossedDocument.class.getName()).log(Level.SEVERE, null, ex);
+</span>        <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">}
+</span>        <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">return text;
+</span>    <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">}
+</span>    
     public boolean canAddComment(int startPos, int endPos) {
         for (CommentData data : list) {
             if (endPos >= data.startPos && startPos <= data.endPos) {
@@ -87,18 +87,18 @@ public class GlossedDocument implements Serializable {
         list.add(new CommentData(comment, startPos, endPos));
     }
     
-    public void removeComment(int startPos, int endPos) {
-        CommentData data = null;
-        for (CommentData cData : list) {
-            if (cData.startPos == startPos && cData.endPos == endPos) {
-                data = cData;
-            }
-        }
-        if (data != null) {
-            list.remove(data);
-        }
-    }
-    
+    <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">public void removeComment(int startPos, int endPos) {
+</span>        <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">CommentData data = null;
+</span>        <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">for (CommentData cData : list) {
+</span>            <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">if (cData.startPos == startPos && cData.endPos == endPos) {
+</span>                <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">data = cData;
+</span>            <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">}
+</span>        <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">}
+</span>        <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">if (data != null) {
+</span>            <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">list.remove(data);
+</span>        <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">}
+</span>    <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">}
+</span>    
     public void removeAllComments() {
         list.clear();
     }
@@ -112,15 +112,15 @@ public class GlossedDocument implements Serializable {
         return null;
     }
     
-    <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">public void addEmptyComment(int startPos, int endPos) {
-</span>        addComment("", startPos, endPos);
+    public void addEmptyComment(int startPos, int endPos) {
+        addComment("", startPos, endPos);
     }
     
-    <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use lowerCamelCase verbs or verb phrases for method names.">public void editComment(String comment, int startPos, int endPos) {
-</span>        <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use named constants instead of multiple occurrences of the same numerical literal.">for (CommentData data : list) {
-</span>            <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Line up closing braces of blocks with the keyword owning the block.">if (data.startPos == startPos && data.endPos == endPos) {
-</span>                <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">data.comment = comment;
-</span>            }
+    public void editComment(String comment, int startPos, int endPos) {
+        for (CommentData data : list) {
+            if (data.startPos == startPos && data.endPos == endPos) {
+                data.comment = comment;
+            }
         }
     }
    

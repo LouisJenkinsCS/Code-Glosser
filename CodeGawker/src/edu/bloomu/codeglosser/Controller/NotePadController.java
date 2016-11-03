@@ -105,7 +105,9 @@ public class NotePadController {
     
     @Subscribe
     public void noteSelectedChange(NoteSelectedChangeEvent e) {
-        // Implement way to make selected Note brighter.
+        if (e.getNote() != Note.DEFAULT) {
+            view.setSelection(e.getNote().getRange());
+        }
     }
     
     @Subscribe

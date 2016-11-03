@@ -246,6 +246,14 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
 
     @Override
     public void setMarkupColor(Bounds bounds, Color color) {
+        // Save the currently selected offsets
+        int start = textCode.getSelectionStart();
+        int end = textCode.getSelectionEnd();
+        
+        // Remove selection
+        textCode.setSelectionStart(start);
+        textCode.setSelectionEnd(start);
+        
         Stream.of(highlighter.getHighlights())
                 .filter((h) -> Bounds.of(h.getStartOffset(), h.getEndOffset()).collidesWith(bounds))
                 .forEach((h) -> {
@@ -259,10 +267,16 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
                         ex.printStackTrace();
                     }
                 });
+        
+        // Restore saved offsets
+        if (start != 0 || end != 0) {
+            setSelection(Bounds.of(start, end));
+        }
     }
 
     @Override
     public void setSelection(Bounds bounds) {
+        this.requestFocus(true);
         textCode.setSelectionStart(bounds.getStart());
         textCode.setSelectionEnd(bounds.getEnd());
     }
