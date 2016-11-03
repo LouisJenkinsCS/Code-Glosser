@@ -6,7 +6,7 @@
 package edu.bloomu.codeglosser;
 
 import edu.bloomu.codeglosser.View.NotePropertiesView;
-import edu.bloomu.codeglosser.View.ProjectFileViewer;
+import edu.bloomu.codeglosser.View.PropertyTreeView;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -35,7 +35,7 @@ public final class MarkupProject implements ActionListener {
     
     @Override
     public void actionPerformed(ActionEvent e) {
-        ProjectFileViewer v = new ProjectFileViewer();
+        PropertyTreeView v = new PropertyTreeView();
         JFileChooser jfc = new JFileChooser();
         jfc.setCurrentDirectory(new File("."));
         jfc.setDialogTitle("Project");
@@ -44,7 +44,7 @@ public final class MarkupProject implements ActionListener {
         
         if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             LOG.info("Current Directory: " + jfc.getCurrentDirectory());
-            v.setDirectory(jfc.getSelectedFile());
+//            v.setDirectory(jfc.getSelectedFile());
         }
         
         JOptionPane.showMessageDialog(null, v);

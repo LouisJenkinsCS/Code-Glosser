@@ -16,4 +16,5 @@ public interface IMarkupView {
     void addMarkup(Bounds ...bounds);
     void removeMarkup(Bounds ...bounds);
     void setMarkupColor(Bounds bounds, Color color);
+    void setSelection(Bounds bounds);
 }

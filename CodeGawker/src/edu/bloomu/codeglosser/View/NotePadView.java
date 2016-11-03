@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 import edu.bloomu.codeglosser.Controller.IMarkupView;
 import edu.bloomu.codeglosser.Controller.NotePadController;
+import edu.bloomu.codeglosser.Utils.ColorUtils;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import java.awt.event.MouseAdapter;
@@ -23,6 +24,7 @@ import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
 import javax.swing.text.Highlighter.HighlightPainter;
+import org.openide.util.Exceptions;
 
 
 /**
@@ -37,6 +39,7 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
     private final PublishSubject<Bounds> onDeleteSelection = PublishSubject.create();
     private final PublishSubject<Bounds> onCreateSelection = PublishSubject.create();
     private final PublishSubject<Object> onPreviewHTML = PublishSubject.create();
+    private final PublishSubject<Integer> onTripleClick = PublishSubject.create();
     
     private final Highlighter highlighter;
     private final HashMap<Bounds, Highlight> hMap = new HashMap<>();
@@ -64,6 +67,11 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
                 if (e.getClickCount() == 2 && !e.isConsumed()) {
                     LOG.info("Double Click!");
                     onShowSelection.onNext(Bounds.of(textCode.getSelectionStart(), textCode.getSelectionEnd()));
+                }
+                
+                if (e.getClickCount() >= 3 && !e.isConsumed()) {
+                    onTripleClick.onNext(textCode.getSelectionStart());
+                    e.consume();
                 }
             }
 
@@ -104,6 +112,9 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
         
         addNote.addActionListener((e) -> {
             LOG.info(e.paramString());
+            if (textCode.getSelectedText() == null)
+                return;
+            
             LOG.info("Selected Text: " + textCode.getSelectedText().replaceAll("    ", "\n"));
             onCreateSelection.onNext(Bounds.of(textCode.getSelectionStart(), textCode.getSelectionEnd()));
         });
@@ -131,9 +142,10 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
     
     public void setText(String str) {
         LOG.info("Text changed...");
-        LOG.info(str.trim());
+//        LOG.info(str.trim());
         // Count line breaks
-        textCode.setText("<html><body> <pre>" + str.trim() + " </pre></body></html>");
+        textCode.setText("<html><head></head><body>" + str.trim() + "</body></html>");
+        LOG.info(textCode.getText());
     }
 
     public Observable<Bounds> onShowSelection() {
@@ -150,6 +162,10 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
     
     public Observable<Object> onPreviewHTML() {
         return onPreviewHTML;
+    }
+    
+    public Observable<Integer> onTripleClick() {
+        return onTripleClick;
     }
     
     /**
@@ -205,7 +221,7 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
                 .forEach((b) -> {
                     Highlight highlight = null;
                     try {
-                        highlight = (Highlight) highlighter.addHighlight(b.getStart(), b.getEnd(), new DefaultHighlightPainter(Color.YELLOW));
+                        highlight = (Highlight) highlighter.addHighlight(b.getStart(), b.getEnd(), new DefaultHighlightPainter(ColorUtils.makeTransparent(Color.YELLOW)));
                     } catch (BadLocationException ex) {
                         LOG.throwing(this.getClass().getName(), "addMarkup", ex);
                     }
@@ -230,12 +246,20 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
 
     @Override
     public void setMarkupColor(Bounds bounds, Color color) {
+        // Save the currently selected offsets
+        int start = textCode.getSelectionStart();
+        int end = textCode.getSelectionEnd();
+        
+        // Remove selection
+        textCode.setSelectionStart(start);
+        textCode.setSelectionEnd(start);
+        
         Stream.of(highlighter.getHighlights())
                 .filter((h) -> Bounds.of(h.getStartOffset(), h.getEndOffset()).collidesWith(bounds))
                 .forEach((h) -> {
                     Bounds b = Bounds.of(h.getStartOffset(), h.getEndOffset());
                     highlighter.removeHighlight(h);
-                    HighlightPainter hp = new DefaultHighlightPainter(color);
+                    HighlightPainter hp = new DefaultHighlightPainter(ColorUtils.makeTransparent(color));
                     try {
                         Highlight h1 = (Highlight) highlighter.addHighlight(b.getStart(), b.getEnd(), hp);
                         hMap.put(b, h1);
@@ -243,5 +267,17 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
                         ex.printStackTrace();
                     }
                 });
+        
+        // Restore saved offsets
+        if (start != 0 || end != 0) {
+            setSelection(Bounds.of(start, end));
+        }
+    }
+
+    @Override
+    public void setSelection(Bounds bounds) {
+        this.requestFocus(true);
+        textCode.setSelectionStart(bounds.getStart());
+        textCode.setSelectionEnd(bounds.getEnd());
     }
 }

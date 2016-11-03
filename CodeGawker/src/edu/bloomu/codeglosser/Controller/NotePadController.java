@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.logging.Logger;
 import javax.swing.text.Document;
 import org.openide.util.Exceptions;
@@ -48,7 +49,7 @@ public class NotePadController {
         
         view.onPreviewHTML()
                 .subscribe((ignored) -> {
-                    String html = HTMLGenerator.generate(model.getTitle(), model.getText());
+                    String html = HTMLGenerator.generate(model.getTitle(), model.getText(), manager.getAllNotes());
                     try {
                         File f = new File("tmp.html");
                         f.createNewFile();
@@ -64,13 +65,18 @@ public class NotePadController {
         
         view.onCreateSelection()
                 .doOnNext((b) -> LOG.info("onShowSelection: " + b.toString()))
+                .map(model::segmentRange)
                 .doOnNext(view::addMarkup)
                 .map((b) -> manager.createNote(b))
                 .subscribe((n) -> bus.post(NoteSelectedChangeEvent.of(n)));
         
         view.onDeleteSelection()
-                .doOnNext((b) -> LOG.info("onDeleteSelection: " + b.toString()))
-                .subscribe((b) -> {
+                .doOnNext(b -> LOG.info("onDeleteSelection: " + b.toString()))
+                .map(b -> manager.getNote(b))
+                .filter(optN -> optN.isPresent())
+                .map(Optional::get)
+                .map(Note::getRange)
+                .subscribe(b -> {
                     view.removeMarkup(b);
                     manager.deleteNote(b);
                 });
@@ -79,6 +85,11 @@ public class NotePadController {
                 .doOnNext((b) -> LOG.info("onShowSelection: " + b.toString()))
                 .map((b) -> manager.getNote(b))
                 .subscribe((opt) -> opt.ifPresent((n) -> bus.post(NoteSelectedChangeEvent.of(n))));
+        
+        view.onTripleClick()
+                .doOnNext(offset -> LOG.info("onTripleClick: " + offset))
+                .map(model::getLineBounds)
+                .subscribe(view::setSelection);
     }
     
     public void setModelDocument(Document doc) {
@@ -90,6 +101,13 @@ public class NotePadController {
     @Subscribe
     public void highlightColorChange(MarkupColorChangeEvent e) {
         view.setMarkupColor(e.getBounds(), e.getColor());
+    }
+    
+    @Subscribe
+    public void noteSelectedChange(NoteSelectedChangeEvent e) {
+        if (e.getNote() != Note.DEFAULT) {
+            view.setSelection(e.getNote().getRange());
+        }
     }
     
     @Subscribe

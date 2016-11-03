@@ -59,6 +59,11 @@ public class Note {
         return Bounds.of(offsets.get(0).getStart(), offsets.get(offsets.size()-1).getEnd());
     }
 
+    public Bounds[] getOffsets() {
+        return offsets.toArray(new Bounds[offsets.size()]);
+    }
+    
+
     public Color getHighlightColor() {
         return highlightColor;
     }

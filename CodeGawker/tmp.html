@@ -1,15 +1,37 @@
-<html>
-    <head>
-        <link rel="stylesheet" href="src/edu/bloomu/codeglosser/HTML/styles/default.css">
-        <script src="src/edu/bloomu/codeglosser/HTML/highlight.pack.js"></script>
-        <script>hljs.initHighlightingOnLoad();</script>
-        <title>test.java</title>
-        <meta charset="UTF-8">
-    </head>
-    <body>
-        <pre>            
-            <code class="java">
-package edu.bloomu.codeglosser;
+<html>    <head>        <link rel="stylesheet" href="src/edu/bloomu/codeglosser/HTML/styles/atom-one-light.css">        <script src="src/edu/bloomu/codeglosser/HTML/highlight.pack.js"></script>        <script>hljs.initHighlightingOnLoad();</script><style>.note {
+  display: inline;
+  position: relative;
+  border-bottom: 1px dotted #0000FF
+}
+
+.note:hover:after {
+  background: #333;
+  background: rgba(0,0,0,.8);
+  border-radius: 5px;
+  bottom: 26px;
+  white-space: pre-wrap;
+  color: #fff;
+  content: attr(msg);
+  left: 20%;
+  padding: 5px 15px;
+  position: absolute;
+  z-index: 98;
+  width:500px;
+  display:block;
+  word-wrap: normal;
+}
+
+.note:hover:before{
+  border:solid;
+  border-color: #333 transparent;
+  border-width: 6px 6px 0 6px;
+  bottom: 20px;
+  content: "";
+  left: 50%;
+  position: absolute;
+  display:block;
+  z-index: 99;
+}</style>        <title>test.java</title>        <meta charset="UTF-8">    </head>    <body>        <pre><code>package edu.bloomu.codeglosser;
 
 import java.awt.Point;
 import java.io.Serializable;
@@ -19,11 +41,11 @@ import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
-/**
- *
- * @author Drue Coles
- */
-public class GlossedDocument implements Serializable {
+<span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Missing: Summary">/**
+</span> <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Missing: Summary">*
+</span> <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Missing: Summary">* @author Drue Coles </span>
+ <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Missing: Summary">*/
+</span>public class GlossedDocument implements Serializable {
 
     private final Document document;
     // Hi
@@ -42,16 +64,16 @@ public class GlossedDocument implements Serializable {
         return name;
     }
        
-    public String getText() {
-        String text = null;
-        try {
-            text = document.getText(0, document.getLength());
-        } catch (BadLocationException ex) {
-            Logger.getLogger(GlossedDocument.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return text;
-    }
-    
+    <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">public String getText() {
+</span>        <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">String text = null;
+</span>        <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">try {
+</span>            <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">text = document.getText(0, document.getLength());
+</span>        <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">} catch (BadLocationException ex) {
+</span>            <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">Logger.getLogger(GlossedDocument.class.getName()).log(Level.SEVERE, null, ex);
+</span>        <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">}
+</span>        <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">return text;
+</span>    <span class="note" style="border-bottom: 1px dotted #0000ff;" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">}
+</span>    
     public boolean canAddComment(int startPos, int endPos) {
         for (CommentData data : list) {
             if (endPos >= data.startPos && startPos <= data.endPos) {
@@ -65,18 +87,18 @@ public class GlossedDocument implements Serializable {
         list.add(new CommentData(comment, startPos, endPos));
     }
     
-    public void removeComment(int startPos, int endPos) {
-        CommentData data = null;
-        for (CommentData cData : list) {
-            if (cData.startPos == startPos && cData.endPos == endPos) {
-                data = cData;
-            }
-        }
-        if (data != null) {
-            list.remove(data);
-        }
-    }
-    
+    <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">public void removeComment(int startPos, int endPos) {
+</span>        <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">CommentData data = null;
+</span>        <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">for (CommentData cData : list) {
+</span>            <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">if (cData.startPos == startPos && cData.endPos == endPos) {
+</span>                <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">data = cData;
+</span>            <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">}
+</span>        <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">}
+</span>        <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">if (data != null) {
+</span>            <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">list.remove(data);
+</span>        <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">}
+</span>    <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="Hello World asd">}
+</span>    
     public void removeAllComments() {
         list.clear();
     }
@@ -104,8 +126,8 @@ public class GlossedDocument implements Serializable {
    
 }
 
-class CommentData implements Serializable {
-
+<span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Each class must have a properly structured doc comment including at least a summary fragment and the author's name (first and last).">class CommentData implements Serializable {
+</span>
     String comment;
     final int startPos;
     final int endPos;
@@ -116,7 +138,4 @@ class CommentData implements Serializable {
         this.comment = "";
     }  
 }
-</code>
-        </pre>
-    </body>
-</html>
+</code></pre>    </body></html>
