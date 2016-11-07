@@ -8,6 +8,7 @@ package edu.bloomu.codeglosser;
 import com.google.common.io.Files;
 import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import edu.bloomu.codeglosser.Utils.HTMLGenerator;
+import edu.bloomu.codeglosser.View.MarkupTopComponent;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -57,21 +58,14 @@ public final class NoteMarkup implements ActionListener {
             return;
         }
         
-        GlossableTopComponent gTopComponent = new GlossableTopComponent(jtc.getDocument());
-        gTopComponent.open();
-        gTopComponent.requestActive();     
-    }
-    
-    private void testHTML(Document doc) {
-        String html = HTMLGenerator.generate(DocumentHelper.getDocumentName(doc), DocumentHelper.getText(doc), new ArrayList<>());
         try {
-            File f = new File("tmp.html");
-            f.createNewFile();
-            BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(f));
-            stream.write(html.getBytes());
-            stream.flush();
-            stream.close();
-            Desktop.getDesktop().browse(f.toURI());
+            File tmp = File.createTempFile("code-glosser-dump", ".tmp");
+            FileOutputStream ostream = new FileOutputStream(tmp);
+            ostream.write(DocumentHelper.getText(jtc.getDocument()).getBytes());
+            ostream.close();
+            MarkupTopComponent mtc = new MarkupTopComponent(tmp);
+            mtc.open();
+            mtc.requestActive();  
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }

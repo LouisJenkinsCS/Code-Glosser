@@ -83,9 +83,12 @@
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="propertyMessage3" max="32767" attributes="0"/>
-                      <Component id="propertyHighlightColor3" alignment="0" pref="0" max="32767" attributes="0"/>
-                      <Component id="propertyNoteSelected" alignment="1" min="-2" max="-2" attributes="0"/>
-                      <Component id="propertyTemplate" alignment="1" max="32767" attributes="0"/>
+                      <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          <Component id="propertyNoteSelected" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Component id="propertyHighlightColor3" alignment="1" pref="0" max="32767" attributes="0"/>
+                      <Component id="jTabbedPane1" alignment="1" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -96,9 +99,8 @@
                           <Component id="propertyMessage3" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Component id="propertyHighlightColor3" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" max="-2" attributes="0"/>
-                          <Component id="propertyTemplate" max="32767" attributes="0"/>
-                          <EmptySpace min="-2" pref="0" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="jTabbedPane1" pref="300" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -110,8 +112,34 @@
                 </Component>
                 <Component class="edu.bloomu.codeglosser.View.PropertyTextArea" name="propertyMessage3">
                 </Component>
-                <Component class="edu.bloomu.codeglosser.View.PropertyTreeView" name="propertyTemplate">
-                </Component>
+                <Container class="javax.swing.JTabbedPane" name="jTabbedPane1">
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
+                  <SubComponents>
+                    <Component class="edu.bloomu.codeglosser.View.PropertyTreeView" name="propertyTemplate">
+                      <Constraints>
+                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                          <JTabbedPaneConstraints tabName="Templates">
+                            <Property name="tabTitle" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                              <ResourceString bundle="edu/bloomu/codeglosser/View/Bundle.properties" key="NotePropertiesView.propertyTemplate.TabConstraints.tabTitle" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                            </Property>
+                          </JTabbedPaneConstraints>
+                        </Constraint>
+                      </Constraints>
+                    </Component>
+                    <Component class="edu.bloomu.codeglosser.View.PropertyTreeView" name="propertyFiles">
+                      <Constraints>
+                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                          <JTabbedPaneConstraints tabName="Files">
+                            <Property name="tabTitle" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                              <ResourceString bundle="edu/bloomu/codeglosser/View/Bundle.properties" key="NotePropertiesView.propertyFiles.TabConstraints.tabTitle" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                            </Property>
+                          </JTabbedPaneConstraints>
+                        </Constraint>
+                      </Constraints>
+                    </Component>
+                  </SubComponents>
+                </Container>
               </SubComponents>
             </Container>
           </SubComponents>

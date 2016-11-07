@@ -38,15 +38,13 @@ public class GlossableTopComponent extends TopComponent {
     private final EventBus bus = new EventBus();
     
 
-    public GlossableTopComponent(Document doc) {
-        doc.putProperty(DefaultEditorKit.EndOfLineStringProperty, "\r\n");
-        setDisplayName(DocumentHelper.getDocumentName(doc) + ".html");
-        setLayout(new BorderLayout());      
-        MarkupView v = new MarkupView();
-        add(v, BorderLayout.CENTER);
-        NoteManager.getInstance(DocumentHelper.getDocumentName(doc));
-        v.setDocument(doc);
-        v.setEventBus(bus);
-        bus.post(FileChangeEvent.of(DocumentHelper.getDocumentName(doc)));
+    public GlossableTopComponent(File file) {
+//        setDisplayName(DocumentHelper.getDocumentName(doc) + ".html");
+//        setLayout(new BorderLayout());      
+//        MarkupView v = new MarkupView(null, bus);
+//        add(v, BorderLayout.CENTER);
+//        NoteManager.getInstance(DocumentHelper.getDocumentName(doc));
+//        v.setDocument(doc);
+//        bus.post(FileChangeEvent.of(DocumentHelper.getDocumentName(doc)));
     }
 }

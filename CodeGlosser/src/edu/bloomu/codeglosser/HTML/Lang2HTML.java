@@ -5,6 +5,7 @@
  */
 package edu.bloomu.codeglosser.HTML;
 
+import edu.bloomu.codeglosser.Utils.HTMLGenerator;
 import java.awt.Color;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
@@ -107,6 +108,8 @@ public abstract class Lang2HTML {
                     
             }
         }
+        
+        LOG.info(HTMLGenerator.generate(code));
         return buf.toString();
     }
     private static final Logger LOG = Logger.getLogger(Lang2HTML.class.getName());

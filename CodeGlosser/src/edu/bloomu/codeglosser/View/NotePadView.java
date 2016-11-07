@@ -9,7 +9,6 @@ import edu.bloomu.codeglosser.Utils.Bounds;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.logging.Logger;
-import edu.bloomu.codeglosser.Controller.IMarkupView;
 import edu.bloomu.codeglosser.Controller.NotePadController;
 import edu.bloomu.codeglosser.Utils.ColorUtils;
 import io.reactivex.Observable;
@@ -242,6 +241,14 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
                 .filter((b) -> Stream.of(bounds).anyMatch(b::collidesWith))
                 .map(hMap::remove)
                 .forEach(highlighter::removeHighlight);
+    }
+
+    @Override
+    public void removeAllMarkups() {
+        LOG.info("Removing all markups!");
+        hMap.values().stream()
+                .forEach(highlighter::removeHighlight);
+        hMap.clear();
     }
 
     @Override

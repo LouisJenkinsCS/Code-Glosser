@@ -43,8 +43,10 @@ public class NotePadController {
     private NoteManager manager;
     private EventBus bus;
     
-    public NotePadController(NotePadView v) {
+    public NotePadController(EventBus eb, NotePadView v) {
         view = v;
+        bus = eb;
+        bus.register(this);
         model = new NotePadModel();
         
         view.onPreviewHTML()
@@ -67,35 +69,31 @@ public class NotePadController {
                 .doOnNext((b) -> LOG.info("onShowSelection: " + b.toString()))
                 .map(model::segmentRange)
                 .doOnNext(view::addMarkup)
-                .map((b) -> manager.createNote(b))
-                .subscribe((n) -> bus.post(NoteSelectedChangeEvent.of(n)));
+                .map(b -> manager.createNote(b))
+                .map(NoteSelectedChangeEvent::of)
+                .subscribe(bus::post);
         
         view.onDeleteSelection()
                 .doOnNext(b -> LOG.info("onDeleteSelection: " + b.toString()))
                 .map(b -> manager.getNote(b))
-                .filter(optN -> optN.isPresent())
+                .filter(Optional::isPresent)
                 .map(Optional::get)
                 .map(Note::getRange)
-                .subscribe(b -> {
-                    view.removeMarkup(b);
-                    manager.deleteNote(b);
-                });
+                .doOnNext(view::removeMarkup)
+                .subscribe(b -> manager.deleteNote(b));
         
         view.onShowSelection()
                 .doOnNext((b) -> LOG.info("onShowSelection: " + b.toString()))
-                .map((b) -> manager.getNote(b))
-                .subscribe((opt) -> opt.ifPresent((n) -> bus.post(NoteSelectedChangeEvent.of(n))));
+                .map(b -> manager.getNote(b))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(NoteSelectedChangeEvent::of)
+                .subscribe(bus::post);
         
         view.onTripleClick()
                 .doOnNext(offset -> LOG.info("onTripleClick: " + offset))
                 .map(model::getLineBounds)
                 .subscribe(view::setSelection);
-    }
-    
-    public void setModelDocument(Document doc) {
-        model.setText(DocumentHelper.getText(doc));
-        model.setTitle(DocumentHelper.getDocumentName(doc));
-        view.setText(model.toHTML());
     }
     
     @Subscribe
@@ -113,12 +111,19 @@ public class NotePadController {
     @Subscribe
     public void handleFileChange(FileChangeEvent event) {
         manager = NoteManager.getInstance(event.getFileName());
+        view.removeAllMarkups();
+        try {
+            model.setText(event.getFileContents());
+            view.setText(model.toHTML());
+            manager.getAllNotes()
+                    .stream()
+                    .peek(n -> view.addMarkup(n.getOffsets()))
+                    .forEach((Note n) -> view.setMarkupColor(n.getRange(), n.getHighlightColor()));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
     
-    public void setEventBus(EventBus bus) {
-        this.bus = bus;
-    }
-
     public NotePadView getView() {
         return view;
     }

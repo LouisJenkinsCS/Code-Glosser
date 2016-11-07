@@ -32,6 +32,8 @@ public final class NoteManager {
     // One NoteManager per File
     private static final HashMap<String, NoteManager> MAPPED_INSTANCES = new HashMap<>();
     
+    public static final NoteManager NULL = new NoteManager();
+    
     public static NoteManager getInstance(String fileName) {
         NoteManager manager = MAPPED_INSTANCES.get(fileName);
         

@@ -7,6 +7,8 @@ package edu.bloomu.codeglosser.View;
 
 import com.google.common.eventbus.EventBus;
 import edu.bloomu.codeglosser.Controller.NotePadController;
+import edu.bloomu.codeglosser.Events.FileChangeEvent;
+import java.io.File;
 import java.util.logging.Logger;
 import javax.swing.text.Document;
 
@@ -20,29 +22,26 @@ public class MarkupView extends javax.swing.JPanel {
     
     
     private final NotePadController npController;
+    private final EventBus eventBus;
+    private final File project;
     
     /**
      * Creates new form MarkupView
      */
-    public MarkupView() {
+    public MarkupView(File project, EventBus eventBus) {
+        this.eventBus = eventBus;
+        this.project = project;
         initComponents();
-        npController = new NotePadController(notePadView1);
+        npController = new NotePadController(eventBus, notePadView1);
+        
+        // Display standalone files immediately
+        if (project.isFile()) {
+            eventBus.post(FileChangeEvent.of(project));
+        }
     }
     
     public void setNotePadText(String str) {
         notePadView1.setText(str);
-    }
-    
-    public void setEventBus(EventBus bus) {
-        notePropertiesView1.setEventBus(bus);
-        bus.register(notePropertiesView1);
-        npController.setEventBus(bus);
-        bus.register(npController);
-    }
-    
-    public void setDocument(Document doc) {
-        npController.setModelDocument(doc);
-        LOG.info(npController.getText());
     }
     
     /**
@@ -55,7 +54,7 @@ public class MarkupView extends javax.swing.JPanel {
     private void initComponents() {
 
         notePadView1 = new edu.bloomu.codeglosser.View.NotePadView();
-        notePropertiesView1 = new edu.bloomu.codeglosser.View.NotePropertiesView();
+        notePropertiesView1 = new edu.bloomu.codeglosser.View.NotePropertiesView(this.project, this.eventBus);
 
         notePropertiesView1.setEventBus(null);
         notePropertiesView1.setMaximumSize(new java.awt.Dimension(500, 37));
