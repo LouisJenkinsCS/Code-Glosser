@@ -29,6 +29,6 @@ public class FileChangeEvent {
     }
     
     public String getFileContents() throws IOException {
-        return new String(Files.readAllBytes(file.toPath()));
+        return new String(Files.readAllBytes(file.toPath())).replace("\r\n", "\n");
     }
 }

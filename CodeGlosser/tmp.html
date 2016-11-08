@@ -31,111 +31,66 @@
   position: absolute;
   display:block;
   z-index: 99;
-}</style>        <title>test.java</title>        <meta charset="UTF-8">    </head>    <body>        <pre><code>package edu.bloomu.codeglosser;
+}</style>        <title></title>        <meta charset="UTF-8">    </head>    <body>        <pre><code><span class="note" style="border-bottom: 1px dotted #ffff00;" msg="null">/*
+</span> <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="null">* To change this license header, choose License Headers in Project Properties.
+</span> <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="null">* To change this template file, choose Tools | Templates
+</span> <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="null">* and open the template in the editor.
+</span> <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="null">*/
+</span>package edu.bloomu.codeglosser.Utils;
 
-import java.awt.Point;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-
-/**
- *
- * @author Drue Coles 
- */
-public class GlossedDocument implements Serializable {
-
-    private final Document document;
-    // Hi
-    private final ArrayList<CommentData> list = new ArrayList<>();
-
-    public GlossedDocument(Document document) {
-        this.document = document;       
-    }
-    
-    public String getDocumentName() {
-        String name = (String) document.getProperty(Document.TitleProperty);
-        int i = name.lastIndexOf(System.getProperty("file.separator"));
-        if (i != -1 && i < name.length()) {
-            name = name.substring(i + 1);
-        }  
-        return name;
-    }
-       
-    public String getText() {
-        String text = null;
-        try {
-            text = document.getText(0, document.getLength());
-        } catch (BadLocationException ex) {
-            Logger.getLogger(GlossedDocument.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return text;
-    }
-    
-    public boolean canAddComment(int startPos, int endPos) {
-        for (CommentData data : list) {
-            if (endPos >= data.startPos && startPos <= data.endPos) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    public void addComment(String comment, int startPos, int endPos) {
-        list.add(new CommentData(comment, startPos, endPos));
-    }
-    
-    public void removeComment(int startPos, int endPos) {
-        CommentData data = null;
-        for (CommentData cData : list) {
-            if (cData.startPos == startPos && cData.endPos == endPos) {
-                data = cData;
-            }
-        }
-        if (data != null) {
-            list.remove(data);
-        }
-    }
-    
-    public void removeAllComments() {
-        list.clear();
-    }
-    
-    <span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">public Point getCommentRange(int startPos, int endPos) {
-</span>        <span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">for (CommentData data : list) {
-</span>            <span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">if (endPos >= data.startPos && startPos <= data.endPos) {
-</span>                <span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">return new Point(data.startPos, data.endPos);
-</span>            <span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">}
-</span>        <span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">}
-</span>        <span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">return null;
-</span>    <span class="note" style="border-bottom: 1px dotted #ff0000;" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.">}
+<span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">/**
+</span> <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">*
+</span> <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">* @author Louis
+</span> <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">*/
+</span><span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">public class Bounds implements Comparable<Bounds> {
+</span>    <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(Bounds.class.getName());
+</span>    <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">private int start;
+</span>    <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">private int end;
 </span>    
-    public void addEmptyComment(int startPos, int endPos) {
-        addComment("", startPos, endPos);
+    <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">public static Bounds of(int start, int end) {
+</span>        <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">return new Bounds(start, end);
+</span>    <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">}
+</span>    
+    public Bounds(int start, int end) {
+        this.start = start;
+        this.end = end;
     }
     
-    public void editComment(String comment, int startPos, int endPos) {
-        for (CommentData data : list) {
-            if (data.startPos == startPos && data.endPos == endPos) {
-                data.comment = comment;
-            }
-        }
+    public boolean contains(Bounds other) {
+        return other.start >= this.start && other.end <= this.end;
     }
-   
-}
+    
+    public boolean collidesWith(Bounds other) {
+        return (other.start <= this.end && other.end >= this.start)
+                || (this.start <= other.end && this.end >= other.start);
+    }
 
-class CommentData implements Serializable {
+    public int getStart() {
+        return start;
+    }
 
-    String comment;
-    final int startPos;
-    final int endPos;
+    public void setStart(int start) {
+        this.start = start;
+    }
 
-    CommentData(String comment, int startPos, int endPos) {
-        this.startPos = startPos;
-        this.endPos = endPos;
-        this.comment = "";
-    }  
+    public int getEnd() {
+        return end;
+    }
+
+    public void setEnd(int end) {
+        this.end = end;
+    }
+
+    @Override
+    public int compareTo(Bounds other) {
+        return Integer.compare(this.start, other.start);
+    }
+
+    @Override
+    public String toString() {
+        return "Bounds{" + "start=" + start + ", end=" + end + '}';
+    }
+    
+    
 }
 </code></pre>    </body></html>
