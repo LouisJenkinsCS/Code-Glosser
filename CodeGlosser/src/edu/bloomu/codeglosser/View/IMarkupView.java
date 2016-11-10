@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.bloomu.codeglosser.Controller;
+package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Utils.Bounds;
 import java.awt.Color;
@@ -15,6 +15,7 @@ import java.awt.Color;
 public interface IMarkupView {
     void addMarkup(Bounds ...bounds);
     void removeMarkup(Bounds ...bounds);
+    void removeAllMarkups();
     void setMarkupColor(Bounds bounds, Color color);
     void setSelection(Bounds bounds);
 }

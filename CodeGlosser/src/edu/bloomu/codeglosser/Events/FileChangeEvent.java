@@ -5,22 +5,30 @@
  */
 package edu.bloomu.codeglosser.Events;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+
 /**
  *
  * @author Louis
  */
 public class FileChangeEvent {
-    private String fileName;
+    private final File file;
     
-    public static FileChangeEvent of(String fileName) {
-        return new FileChangeEvent(fileName);
+    public static FileChangeEvent of(File file) {
+        return new FileChangeEvent(file);
     }
     
-    public FileChangeEvent(String fileName) {
-        this.fileName = fileName;
+    public FileChangeEvent(File file) {
+        this.file = file;
     }
 
     public String getFileName() {
-        return fileName;
+        return this.file.getName();
+    }
+    
+    public String getFileContents() throws IOException {
+        return new String(Files.readAllBytes(file.toPath())).replace("\r\n", "\n");
     }
 }

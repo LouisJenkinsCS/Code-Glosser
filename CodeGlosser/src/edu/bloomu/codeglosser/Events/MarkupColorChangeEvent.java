@@ -5,6 +5,7 @@
  */
 package edu.bloomu.codeglosser.Events;
 
+import edu.bloomu.codeglosser.Model.Note;
 import edu.bloomu.codeglosser.Utils.Bounds;
 import java.awt.Color;
 
@@ -16,8 +17,8 @@ public class MarkupColorChangeEvent {
     private Color color;
     private Bounds bounds;
     
-    public static MarkupColorChangeEvent of(Bounds b, Color c) {
-        return new MarkupColorChangeEvent(b, c);
+    public static MarkupColorChangeEvent of(Note note) {
+        return new MarkupColorChangeEvent(note.getRange(), note.getHighlightColor());
     }
 
     public MarkupColorChangeEvent(Bounds bounds, Color color) {

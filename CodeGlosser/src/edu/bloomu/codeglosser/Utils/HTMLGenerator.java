@@ -6,8 +6,12 @@
 package edu.bloomu.codeglosser.Utils;
 
 import edu.bloomu.codeglosser.Model.Note;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import org.apache.logging.log4j.util.Strings;
 
 
 
@@ -18,6 +22,10 @@ import java.util.logging.Logger;
 public class HTMLGenerator {
 
     private static final Logger LOG = Logger.getLogger(HTMLGenerator.class.getName());
+    
+    public static String generate(String code) {
+        return "";
+    }
     
     public static String generate(String title, String code, List<Note> notes) {
         StringBuilder builder = new StringBuilder();

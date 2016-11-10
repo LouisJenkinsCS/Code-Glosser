@@ -65,6 +65,7 @@ public class PropertyTreeView extends javax.swing.JPanel implements ObservablePr
             }
         };
         propertyTree.addMouseListener(doubleClickListener);
+        empty();
     }
     
     public void setRoot(TreeViewBranch root) {
@@ -87,6 +88,11 @@ public class PropertyTreeView extends javax.swing.JPanel implements ObservablePr
                 populateTree((TreeViewBranch) v, n);
             }
         }
+    }
+    
+    public void empty() {
+        DefaultTreeModel model = (DefaultTreeModel) propertyTree.getModel();
+        model.setRoot(null);
     }
 
     /**

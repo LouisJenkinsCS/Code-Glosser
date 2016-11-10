@@ -89,6 +89,7 @@ public class NotePadModel {
                     break;
                 case '\r':
                     ch = iter.next();
+                    currOffset++;
                 case '\n':
                     String orig = text.substring(start, currOffset);
                     String trimmed = orig.trim();
@@ -108,7 +109,8 @@ public class NotePadModel {
                     start = currOffset + 1;
                     break;
                 case CharacterIterator.DONE:
-                    LOG.severe("EOF before finish...");
+                    LOG.severe("EOF before finish... Text.length() = " + text.length() + ", bounds: " + range.toString());
+                    LOG.severe("Remaining String: " + text.substring(start, end));
                     throw new InvalidTextSelectionException();
             }
             currOffset++;

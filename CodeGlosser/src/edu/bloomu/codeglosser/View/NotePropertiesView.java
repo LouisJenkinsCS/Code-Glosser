@@ -8,12 +8,13 @@ package edu.bloomu.codeglosser.View;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import edu.bloomu.codeglosser.Controller.NoteManager;
-import edu.bloomu.codeglosser.Controller.NoteView;
 import edu.bloomu.codeglosser.Events.FileChangeEvent;
 import edu.bloomu.codeglosser.Model.Note;
 import edu.bloomu.codeglosser.Events.MarkupColorChangeEvent;
 import edu.bloomu.codeglosser.Events.NoteSelectedChangeEvent;
 import edu.bloomu.codeglosser.Events.NoteUpdateChangeEvent;
+import edu.bloomu.codeglosser.Model.ProjectBranch;
+import edu.bloomu.codeglosser.Model.ProjectLeaf;
 import edu.bloomu.codeglosser.Model.TemplateBranch;
 import static edu.bloomu.codeglosser.Model.TemplateBranch.KEY_CATEGORY;
 import edu.bloomu.codeglosser.Model.TemplateLeaf;
@@ -52,8 +53,11 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
     /**
      * Creates new form NoteDescriptorPane
      */
-    public NotePropertiesView() {
+    public NotePropertiesView(File project, EventBus bus) {
         initComponents();
+        
+        this.bus = bus;
+        bus.register(this);
         
         propertyMessage3.setMessage("");
         propertyMessage3.observe()
@@ -68,30 +72,31 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
         
         propertyHighlightColor3.setPropertyName("Highlight Color");
         propertyHighlightColor3.observe()
-                .doOnNext((c) -> System.out.println("Highlight Color Change: " + c.toString()))
-                .subscribe((c) -> {
-                    bus.post(MarkupColorChangeEvent.of(note.getRange(), c));
-                    note.setHighlightColor(c);
-                });
+                .doOnNext(c -> System.out.println("Highlight Color Change: " + c.toString()))
+                .doOnNext(c -> note.setHighlightColor(c))
+                .map(c -> note)
+                .map(MarkupColorChangeEvent::of)
+                .subscribe(bus::post);
         
         propertyNoteSelected.observe()
-                .doOnNext((n) -> System.out.println("Note Selection Change: " + n.toString()))
-                .subscribe((n) -> { 
-                    if (bus != null) {
-                        bus.post(NoteSelectedChangeEvent.of(n));
-                    }
-                });
+                .doOnNext(n -> System.out.println("Note Selection Change: " + n.toString()))
+                .map(NoteSelectedChangeEvent::of)
+                .subscribe(bus::post);
         
         // Look for template file named "templates.json"
         initTemplate();
+        initProjectFiles(project);
         
+        // NoteProperties start out with an empty view because there is nothing to select.
         clear();
     }
     
     private void initTemplate() {
         File f = new File("templates.json");
-        if (!f.exists())
-                propertyTemplate.setEnabled(false);
+        if (!f.exists()) {
+                propertyTemplate.empty();
+                return;
+        }
         
         try {
             JSONObject root = (JSONObject) new JSONParser().parse(new FileReader(f));
@@ -128,8 +133,19 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
         }
     }
     
+    private void initProjectFiles(File project) {
+        // Initialize file view if is project
+        if (project.isDirectory()) {
+            propertyFiles.setRoot(new ProjectBranch(project));
+            propertyFiles.observe()
+                    .cast(ProjectLeaf.class)
+                    .map(ProjectLeaf::getFile)
+                    .map(FileChangeEvent::of)
+                    .subscribe(bus::post);
+        }
+    }
+    
     public void setEventBus(EventBus bus) {
-        this.bus = bus;
     }
     
     @Subscribe
@@ -143,7 +159,9 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
     public void handleNoteUpdateChange(NoteUpdateChangeEvent event) {
         LOG.info("Received NoteUpdateChangeEvent...");
         Note n = event.getNote();
-        bus.post(MarkupColorChangeEvent.of(n.getRange(), n.getHighlightColor()));
+        
+        // Color could have changed...
+        bus.post(MarkupColorChangeEvent.of(n));
         if (note == event.getNote()) {
             List<Note> list = manager.getAllNotes();
             propertyNoteSelected.update(list.toArray(new Note[list.size()]));
@@ -197,21 +215,28 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
         propertyNoteSelected = new edu.bloomu.codeglosser.View.propertyNoteName();
         propertyHighlightColor3 = new edu.bloomu.codeglosser.View.PropertyColor();
         propertyMessage3 = new edu.bloomu.codeglosser.View.PropertyTextArea();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         propertyTemplate = new edu.bloomu.codeglosser.View.PropertyTreeView();
+        propertyFiles = new edu.bloomu.codeglosser.View.PropertyTreeView();
 
         jInternalFrame4.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
         jInternalFrame4.setIconifiable(true);
         jInternalFrame4.setTitle(org.openide.util.NbBundle.getMessage(NotePropertiesView.class, "NotePropertiesView.jInternalFrame4.title")); // NOI18N
         jInternalFrame4.setVisible(true);
 
+        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(NotePropertiesView.class, "NotePropertiesView.propertyTemplate.TabConstraints.tabTitle"), propertyTemplate); // NOI18N
+        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(NotePropertiesView.class, "NotePropertiesView.propertyFiles.TabConstraints.tabTitle"), propertyFiles); // NOI18N
+
         javax.swing.GroupLayout jInternalFrame4Layout = new javax.swing.GroupLayout(jInternalFrame4.getContentPane());
         jInternalFrame4.getContentPane().setLayout(jInternalFrame4Layout);
         jInternalFrame4Layout.setHorizontalGroup(
             jInternalFrame4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(propertyMessage3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(propertyHighlightColor3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-            .addComponent(propertyNoteSelected, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(propertyTemplate, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jInternalFrame4Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(propertyNoteSelected, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(propertyHighlightColor3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         jInternalFrame4Layout.setVerticalGroup(
             jInternalFrame4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -222,8 +247,7 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(propertyHighlightColor3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(propertyTemplate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0))
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout propertyAreaLayout = new javax.swing.GroupLayout(propertyArea);
@@ -280,7 +304,9 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JInternalFrame jInternalFrame4;
     private javax.swing.JLayeredPane jLayeredPane1;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel propertyArea;
+    private edu.bloomu.codeglosser.View.PropertyTreeView propertyFiles;
     private edu.bloomu.codeglosser.View.PropertyColor propertyHighlightColor3;
     private edu.bloomu.codeglosser.View.PropertyTextArea propertyMessage3;
     private edu.bloomu.codeglosser.View.propertyNoteName propertyNoteSelected;

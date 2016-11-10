@@ -44,6 +44,9 @@
         </Property>
         <Property name="name" type="java.lang.String" value="" noResource="true"/>
       </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new edu.bloomu.codeglosser.View.NotePropertiesView(this.project, this.eventBus)"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>
