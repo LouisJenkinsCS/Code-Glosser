@@ -9,10 +9,10 @@ import edu.bloomu.codeglosser.Session.MarkupManager;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import edu.bloomu.codeglosser.Events.FileChangeEvent;
-import edu.bloomu.codeglosser.Model.GlossableModel;
+import edu.bloomu.codeglosser.Model.GlosserModel;
 import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import edu.bloomu.codeglosser.Utils.HTMLGenerator;
-import edu.bloomu.codeglosser.View.GlossableView;
+import edu.bloomu.codeglosser.View.GlosserView;
 import io.reactivex.Observable;
 import java.awt.Desktop;
 import java.io.BufferedOutputStream;
@@ -39,16 +39,16 @@ public class GlosserController {
     private static final Logger LOG = Logger.getLogger(GlosserController.class.getName());
     
     
-    private final GlossableView view;
-    private final GlossableModel model;
+    private final GlosserView view;
+    private final GlosserModel model;
     private MarkupManager manager;
     private EventBus bus;
     
-    public GlosserController(EventBus eb, GlossableView v) {
+    public GlosserController(EventBus eb, GlosserView v) {
         view = v;
         bus = eb;
         bus.register(this);
-        model = new GlossableModel();
+        model = new GlosserModel();
         
         view.onPreviewHTML()
                 .subscribe((ignored) -> {
@@ -125,11 +125,11 @@ public class GlosserController {
         }
     }
     
-    public GlossableView getView() {
+    public GlosserView getView() {
         return view;
     }
 
-    public GlossableModel getModel() {
+    public GlosserModel getModel() {
         return model;
     }
     

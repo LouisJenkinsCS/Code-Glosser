@@ -30,9 +30,9 @@ import org.openide.util.Exceptions;
  *
  * @author Louis
  */
-public class GlossableView extends javax.swing.JPanel implements IMarkupView {
+public class GlosserView extends javax.swing.JPanel implements IMarkupView {
     
-    private static final Logger LOG = Logger.getLogger(GlossableView.class.getName());
+    private static final Logger LOG = Logger.getLogger(GlosserView.class.getName());
     
     private final PublishSubject<Bounds> onShowSelection = PublishSubject.create();
     private final PublishSubject<Bounds> onDeleteSelection = PublishSubject.create();
@@ -48,7 +48,7 @@ public class GlossableView extends javax.swing.JPanel implements IMarkupView {
     /**
      * Creates new form NotePad
      */
-    public GlossableView() {
+    public GlosserView() {
         LOG.info("Initialized...");
         initComponents();
         highlighter = textCode.getHighlighter();

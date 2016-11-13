@@ -7,7 +7,7 @@ import edu.bloomu.codeglosser.Events.FileChangeEvent;
 import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import edu.bloomu.codeglosser.View.MarkupView;
 import edu.bloomu.codeglosser.View.MarkupPropertiesView;
-import edu.bloomu.codeglosser.View.GlossableView;
+import edu.bloomu.codeglosser.View.GlosserView;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
