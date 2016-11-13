@@ -3,16 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.bloomu.codeglosser.Model;
+package edu.bloomu.codeglosser.Events;
 
 /**
  *
  * @author Louis
  */
-public interface TreeViewNode {
-    
-    
-    @Override
-    public String toString();
+public class OnCloseEvent {
     
 }

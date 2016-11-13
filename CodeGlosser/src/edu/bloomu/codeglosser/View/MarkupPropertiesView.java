@@ -15,9 +15,9 @@ import edu.bloomu.codeglosser.Events.NoteSelectedChangeEvent;
 import edu.bloomu.codeglosser.Events.NoteUpdateChangeEvent;
 import edu.bloomu.codeglosser.Model.ProjectBranch;
 import edu.bloomu.codeglosser.Model.ProjectLeaf;
-import edu.bloomu.codeglosser.Model.TemplateBranch;
-import static edu.bloomu.codeglosser.Model.TemplateBranch.KEY_CATEGORY;
-import edu.bloomu.codeglosser.Model.TemplateLeaf;
+import edu.bloomu.codeglosser.Model.Templates.TemplateBranch;
+import edu.bloomu.codeglosser.Model.Templates.TemplateLeaf;
+import edu.bloomu.codeglosser.Model.Templates.TemplateNodeFactory;
 import edu.bloomu.codeglosser.Model.TreeViewBranch;
 import edu.bloomu.codeglosser.Model.TreeViewNode;
 import io.reactivex.disposables.Disposable;
@@ -103,13 +103,7 @@ public class MarkupPropertiesView extends javax.swing.JPanel implements IMarkupP
             JSONArray templates = (JSONArray) root.get("templates");
             TreeViewNode[] children = new TreeViewNode[templates.size()];
             for (int i = 0; i < templates.size(); i++) {
-                JSONObject obj = (JSONObject) templates.get(i);
-                // Is another branch...
-                if (obj.containsKey(KEY_CATEGORY)) {
-                    children[i] = new TemplateBranch(obj);
-                } else {
-                    children[i] = new TemplateLeaf((JSONObject) templates.get(i));
-                }
+                children[i] = TemplateNodeFactory.getTemplateNode((JSONObject) templates.get(i));
             }
             
             propertyTemplate.setRoot(new TreeViewBranch() {

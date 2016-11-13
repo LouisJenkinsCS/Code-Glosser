@@ -5,19 +5,20 @@
  */
 package edu.bloomu.codeglosser.Session;
 
+import edu.bloomu.codeglosser.Events.OnCloseEvent;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Model.MarkupFactory;
-import edu.bloomu.codeglosser.Model.TemplateLeaf;
+import edu.bloomu.codeglosser.Model.Templates.MarkupTemplate;
+import edu.bloomu.codeglosser.Model.Templates.TemplateLeaf;
 import edu.bloomu.codeglosser.Utils.Bounds;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.*;
-import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
 
 /**
  *
@@ -56,6 +57,11 @@ public final class MarkupManager implements SessionManager {
     }
 
     @Override
+    public void onClose(OnCloseEvent event) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
     public String getFileName() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -66,12 +72,12 @@ public final class MarkupManager implements SessionManager {
     }
 
     @Override
-    public JSONObject[] serializeAll() {
+    public JSONArray serializeAll() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void deserializeAll(JSONObject[] objs) {
+    public void deserializeAll(JSONArray arr) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
@@ -155,8 +161,9 @@ public final class MarkupManager implements SessionManager {
             return;
         }
         
-        currentNote.setMsg(template.getMessage());
-        currentNote.setHighlightColor(template.getColor());
+        MarkupTemplate mt = template.getTemplate();
+        currentNote.setMsg(mt.getMessage());
+        currentNote.setHighlightColor(mt.getColor());
         onNoteUpdate.onNext(currentNote);
     }
 }

@@ -5,7 +5,9 @@
  */
 package edu.bloomu.codeglosser.Session;
 
-import org.json.simple.JSONObject;
+import com.google.common.eventbus.Subscribe;
+import edu.bloomu.codeglosser.Events.OnCloseEvent;
+import org.json.simple.JSONArray;
 
 /**
  *
@@ -13,11 +15,14 @@ import org.json.simple.JSONObject;
  */
 public interface SessionManager {
     
-    public String getFileName();
+    @Subscribe
+    void onClose(OnCloseEvent event);
     
-    public String getTag();
+    String getFileName();
     
-    JSONObject[] serializeAll();
+    String getTag();
     
-    void deserializeAll(JSONObject[] objs);
+    JSONArray serializeAll();
+    
+    void deserializeAll(JSONArray arr);
 }
