@@ -5,7 +5,7 @@
  */
 package edu.bloomu.codeglosser.Utils;
 
-import edu.bloomu.codeglosser.Model.Note;
+import edu.bloomu.codeglosser.Model.Markup;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
@@ -27,7 +27,7 @@ public class HTMLGenerator {
         return "";
     }
     
-    public static String generate(String title, String code, List<Note> notes) {
+    public static String generate(String title, String code, List<Markup> notes) {
         StringBuilder builder = new StringBuilder();
 //        code = code.replaceAll("&", "&amp;");
 //        code = code.replaceAll("<", "&lt;");
@@ -89,14 +89,14 @@ public class HTMLGenerator {
         return builder.toString();
     }
     
-    private static String generateMarkups(List<Note> notes, String code) {
+    private static String generateMarkups(List<Markup> notes, String code) {
         // Ascending order
         notes.sort((n1, n2) -> n1.getRange().compareTo(n2.getRange()));
         StringBuilder finalCode = new StringBuilder();
         
         int offset = 0;
         
-        for (Note n : notes) {
+        for (Markup n : notes) {
             for (Bounds b : n.getOffsets()) {
                 // Add all characters up to next markup...
                 finalCode.append(code.substring(offset, b.getStart() - 1));

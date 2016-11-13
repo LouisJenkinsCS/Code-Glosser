@@ -1,13 +1,13 @@
 package edu.bloomu.codeglosser;
 
 import com.google.common.eventbus.EventBus;
-import edu.bloomu.codeglosser.Controller.NoteManager;
-import edu.bloomu.codeglosser.Controller.NotePadController;
+import edu.bloomu.codeglosser.Session.MarkupManager;
+import edu.bloomu.codeglosser.Controller.GlosserController;
 import edu.bloomu.codeglosser.Events.FileChangeEvent;
 import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import edu.bloomu.codeglosser.View.MarkupView;
-import edu.bloomu.codeglosser.View.NotePropertiesView;
-import edu.bloomu.codeglosser.View.NotePadView;
+import edu.bloomu.codeglosser.View.MarkupPropertiesView;
+import edu.bloomu.codeglosser.View.GlossableView;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
@@ -43,7 +43,7 @@ public class GlossableTopComponent extends TopComponent {
 //        setLayout(new BorderLayout());      
 //        MarkupView v = new MarkupView(null, bus);
 //        add(v, BorderLayout.CENTER);
-//        NoteManager.getInstance(DocumentHelper.getDocumentName(doc));
+//        MarkupManager.getInstance(DocumentHelper.getDocumentName(doc));
 //        v.setDocument(doc);
 //        bus.post(FileChangeEvent.of(DocumentHelper.getDocumentName(doc)));
     }

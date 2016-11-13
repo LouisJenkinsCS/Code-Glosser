@@ -5,13 +5,13 @@
  */
 package edu.bloomu.codeglosser.View;
 
-import edu.bloomu.codeglosser.Model.Note;
+import edu.bloomu.codeglosser.Model.Markup;
 
 /**
  *
  * @author Louis
  */
-public interface NoteView {    
-    void display(Note note);
+public interface IMarkupPropertiesView {    
+    void display(Markup note);
     void clear();
 }

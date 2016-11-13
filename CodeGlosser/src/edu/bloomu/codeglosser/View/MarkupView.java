@@ -6,7 +6,7 @@
 package edu.bloomu.codeglosser.View;
 
 import com.google.common.eventbus.EventBus;
-import edu.bloomu.codeglosser.Controller.NotePadController;
+import edu.bloomu.codeglosser.Controller.GlosserController;
 import edu.bloomu.codeglosser.Events.FileChangeEvent;
 import java.io.File;
 import java.util.logging.Logger;
@@ -21,7 +21,7 @@ public class MarkupView extends javax.swing.JPanel {
     private static final Logger LOG = Logger.getLogger(MarkupView.class.getName());
     
     
-    private final NotePadController npController;
+    private final GlosserController npController;
     private final EventBus eventBus;
     private final File project;
     
@@ -32,7 +32,7 @@ public class MarkupView extends javax.swing.JPanel {
         this.eventBus = eventBus;
         this.project = project;
         initComponents();
-        npController = new NotePadController(eventBus, notePadView1);
+        npController = new GlosserController(eventBus, notePadView1);
         
         // Display standalone files immediately
         if (project.isFile()) {
@@ -53,8 +53,8 @@ public class MarkupView extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        notePadView1 = new edu.bloomu.codeglosser.View.NotePadView();
-        notePropertiesView1 = new edu.bloomu.codeglosser.View.NotePropertiesView(this.project, this.eventBus);
+        notePadView1 = new edu.bloomu.codeglosser.View.GlossableView();
+        notePropertiesView1 = new edu.bloomu.codeglosser.View.MarkupPropertiesView(this.project, this.eventBus);
 
         notePropertiesView1.setEventBus(null);
         notePropertiesView1.setMaximumSize(new java.awt.Dimension(500, 37));
@@ -79,7 +79,7 @@ public class MarkupView extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private edu.bloomu.codeglosser.View.NotePadView notePadView1;
-    private edu.bloomu.codeglosser.View.NotePropertiesView notePropertiesView1;
+    private edu.bloomu.codeglosser.View.GlossableView notePadView1;
+    private edu.bloomu.codeglosser.View.MarkupPropertiesView notePropertiesView1;
     // End of variables declaration//GEN-END:variables
 }

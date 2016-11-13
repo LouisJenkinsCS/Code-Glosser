@@ -6,7 +6,7 @@
 package edu.bloomu.codeglosser;
 
 import edu.bloomu.codeglosser.View.MarkupTopComponent;
-import edu.bloomu.codeglosser.View.NotePropertiesView;
+import edu.bloomu.codeglosser.View.MarkupPropertiesView;
 import edu.bloomu.codeglosser.View.PropertyTreeView;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

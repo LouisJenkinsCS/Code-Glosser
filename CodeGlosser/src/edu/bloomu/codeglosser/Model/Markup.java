@@ -17,8 +17,8 @@ import org.apache.logging.log4j.util.Strings;
  *
  * @author Louis
  */
-public class Note {
-    public static Note DEFAULT = new Note(Strings.EMPTY, "<None Selected>");
+public class Markup {
+    public static Markup DEFAULT = new Markup(Strings.EMPTY, "<None Selected>");
     
     private String msg;
     private String id;
@@ -26,7 +26,7 @@ public class Note {
     private Color highlightColor;
     private Color textColor;
 
-    public Note(String msg, String id, Bounds ...offsets) {
+    public Markup(String msg, String id, Bounds ...offsets) {
         this.msg = msg;
         this.id = id;
         this.offsets.addAll(Lists.newArrayList(offsets));

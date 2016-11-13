@@ -21,13 +21,13 @@ import org.apache.logging.log4j.util.Strings;
  * 
  * Model for the the NotePad view.
  */
-public class NotePadModel {
+public class GlossableModel {
     
-    private static final Logger LOG = Logger.getLogger(NotePadModel.class.getName());
+    private static final Logger LOG = Logger.getLogger(GlossableModel.class.getName());
     private String text = "";
     private String title = "";
 
-    public NotePadModel() {
+    public GlossableModel() {
         LOG.info("Initialized...");
     }
     

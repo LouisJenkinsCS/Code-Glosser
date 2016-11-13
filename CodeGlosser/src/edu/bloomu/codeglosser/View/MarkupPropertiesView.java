@@ -7,9 +7,9 @@ package edu.bloomu.codeglosser.View;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import edu.bloomu.codeglosser.Controller.NoteManager;
+import edu.bloomu.codeglosser.Session.MarkupManager;
 import edu.bloomu.codeglosser.Events.FileChangeEvent;
-import edu.bloomu.codeglosser.Model.Note;
+import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Events.MarkupColorChangeEvent;
 import edu.bloomu.codeglosser.Events.NoteSelectedChangeEvent;
 import edu.bloomu.codeglosser.Events.NoteUpdateChangeEvent;
@@ -39,21 +39,21 @@ import org.reactivestreams.Subscription;
  *
  * @author Louis
  */
-public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
+public class MarkupPropertiesView extends javax.swing.JPanel implements IMarkupPropertiesView {
 
-    private static final Logger LOG = Logger.getLogger(NotePropertiesView.class.getName());
+    private static final Logger LOG = Logger.getLogger(MarkupPropertiesView.class.getName());
     
     
     Disposable managerUpdateSubscription;
     Disposable managerAddOrRemoveSubscription;
-    private NoteManager manager;
-    private Note note;
+    private MarkupManager manager;
+    private Markup note;
     private EventBus bus;
     
     /**
      * Creates new form NoteDescriptorPane
      */
-    public NotePropertiesView(File project, EventBus bus) {
+    public MarkupPropertiesView(File project, EventBus bus) {
         initComponents();
         
         this.bus = bus;
@@ -64,7 +64,7 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
                 .throttleLast(1, TimeUnit.SECONDS)
                 .doOnNext((str) -> System.out.println("Note Message Change: " + str))
                 .subscribe((str) -> {
-                    // Note can be null when a change occurs (normally at initialization)
+                    // Markup can be null when a change occurs (normally at initialization)
                     if (note != null) {
                         note.setMsg(str);
                     }
@@ -158,13 +158,13 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
     @Subscribe
     public void handleNoteUpdateChange(NoteUpdateChangeEvent event) {
         LOG.info("Received NoteUpdateChangeEvent...");
-        Note n = event.getNote();
+        Markup n = event.getNote();
         
         // Color could have changed...
         bus.post(MarkupColorChangeEvent.of(n));
         if (note == event.getNote()) {
-            List<Note> list = manager.getAllNotes();
-            propertyNoteSelected.update(list.toArray(new Note[list.size()]));
+            List<Markup> list = manager.getAllNotes();
+            propertyNoteSelected.update(list.toArray(new Markup[list.size()]));
             display(note);
         }
     }
@@ -172,7 +172,7 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
     @Subscribe
     public void handleFileChange(FileChangeEvent event) {
         LOG.info("Received FileChangeEvent...");
-        manager = NoteManager.getInstance(event.getFileName());
+        manager = MarkupManager.getInstance(event.getFileName());
         if (managerAddOrRemoveSubscription != null) {
             managerAddOrRemoveSubscription.dispose();
             managerAddOrRemoveSubscription = null;
@@ -183,13 +183,13 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
             managerUpdateSubscription = null;
         }
         
-        List<Note> list = manager.getAllNotes();
-        propertyNoteSelected.update(list.toArray(new Note[list.size()]));
+        List<Markup> list = manager.getAllNotes();
+        propertyNoteSelected.update(list.toArray(new Markup[list.size()]));
         managerAddOrRemoveSubscription = manager
                 .observeAddOrRemove()
                 .subscribe(o -> {
-                    List<Note> l = manager.getAllNotes();
-                    propertyNoteSelected.update(l.toArray(new Note[l.size()]));
+                    List<Markup> l = manager.getAllNotes();
+                    propertyNoteSelected.update(l.toArray(new Markup[l.size()]));
                 });
         
         managerUpdateSubscription = manager
@@ -221,11 +221,11 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
 
         jInternalFrame4.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
         jInternalFrame4.setIconifiable(true);
-        jInternalFrame4.setTitle(org.openide.util.NbBundle.getMessage(NotePropertiesView.class, "NotePropertiesView.jInternalFrame4.title")); // NOI18N
+        jInternalFrame4.setTitle(org.openide.util.NbBundle.getMessage(MarkupPropertiesView.class, "MarkupPropertiesView.jInternalFrame4.title")); // NOI18N
         jInternalFrame4.setVisible(true);
 
-        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(NotePropertiesView.class, "NotePropertiesView.propertyTemplate.TabConstraints.tabTitle"), propertyTemplate); // NOI18N
-        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(NotePropertiesView.class, "NotePropertiesView.propertyFiles.TabConstraints.tabTitle"), propertyFiles); // NOI18N
+        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(MarkupPropertiesView.class, "MarkupPropertiesView.propertyTemplate.TabConstraints.tabTitle"), propertyTemplate); // NOI18N
+        jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(MarkupPropertiesView.class, "MarkupPropertiesView.propertyFiles.TabConstraints.tabTitle"), propertyFiles); // NOI18N
 
         javax.swing.GroupLayout jInternalFrame4Layout = new javax.swing.GroupLayout(jInternalFrame4.getContentPane());
         jInternalFrame4.getContentPane().setLayout(jInternalFrame4Layout);
@@ -314,9 +314,9 @@ public class NotePropertiesView extends javax.swing.JPanel implements NoteView {
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public void display(Note note) {
+    public void display(Markup note) {
         this.note = note;
-        if (note == Note.DEFAULT) {
+        if (note == Markup.DEFAULT) {
             clear();
             return;
         }

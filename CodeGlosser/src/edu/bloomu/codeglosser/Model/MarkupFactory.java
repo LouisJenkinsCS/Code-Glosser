@@ -12,10 +12,10 @@ import edu.bloomu.codeglosser.Utils.IdentifierGenerator;
  *
  * @author Louis
  */
-public final class NoteFactory {
+public final class MarkupFactory {
     private static long notes;
     
-    public static Note createNote(Bounds ...bounds) {
-        return new Note(null, IdentifierGenerator.generateIdentifier("Note"), bounds);
+    public static Markup createNote(Bounds ...bounds) {
+        return new Markup(null, IdentifierGenerator.generateIdentifier("Note"), bounds);
     }
 }

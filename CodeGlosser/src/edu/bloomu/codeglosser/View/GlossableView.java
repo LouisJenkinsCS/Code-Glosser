@@ -9,7 +9,7 @@ import edu.bloomu.codeglosser.Utils.Bounds;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.logging.Logger;
-import edu.bloomu.codeglosser.Controller.NotePadController;
+import edu.bloomu.codeglosser.Controller.GlosserController;
 import edu.bloomu.codeglosser.Utils.ColorUtils;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
@@ -30,9 +30,9 @@ import org.openide.util.Exceptions;
  *
  * @author Louis
  */
-public class NotePadView extends javax.swing.JPanel implements IMarkupView {
+public class GlossableView extends javax.swing.JPanel implements IMarkupView {
     
-    private static final Logger LOG = Logger.getLogger(NotePadView.class.getName());
+    private static final Logger LOG = Logger.getLogger(GlossableView.class.getName());
     
     private final PublishSubject<Bounds> onShowSelection = PublishSubject.create();
     private final PublishSubject<Bounds> onDeleteSelection = PublishSubject.create();
@@ -48,7 +48,7 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
     /**
      * Creates new form NotePad
      */
-    public NotePadView() {
+    public GlossableView() {
         LOG.info("Initialized...");
         initComponents();
         highlighter = textCode.getHighlighter();

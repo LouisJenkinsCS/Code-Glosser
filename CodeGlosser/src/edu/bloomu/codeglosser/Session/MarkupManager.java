@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.bloomu.codeglosser.Controller;
+package edu.bloomu.codeglosser.Session;
 
-import edu.bloomu.codeglosser.Model.Note;
-import edu.bloomu.codeglosser.Model.NoteFactory;
+import edu.bloomu.codeglosser.Model.Markup;
+import edu.bloomu.codeglosser.Model.MarkupFactory;
 import edu.bloomu.codeglosser.Model.TemplateLeaf;
 import edu.bloomu.codeglosser.Utils.Bounds;
 import io.reactivex.Observable;
@@ -17,52 +17,73 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.*;
+import org.json.simple.JSONObject;
 
 /**
  *
  * @author Louis
  */
-public final class NoteManager {
+public final class MarkupManager implements SessionManager {
     
     private final PublishSubject onNoteAddOrRemove = PublishSubject.create();
-    private final PublishSubject<Note> onNoteUpdate = PublishSubject.create();
+    private final PublishSubject<Markup> onNoteUpdate = PublishSubject.create();
     
     
-    private final static Logger LOG = LogManager.getLogger(NoteManager.class);
-    // One NoteManager per File
-    private static final HashMap<String, NoteManager> MAPPED_INSTANCES = new HashMap<>();
+    private final static Logger LOG = LogManager.getLogger(MarkupManager.class);
+    // One MarkupManager per File
+    private static final HashMap<String, MarkupManager> MAPPED_INSTANCES = new HashMap<>();
     
-    public static final NoteManager NULL = new NoteManager();
+    public static final MarkupManager NULL = new MarkupManager();
     
-    public static NoteManager getInstance(String fileName) {
-        NoteManager manager = MAPPED_INSTANCES.get(fileName);
+    public static MarkupManager getInstance(String fileName) {
+        MarkupManager manager = MAPPED_INSTANCES.get(fileName);
         
-        // If we haven't created a NoteManager for this file already, create a new one.
+        // If we haven't created a MarkupManager for this file already, create a new one.
         if (manager == null) {
-            manager = new NoteManager();
+            manager = new MarkupManager();
             MAPPED_INSTANCES.put(fileName, manager);
         }
         
         return manager;
     }
     
-    private final HashMap<String, Note> noteMap;
-    private Note currentNote;
+    private final HashMap<String, Markup> noteMap;
+    private Markup currentNote;
     
-    private NoteManager() {
+    private MarkupManager() {
         noteMap = new HashMap<>();
         currentNote = null;
     }
+
+    @Override
+    public String getFileName() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getTag() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public JSONObject[] serializeAll() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void deserializeAll(JSONObject[] objs) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
-    public void setCurrentNote(Note note) {
+    public void setCurrentNote(Markup note) {
         this.currentNote = note;
     }
     
-    public List<Note> getAllNotes() {
+    public List<Markup> getAllNotes() {
         return noteMap.values().stream().collect(Collectors.toList());
     }
     
-    public Optional<Note> getNote(Bounds bounds) {
+    public Optional<Markup> getNote(Bounds bounds) {
         return noteMap
                 .values()
                 .stream()
@@ -75,7 +96,7 @@ public final class NoteManager {
         return !getNote(bounds).isPresent();
     }
     
-    public Optional<Note> getNote(String id) {
+    public Optional<Markup> getNote(String id) {
         return Optional.ofNullable(noteMap.get(id));
     }
     
@@ -91,11 +112,11 @@ public final class NoteManager {
     }
     
     public void deleteNote(Bounds bounds) {
-        getNote(bounds).map(Note::getId).ifPresent(this::deleteNote);
+        getNote(bounds).map(Markup::getId).ifPresent(this::deleteNote);
     }
     
     public void deleteNote(String id) {
-        Note note = noteMap.get(id);
+        Markup note = noteMap.get(id);
         if (note != null) {
             noteMap.remove(id);
             if (note == currentNote) {
@@ -109,7 +130,7 @@ public final class NoteManager {
         return onNoteAddOrRemove;
     }
     
-    public Observable<Note> observeNoteUpdate() {
+    public Observable<Markup> observeNoteUpdate() {
         return onNoteUpdate;
     }
     
@@ -119,8 +140,8 @@ public final class NoteManager {
         currentNote = null;
     }
     
-    public Note createNote(Bounds ...bounds) {
-        Note note = NoteFactory.createNote(bounds);
+    public Markup createNote(Bounds ...bounds) {
+        Markup note = MarkupFactory.createNote(bounds);
         // TODO: Bounds -> [Bounds]
         noteMap.put(note.getId(), note);
         onNoteAddOrRemove.onNext(new Object());
