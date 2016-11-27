@@ -5,20 +5,21 @@
  */
 package edu.bloomu.codeglosser.Controller;
 
+import edu.bloomu.codeglosser.Session.MarkupManager;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import edu.bloomu.codeglosser.Events.FileChangeEvent;
-import edu.bloomu.codeglosser.Model.NotePadModel;
+import edu.bloomu.codeglosser.Model.GlosserModel;
 import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import edu.bloomu.codeglosser.Utils.HTMLGenerator;
-import edu.bloomu.codeglosser.View.NotePadView;
+import edu.bloomu.codeglosser.View.GlosserView;
 import io.reactivex.Observable;
 import java.awt.Desktop;
 import java.io.BufferedOutputStream;
 import edu.bloomu.codeglosser.Utils.Bounds;
 import edu.bloomu.codeglosser.Events.MarkupColorChangeEvent;
 import edu.bloomu.codeglosser.Events.NoteSelectedChangeEvent;
-import edu.bloomu.codeglosser.Model.Note;
+import edu.bloomu.codeglosser.Model.Markup;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,21 +34,21 @@ import org.openide.util.Exceptions;
  *
  * @author Louis
  */
-public class NotePadController {
+public class GlosserController {
 
-    private static final Logger LOG = Logger.getLogger(NotePadController.class.getName());
+    private static final Logger LOG = Logger.getLogger(GlosserController.class.getName());
     
     
-    private final NotePadView view;
-    private final NotePadModel model;
-    private NoteManager manager;
+    private final GlosserView view;
+    private final GlosserModel model;
+    private MarkupManager manager;
     private EventBus bus;
     
-    public NotePadController(EventBus eb, NotePadView v) {
+    public GlosserController(EventBus eb, GlosserView v) {
         view = v;
         bus = eb;
         bus.register(this);
-        model = new NotePadModel();
+        model = new GlosserModel();
         
         view.onPreviewHTML()
                 .subscribe((ignored) -> {
@@ -78,7 +79,7 @@ public class NotePadController {
                 .map(b -> manager.getNote(b))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .map(Note::getRange)
+                .map(Markup::getRange)
                 .doOnNext(view::removeMarkup)
                 .subscribe(b -> manager.deleteNote(b));
         
@@ -103,14 +104,14 @@ public class NotePadController {
     
     @Subscribe
     public void noteSelectedChange(NoteSelectedChangeEvent e) {
-        if (e.getNote() != Note.DEFAULT) {
+        if (e.getNote() != Markup.DEFAULT) {
             view.setSelection(e.getNote().getRange());
         }
     }
     
     @Subscribe
     public void handleFileChange(FileChangeEvent event) {
-        manager = NoteManager.getInstance(event.getFileName());
+        manager = MarkupManager.getInstance(event.getFileName());
         view.removeAllMarkups();
         try {
             model.setText(event.getFileContents());
@@ -118,17 +119,17 @@ public class NotePadController {
             manager.getAllNotes()
                     .stream()
                     .peek(n -> view.addMarkup(n.getOffsets()))
-                    .forEach((Note n) -> view.setMarkupColor(n.getRange(), n.getHighlightColor()));
+                    .forEach((Markup n) -> view.setMarkupColor(n.getRange(), n.getHighlightColor()));
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
     }
     
-    public NotePadView getView() {
+    public GlosserView getView() {
         return view;
     }
 
-    public NotePadModel getModel() {
+    public GlosserModel getModel() {
         return model;
     }
     

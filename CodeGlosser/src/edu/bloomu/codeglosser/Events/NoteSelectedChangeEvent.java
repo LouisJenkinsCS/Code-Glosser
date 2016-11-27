@@ -5,24 +5,24 @@
  */
 package edu.bloomu.codeglosser.Events;
 
-import edu.bloomu.codeglosser.Model.Note;
+import edu.bloomu.codeglosser.Model.Markup;
 
 /**
  *
  * @author Louis
  */
 public class NoteSelectedChangeEvent {
-    private Note note;
+    private Markup note;
     
-    public static NoteSelectedChangeEvent of(Note note) {
+    public static NoteSelectedChangeEvent of(Markup note) {
         return new NoteSelectedChangeEvent(note);
     }
     
-    public NoteSelectedChangeEvent(Note note) {
+    public NoteSelectedChangeEvent(Markup note) {
         this.note = note;
     }
 
-    public Note getNote() {
+    public Markup getNote() {
         return note;
     }
 }

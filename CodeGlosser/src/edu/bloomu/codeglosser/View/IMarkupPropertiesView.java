@@ -3,16 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.bloomu.codeglosser.Model;
+package edu.bloomu.codeglosser.View;
+
+import edu.bloomu.codeglosser.Model.Markup;
 
 /**
  *
  * @author Louis
  */
-public interface TreeViewNode {
-    
-    
-    @Override
-    public String toString();
-    
+public interface IMarkupPropertiesView {    
+    void display(Markup note);
+    void clear();
 }

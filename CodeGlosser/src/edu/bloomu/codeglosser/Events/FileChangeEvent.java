@@ -5,6 +5,7 @@
  */
 package edu.bloomu.codeglosser.Events;
 
+import edu.bloomu.codeglosser.Utils.HTMLGenerator;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,7 +26,7 @@ public class FileChangeEvent {
     }
 
     public String getFileName() {
-        return this.file.getName();
+        return HTMLGenerator.relativeFileName(this.file);
     }
     
     public String getFileContents() throws IOException {

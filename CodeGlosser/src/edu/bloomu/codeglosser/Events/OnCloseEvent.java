@@ -3,15 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.bloomu.codeglosser.View;
-
-import edu.bloomu.codeglosser.Model.Note;
+package edu.bloomu.codeglosser.Events;
 
 /**
  *
  * @author Louis
  */
-public interface NoteView {    
-    void display(Note note);
-    void clear();
+public class OnCloseEvent {
+    
 }

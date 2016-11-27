@@ -5,7 +5,7 @@
  */
 package edu.bloomu.codeglosser.View;
 
-import edu.bloomu.codeglosser.Model.Note;
+import edu.bloomu.codeglosser.Model.Markup;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import java.util.ArrayList;
@@ -20,13 +20,13 @@ import javax.swing.JComboBox;
  *
  * @author Louis
  */
-public class propertyNoteName extends javax.swing.JPanel implements ObservableProperty<Note> {
+public class propertyNoteName extends javax.swing.JPanel implements ObservableProperty<Markup> {
     
-    private PublishSubject<Note> onNoteSelection = PublishSubject.create();
+    private PublishSubject<Markup> onNoteSelection = PublishSubject.create();
     private static final Logger LOG = Logger.getLogger(propertyNoteName.class.getName());
     
     // Kept track of to prevent invoking 'setSelectedItem' and triggering the ActionListener (which would cause an infinite loop)
-    private Note currentNote;
+    private Markup currentNote;
     
     
     /**
@@ -36,8 +36,8 @@ public class propertyNoteName extends javax.swing.JPanel implements ObservablePr
         initComponents();
         clear();
         noteSelector.addActionListener(e -> {
-            JComboBox<Note> src = (JComboBox<Note>) e.getSource();
-            Note n = (Note) src.getSelectedItem();
+            JComboBox<Markup> src = (JComboBox<Markup>) e.getSource();
+            Markup n = (Markup) src.getSelectedItem();
             if (n != null) {
                 currentNote = n;
                 onNoteSelection.onNext(n);
@@ -45,22 +45,22 @@ public class propertyNoteName extends javax.swing.JPanel implements ObservablePr
         });
     }
     
-    public void update(Note... notes) {
-        Note n = currentNote;
+    public void update(Markup... notes) {
+        Markup n = currentNote;
         clear();
         Stream.of(notes).forEach(noteSelector::addItem);
         if (!Stream.of(notes).anyMatch(n::equals)) {
-            noteSelector.setSelectedItem(Note.DEFAULT);
+            noteSelector.setSelectedItem(Markup.DEFAULT);
         }
     }
     
     public void clear() {
         noteSelector.removeAllItems();
-        currentNote = Note.DEFAULT;
+        currentNote = Markup.DEFAULT;
         noteSelector.addItem(currentNote);
     }
     
-    public void setSelectedNote(Note n) {
+    public void setSelectedNote(Markup n) {
         if (n != currentNote)
             noteSelector.setSelectedItem(n);
     }
@@ -91,12 +91,12 @@ public class propertyNoteName extends javax.swing.JPanel implements ObservablePr
     }// </editor-fold>//GEN-END:initComponents
 
     @Override
-    public Observable<Note> observe() {
+    public Observable<Markup> observe() {
         return onNoteSelection;
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<Note> noteSelector;
+    private javax.swing.JComboBox<Markup> noteSelector;
     // End of variables declaration//GEN-END:variables
 }

@@ -3,16 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.bloomu.codeglosser.Model;
+package edu.bloomu.codeglosser.Session;
+
+import org.json.simple.JSONObject;
 
 /**
  *
  * @author Louis
  */
-public interface TreeViewNode {
+public interface SessionObject {
     
+    String getId();
     
-    @Override
-    public String toString();
+    JSONObject serialize();
     
+    void deserialize(JSONObject obj);
 }

@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.bloomu.codeglosser.Model;
+package edu.bloomu.codeglosser.Model.Templates;
 
+import edu.bloomu.codeglosser.Model.TreeViewBranch;
+import edu.bloomu.codeglosser.Model.TreeViewNode;
 import java.util.HashMap;
 import java.util.function.Function;
 import java.util.logging.Logger;
@@ -19,8 +21,9 @@ import org.json.simple.JSONObject;
  */
 public class TemplateBranch implements TreeViewBranch {
     
-    public static final String KEY_BODY = "body";
-    public static final String KEY_CATEGORY = "category";
+    protected static final String KEY_BODY = "body";
+    protected static final String KEY_CATEGORY = "category";
+    protected static final String KEY_TITLE = "title";
     
     private static final Logger LOG = Logger.getLogger(TemplateBranch.class.getName());
     
@@ -34,13 +37,7 @@ public class TemplateBranch implements TreeViewBranch {
         JSONArray arr = (JSONArray) data.get(KEY_BODY);
         TreeViewNode[] children = new TreeViewNode[arr.size()];
         for (int i = 0; i < arr.size(); i++) {
-            JSONObject obj = (JSONObject) arr.get(i);
-            // Is another branch...
-            if (obj.containsKey(KEY_CATEGORY)) {
-                children[i] = new TemplateBranch(obj);
-            } else {
-                children[i] = new TemplateLeaf((JSONObject) arr.get(i));
-            }
+            children[i] = TemplateNodeFactory.getTemplateNode((JSONObject) arr.get(i));
         }
         
         childrenMap.putAll(

@@ -9,8 +9,9 @@ import edu.bloomu.codeglosser.Utils.Bounds;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.logging.Logger;
-import edu.bloomu.codeglosser.Controller.NotePadController;
+import edu.bloomu.codeglosser.Controller.GlosserController;
 import edu.bloomu.codeglosser.Utils.ColorUtils;
+import edu.bloomu.codeglosser.Utils.HTMLGenerator;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import java.awt.event.MouseAdapter;
@@ -30,9 +31,9 @@ import org.openide.util.Exceptions;
  *
  * @author Louis
  */
-public class NotePadView extends javax.swing.JPanel implements IMarkupView {
+public class GlosserView extends javax.swing.JPanel implements IMarkupView {
     
-    private static final Logger LOG = Logger.getLogger(NotePadView.class.getName());
+    private static final Logger LOG = Logger.getLogger(GlosserView.class.getName());
     
     private final PublishSubject<Bounds> onShowSelection = PublishSubject.create();
     private final PublishSubject<Bounds> onDeleteSelection = PublishSubject.create();
@@ -48,7 +49,7 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
     /**
      * Creates new form NotePad
      */
-    public NotePadView() {
+    public GlosserView() {
         LOG.info("Initialized...");
         initComponents();
         highlighter = textCode.getHighlighter();
@@ -135,8 +136,11 @@ public class NotePadView extends javax.swing.JPanel implements IMarkupView {
         });
         
         JMenuItem previewHTML = new JMenuItem("Preview");
+        JMenuItem exportProject = new JMenuItem("Export Project");
         previewHTML.addActionListener(onPreviewHTML::onNext);
+        exportProject.addActionListener((e) -> HTMLGenerator.generateAll());
         popup.add(previewHTML);
+        popup.add(exportProject);
     }
     
     public void setText(String str) {
