@@ -87,8 +87,8 @@ public class HTMLGenerator {
         builder
                 .append("<html>")
                 .append("    <head>")
-                .append("        <link rel=\"stylesheet\" href=\"src/edu/bloomu/codeglosser/HTML/styles/atom-one-light.css\">")
-                .append("        <script src=\"src/edu/bloomu/codeglosser/HTML/highlight.pack.js\"></script>")
+                .append("        <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/styles/atom-one-light.min.css\"></script>")
+                .append("        <script src=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/highlight.min.js\"></script>")
                 .append("        <script>hljs.initHighlightingOnLoad();</script>")
                 .append("<style>.note {\n")
                 .append("  display: inline;\n" )
