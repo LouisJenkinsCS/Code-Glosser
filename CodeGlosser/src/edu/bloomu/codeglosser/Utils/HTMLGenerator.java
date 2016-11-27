@@ -5,13 +5,24 @@
  */
 package edu.bloomu.codeglosser.Utils;
 
+import com.google.common.io.ByteStreams;
 import edu.bloomu.codeglosser.Model.Markup;
+import edu.bloomu.codeglosser.Session.MarkupManager;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import org.apache.logging.log4j.core.util.IOUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.openide.util.Exceptions;
 
 
 
@@ -25,6 +36,47 @@ public class HTMLGenerator {
     
     public static String generate(String code) {
         return "";
+    }
+    
+    public static String relativeFileName(File f) {
+        return new File(".").toURI().relativize(f.toURI()).getPath();
+    }
+    
+    public static void generateDirectory(File dir, ZipOutputStream stream) throws IOException {
+        // Directories must end with a slash.
+        String name = relativeFileName(dir);
+        name = name.endsWith("/") ? name : name + "/";
+        stream.putNextEntry(new ZipEntry(name));
+        
+        for (final File f : dir.listFiles()) {
+            if (f.isDirectory()) {
+                generateDirectory(f, stream);
+            } else if (f.getName().toLowerCase().endsWith(".java")){
+                generateFile(f, stream);
+            }
+        }
+    }
+    
+    public static void generateFile(File file, ZipOutputStream ostream) {
+        try {
+            // Copy contents into zip file (We replace carriage returns for standard newlines)
+            String title = relativeFileName(file);
+            String code = new String(Files.readAllBytes(file.toPath())).replace("\r\n", "\n");
+            String result = generate(title, code, MarkupManager.getInstance(title).getAllNotes());
+            ostream.putNextEntry(new ZipEntry(title + ".html"));
+            ostream.write(result.getBytes());
+            ostream.closeEntry();
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
+    
+    public static void generateAll() {
+        try(ZipOutputStream stream = new ZipOutputStream(new FileOutputStream(new File("exported.zip")))) {
+            generateDirectory(new File("."), stream);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
     }
     
     public static String generate(String title, String code, List<Markup> notes) {
@@ -41,7 +93,7 @@ public class HTMLGenerator {
                 .append("<style>.note {\n")
                 .append("  display: inline;\n" )
                 .append("  position: relative;\n" )
-                .append("  border-bottom: 1px dotted #0000FF\n" )
+                .append("  background-color: yellow;\n" )
                 .append("}\n" )
                 .append("\n" )
                 .append(".note:hover:after {\n" )
@@ -104,7 +156,7 @@ public class HTMLGenerator {
                 // Inject the code for the markup.
                 String color = String.format("#%02x%02x%02x",
                         n.getHighlightColor().getRed(), n.getHighlightColor().getGreen(), n.getHighlightColor().getBlue());
-                finalCode.append("<span class=\"note\" style=\"border-bottom: 1px dotted ").append(color).append(";\" msg=\"").append(n.getMsg()).append("\">");
+                finalCode.append("<span class=\"note\" msg=\"").append(n.getMsg()).append("\">");
 
                 // Read in the text in between markups...
                 finalCode.append(code.substring(b.getStart() - 1, b.getEnd()));

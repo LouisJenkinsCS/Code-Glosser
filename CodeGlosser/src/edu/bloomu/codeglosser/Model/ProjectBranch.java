@@ -30,10 +30,14 @@ public class ProjectBranch implements TreeViewBranch {
         }
         
         ArrayList<TreeViewNode> children = new ArrayList<>();
+        // Filter non-Java files
         for (final File f : directory.listFiles()) {
             if (f.isDirectory()) {
-                children.add(new ProjectBranch(f));
-            } else {
+                ProjectBranch dir = new ProjectBranch(f);
+                if (dir.getChildren().length > 0) {
+                    children.add(dir);
+                }
+            } else if (f.getName().toLowerCase().endsWith(".java")){
                 children.add(new ProjectLeaf(f));
             }
         }

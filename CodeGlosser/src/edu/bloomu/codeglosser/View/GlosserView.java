@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 import edu.bloomu.codeglosser.Controller.GlosserController;
 import edu.bloomu.codeglosser.Utils.ColorUtils;
+import edu.bloomu.codeglosser.Utils.HTMLGenerator;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import java.awt.event.MouseAdapter;
@@ -135,8 +136,11 @@ public class GlosserView extends javax.swing.JPanel implements IMarkupView {
         });
         
         JMenuItem previewHTML = new JMenuItem("Preview");
+        JMenuItem exportProject = new JMenuItem("Export Project");
         previewHTML.addActionListener(onPreviewHTML::onNext);
+        exportProject.addActionListener((e) -> HTMLGenerator.generateAll());
         popup.add(previewHTML);
+        popup.add(exportProject);
     }
     
     public void setText(String str) {

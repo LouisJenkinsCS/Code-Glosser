@@ -1,7 +1,7 @@
 <html>    <head>        <link rel="stylesheet" href="src/edu/bloomu/codeglosser/HTML/styles/atom-one-light.css">        <script src="src/edu/bloomu/codeglosser/HTML/highlight.pack.js"></script>        <script>hljs.initHighlightingOnLoad();</script><style>.note {
   display: inline;
   position: relative;
-  border-bottom: 1px dotted #0000FF
+  background-color: yellow;
 }
 
 .note:hover:after {
@@ -31,66 +31,54 @@
   position: absolute;
   display:block;
   z-index: 99;
-}</style>        <title></title>        <meta charset="UTF-8">    </head>    <body>        <pre><code><span class="note" style="border-bottom: 1px dotted #ffff00;" msg="null">/*
-</span> <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="null">* To change this license header, choose License Headers in Project Properties.
-</span> <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="null">* To change this template file, choose Tools | Templates
-</span> <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="null">* and open the template in the editor.
-</span> <span class="note" style="border-bottom: 1px dotted #ffff00;" msg="null">*/
-</span>package edu.bloomu.codeglosser.Utils;
+}</style>        <title></title>        <meta charset="UTF-8">    </head>    <body>        <pre><code>package edu.bloomu.codeglosser;
 
-<span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">/**
-</span> <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">*
-</span> <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">* @author Louis
-</span> <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">*/
-</span><span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">public class Bounds implements Comparable<Bounds> {
-</span>    <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(Bounds.class.getName());
-</span>    <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">private int start;
-</span>    <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">private int end;
-</span>    
-    <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">public static Bounds of(int start, int end) {
-</span>        <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">return new Bounds(start, end);
-</span>    <span class="note" style="border-bottom: 1px dotted #00ffff;" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">}
-</span>    
-    public Bounds(int start, int end) {
-        this.start = start;
-        this.end = end;
-    }
+<span class="note" msg="Consistently indent all statements appearing within a block to clarify the logic and flow of control.">import com.google.common.eventbus.EventBus;
+</span>import edu.bloomu.codeglosser.Session.MarkupManager;
+import edu.bloomu.codeglosser.Controller.GlosserController;
+import edu.bloomu.codeglosser.Events.FileChangeEvent;
+import edu.bloomu.codeglosser.Utils.DocumentHelper;
+import edu.bloomu.codeglosser.View.MarkupView;
+<span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">import edu.bloomu.codeglosser.View.MarkupPropertiesView;
+</span>import edu.bloomu.codeglosser.View.GlosserView;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.io.File;
+import java.net.URL;
+import javax.swing.JScrollPane;
+<span class="note" msg="Use blank lines to separate parts of a method that are logically distinct.">import javax.swing.JSplitPane;
+</span>import javax.swing.JTextArea;
+import javax.swing.text.DefaultEditorKit;
+import javax.swing.text.Document;
+import org.openide.windows.TopComponent;
+
+/**
+ *
+ * @author Drue Coles
+ */
+@TopComponent.Description(
+        preferredID = "GlossTopComponent",
+        //iconBase="SET/PATH/TO/ICON/HERE", 
+        persistenceType = TopComponent.PERSISTENCE_ALWAYS
+)
+@TopComponent.Registration(mode = "glossEditor", openAtStartup = false)
+public class GlossableTopComponent extends TopComponent {
     
-    public boolean contains(Bounds other) {
-        return other.start >= this.start && other.end <= this.end;
-    }
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(GlossableTopComponent.class.getName());
+
+    private static final char SYM = '\u2691'; // flag
+    private final EventBus bus = new EventBus();
     
-    public boolean collidesWith(Bounds other) {
-        return (other.start <= this.end && other.end >= this.start)
-                || (this.start <= other.end && this.end >= other.start);
-    }
 
-    public int getStart() {
-        return start;
+    public GlossableTopComponent(File file) {
+//        setDisplayName(DocumentHelper.getDocumentName(doc) + ".html");
+//        setLayout(new BorderLayout());      
+//        MarkupView v = new MarkupView(null, bus);
+//        add(v, BorderLayout.CENTER);
+//        MarkupManager.getInstance(DocumentHelper.getDocumentName(doc));
+//        v.setDocument(doc);
+//        bus.post(FileChangeEvent.of(DocumentHelper.getDocumentName(doc)));
     }
-
-    public void setStart(int start) {
-        this.start = start;
-    }
-
-    public int getEnd() {
-        return end;
-    }
-
-    public void setEnd(int end) {
-        this.end = end;
-    }
-
-    @Override
-    public int compareTo(Bounds other) {
-        return Integer.compare(this.start, other.start);
-    }
-
-    @Override
-    public String toString() {
-        return "Bounds{" + "start=" + start + ", end=" + end + '}';
-    }
-    
-    
 }
 </code></pre>    </body></html>
