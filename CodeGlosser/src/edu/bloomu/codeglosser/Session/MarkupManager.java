@@ -13,6 +13,7 @@ import edu.bloomu.codeglosser.Model.Templates.TemplateLeaf;
 import edu.bloomu.codeglosser.Utils.Bounds;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +36,21 @@ public final class MarkupManager implements SessionManager {
     private static final HashMap<String, MarkupManager> MAPPED_INSTANCES = new HashMap<>();
     
     public static final MarkupManager NULL = new MarkupManager();
+    
+    private static URI PREFIX_URI;
+    
+    public static boolean instanceExists(String fileName) {
+        return MAPPED_INSTANCES.containsKey(fileName);
+    }
+    
+    public static void setURIPrefix(URI uri) {
+        LOG.info("Set URI: " + uri.toString());
+        PREFIX_URI = uri;
+    }
+    
+    public static URI getURIPrefix() {
+        return PREFIX_URI;
+    }
     
     public static MarkupManager getInstance(String fileName) {
         MarkupManager manager = MAPPED_INSTANCES.get(fileName);
