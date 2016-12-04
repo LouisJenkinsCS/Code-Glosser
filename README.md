@@ -55,20 +55,20 @@ Powered By: 'highlight.js'
 
 ##### Create Markup
 
-![](screenshots/createMarkupEvent.png)
+![](screenshots/createMarkupEvent.PNG)
 
 ##### Show Markup
 
-![](screenshots/showMarkupEvent.png)
+![](screenshots/showMarkupEvent.PNG)
 
 ##### Double and Triple Click
 
-![](screenshots/Double_And_Triple_Click_Event.png)
+![](screenshots/Double_And_Triple_Click_Event.PNG)
 
 ##### Delete Markup
 
-![](screenshots/deleteMarkupEvent.png)
+![](screenshots/deleteMarkupEvent.PNG)
 
 ##### Modify Markup
 
-![](screenshots/modifyMarkupEvent.png)
+![](screenshots/modifyMarkupEvent.PNG)
