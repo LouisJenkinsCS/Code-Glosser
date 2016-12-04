@@ -39,10 +39,27 @@ public class HTMLGenerator {
     }
     
     public static String relativeFileName(File f) {
-        return new File(".").toURI().relativize(f.toURI()).getPath();
+        LOG.info("Relativized Filename: " + f.getName() + " to " + MarkupManager.getURIPrefix().relativize(f.toURI()).getPath());
+        return MarkupManager.getURIPrefix().relativize(f.toURI()).getPath();
+    }
+    
+    public static boolean isValidDirectory(File dir) {
+        for (File f : dir.listFiles()) {
+            if (f.isDirectory() && isValidDirectory(f)) {
+                return true;
+            } else if (MarkupManager.instanceExists(relativeFileName(f))) {
+                return true;
+            }
+        }
+        return false;
     }
     
     public static void generateDirectory(File dir, ZipOutputStream stream) throws IOException {
+        // Only generate if directory contains a file that is marked up.
+        if (!isValidDirectory(dir)) {
+            return;
+        }
+        
         // Directories must end with a slash.
         String name = relativeFileName(dir);
         name = name.endsWith("/") ? name : name + "/";
@@ -51,7 +68,7 @@ public class HTMLGenerator {
         for (final File f : dir.listFiles()) {
             if (f.isDirectory()) {
                 generateDirectory(f, stream);
-            } else if (f.getName().toLowerCase().endsWith(".java")){
+            } else if (MarkupManager.instanceExists(relativeFileName(f))){
                 generateFile(f, stream);
             }
         }
@@ -61,6 +78,7 @@ public class HTMLGenerator {
         try {
             // Copy contents into zip file (We replace carriage returns for standard newlines)
             String title = relativeFileName(file);
+            
             String code = new String(Files.readAllBytes(file.toPath())).replace("\r\n", "\n");
             String result = generate(title, code, MarkupManager.getInstance(title).getAllNotes());
             ostream.putNextEntry(new ZipEntry(title + ".html"));
@@ -72,8 +90,15 @@ public class HTMLGenerator {
     }
     
     public static void generateAll() {
-        try(ZipOutputStream stream = new ZipOutputStream(new FileOutputStream(new File("exported.zip")))) {
-            generateDirectory(new File("."), stream);
+        try(ZipOutputStream stream = new ZipOutputStream(new FileOutputStream(new File(MarkupManager.getURIPrefix().getPath() + "/exported.zip")))) {
+            File dir = new File(MarkupManager.getURIPrefix());
+            for (final File f : dir.listFiles()) {
+                if (f.isDirectory()) {
+                    generateDirectory(f, stream);
+                } else if (f.getName().toLowerCase().endsWith(".java")){
+                    generateFile(f, stream);
+                }
+        }
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }

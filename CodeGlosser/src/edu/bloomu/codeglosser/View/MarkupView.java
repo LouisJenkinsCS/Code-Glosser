@@ -8,6 +8,7 @@ package edu.bloomu.codeglosser.View;
 import com.google.common.eventbus.EventBus;
 import edu.bloomu.codeglosser.Controller.GlosserController;
 import edu.bloomu.codeglosser.Events.FileChangeEvent;
+import edu.bloomu.codeglosser.Session.MarkupManager;
 import java.io.File;
 import java.util.logging.Logger;
 import javax.swing.text.Document;
@@ -31,6 +32,7 @@ public class MarkupView extends javax.swing.JPanel {
     public MarkupView(File project, EventBus eventBus) {
         this.eventBus = eventBus;
         this.project = project;
+        MarkupManager.setURIPrefix(project.toURI());
         initComponents();
         npController = new GlosserController(eventBus, notePadView1);
         
