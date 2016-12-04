@@ -1,21 +1,74 @@
-# Code Glosser
+# Code Glosser (Rough Draft)
 
-## What is it
+## What is it?
 
-[TODO]
+A tool for instructors to markup student code. Leave feedback by marking up code by leaving messages, which the user can see in HTML.
+There is currently minimal support for project-wide markups.
 
-## Screenshots
+## Features
 
-### Creating a Markup
+### NetBeans Integration
 
-![Creating a Markup](screenshots/add_new_markup.png)
+Will be available soon on NetBeans Plugin-Portal soon, and hence will be readily available.
 
-![Created Markup](screenshots/created_markup.png)
+### Markup and Evaluate Code
 
-### Applying a Template
+Markup student code by leaving notes, which they will be able to see in HTML. 
 
-![Applying a Template](screenshots/apply_template.png)
+### Export Markups to HTML Format
 
-### Export to HTML
+Export marked-up code as HTML. Marked up code appears as being highlighted, and display the message on hover.
 
-![HTML Markups](screenshots/markup_in_html.png)
+![Marked Up as HTML](screenshots/markup_in_html.png)
+
+Powered By: 'highlight.js'
+
+#### Markup Entire Projects
+
+##### Project Files View
+
+![](screenshots/Project-View.png)
+
+![](screenshots/Project-View2.png)
+
+##### Add Markup (Custom)
+
+![](screenshots/create_and_custom_markup.png)
+
+##### Add Markup (Template)
+
+![](screenshots/create_and_apply_template.png)
+
+##### Color-Distinct Markups
+
+![](screenshots/color-specific_markups.png)
+
+## Implementation
+
+### Control Flow
+
+#### Reactive MVC
+
+![Event Control Flow](screenshots/EventControlFlow.PNG)
+
+#### Events
+
+##### Create Markup
+
+![](screenshots/createMarkupEvent.png)
+
+##### Show Markup
+
+![](screenshots/showMarkupEvent.png)
+
+##### Double and Triple Click
+
+![](screenshots/Double_And_Triple_Click_Event.png)
+
+##### Delete Markup
+
+![](screenshots/deleteMarkupEvent.png)
+
+##### Modify Markup
+
+![](screenshots/modifyMarkupEvent.png)

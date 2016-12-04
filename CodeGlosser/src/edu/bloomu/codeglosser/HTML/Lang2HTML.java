@@ -57,17 +57,17 @@ public abstract class Lang2HTML {
                 case ' ':
                     buf.append("&nbsp;");
                     break;
-                case '&':
-                    buf.append("&amp;");
-                    break;
-                case '\"':
-                    buf.append("&quot;");
-                    break;
-                case '\'':
-                    buf.append("&apos;");
-                    break;
+//                case '&':
+//                    buf.append("&amp;");
+//                    break;
+//                case '\"':
+//                    buf.append("&quot;");
+//                    break;
+//                case '\'':
+//                    buf.append("&apos;");
+//                    break;
                 case '\t':
-                    buf.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+                    buf.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
                     break;
                 case '\r':
                     if (it.next() != '\n')
