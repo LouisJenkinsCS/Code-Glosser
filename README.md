@@ -55,20 +55,21 @@ Powered By: 'highlight.js'
 
 ##### Create Markup
 
-![](screenshots/createMarkupEvent.PNG)
+![](screenshots/CreateMarkupDiagram.PNG)
 
-##### Show Markup
+##### Select Markup
 
-![](screenshots/showMarkupEvent.PNG)
+![](screenshots/SelectMarkupDiagram.PNG)
 
-##### Double and Triple Click
+##### Mutate Markup
 
-![](screenshots/Double_And_Triple_Click_Event.PNG)
+![](screenshots/MutateMarkupDiagram.PNG)
 
-##### Delete Markup
 
-![](screenshots/deleteMarkupEvent.PNG)
+##### File Change
 
-##### Modify Markup
+![](screenshots/FileChangeDiagram.PNG)
 
-![](screenshots/modifyMarkupEvent.PNG)
+##### Apply Templates
+
+![](screenshots/ApplyTemplatesDiagram.PNG)
