@@ -43,33 +43,3 @@ Powered By: 'highlight.js'
 
 ![](screenshots/color-specific_markups.png)
 
-## Implementation
-
-### Control Flow
-
-#### Reactive MVC
-
-![Event Control Flow](screenshots/EventControlFlow.PNG)
-
-#### Events
-
-##### Create Markup
-
-![](screenshots/CreateMarkupDiagram.PNG)
-
-##### Select Markup
-
-![](screenshots/SelectMarkupDiagram.PNG)
-
-##### Mutate Markup
-
-![](screenshots/MutateMarkupDiagram.PNG)
-
-
-##### File Change
-
-![](screenshots/FileChangeDiagram.PNG)
-
-##### Apply Templates
-
-![](screenshots/ApplyTemplatesDiagram.PNG)
