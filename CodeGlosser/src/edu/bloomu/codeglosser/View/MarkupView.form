@@ -32,7 +32,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="edu.bloomu.codeglosser.View.GlosserView" name="notePadView1">
+    <Component class="edu.bloomu.codeglosser.View.MarkupView1" name="notePadView1">
     </Component>
     <Component class="edu.bloomu.codeglosser.View.MarkupPropertiesView" name="notePropertiesView1">
       <Properties>

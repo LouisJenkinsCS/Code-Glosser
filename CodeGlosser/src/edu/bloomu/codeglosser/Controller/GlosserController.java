@@ -12,7 +12,7 @@ import edu.bloomu.codeglosser.Events.FileChangeEvent;
 import edu.bloomu.codeglosser.Model.GlosserModel;
 import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import edu.bloomu.codeglosser.Utils.HTMLGenerator;
-import edu.bloomu.codeglosser.View.GlosserView;
+import edu.bloomu.codeglosser.View.MarkupView1;
 import io.reactivex.Observable;
 import java.awt.Desktop;
 import java.io.BufferedOutputStream;
@@ -39,12 +39,12 @@ public class GlosserController {
     private static final Logger LOG = Logger.getLogger(GlosserController.class.getName());
     
     
-    private final GlosserView view;
+    private final MarkupView1 view;
     private final GlosserModel model;
     private MarkupManager manager;
     private EventBus bus;
     
-    public GlosserController(EventBus eb, GlosserView v) {
+    public GlosserController(EventBus eb, MarkupView1 v) {
         view = v;
         bus = eb;
         bus.register(this);
@@ -125,7 +125,7 @@ public class GlosserController {
         }
     }
     
-    public GlosserView getView() {
+    public MarkupView1 getView() {
         return view;
     }
 

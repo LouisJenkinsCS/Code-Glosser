@@ -55,7 +55,7 @@ public class MarkupView extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        notePadView1 = new edu.bloomu.codeglosser.View.GlosserView();
+        notePadView1 = new edu.bloomu.codeglosser.View.MarkupView1();
         notePropertiesView1 = new edu.bloomu.codeglosser.View.MarkupPropertiesView(this.project, this.eventBus);
 
         notePropertiesView1.setEventBus(null);
@@ -81,7 +81,7 @@ public class MarkupView extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private edu.bloomu.codeglosser.View.GlosserView notePadView1;
+    private edu.bloomu.codeglosser.View.MarkupView1 notePadView1;
     private edu.bloomu.codeglosser.View.MarkupPropertiesView notePropertiesView1;
     // End of variables declaration//GEN-END:variables
 }

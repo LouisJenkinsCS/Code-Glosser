@@ -8,6 +8,8 @@ package edu.bloomu.codeglosser.Utils;
 import com.google.common.io.ByteStreams;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Session.MarkupManager;
+import java.awt.Desktop;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -18,11 +20,21 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import javafx.application.Application;
+import javafx.concurrent.Worker;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.Stage;
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import org.apache.logging.log4j.core.util.IOUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.openide.util.Exceptions;
+import static org.openqa.grid.common.SeleniumProtocol.WebDriver;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 
 
 
@@ -156,13 +168,14 @@ public class HTMLGenerator {
                 .append("    </head>")
                 .append("    <body>")
                 .append("        <pre>")
-                .append("<code>")
+                .append("<code id=\"code_segment\">")
                 .append(generateMarkups(notes, code))
                 .append("</code>")
                 .append("</pre>")
                 .append("    </body>")
                 .append("</html>");
         
+        ScriptEngineManager manager = new ScriptEngineManager();
         return builder.toString();
     }
     

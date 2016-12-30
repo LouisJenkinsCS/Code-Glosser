@@ -1,5 +1,34 @@
 # Code Glosser
 
+## Introduction
+
+This work has been produced for an Independent Study at Bloomsburg University by me, Louis Jenkins, under the supervision of Drue Coles. This Independent Study
+has taught me a surprising amount, and not all are purely technical detail as some even relate to how I see my future. Without any disrespect to Bloomsburg University,
+the Department of Mathematical and Digital Sciences, or even Drue Coles, I would like to mention that this experience has further solidified my resolve to go graduate
+school over that of industry after graduation. It isn't that the work is necessarily very challenging, but it comes down to the tedium behind software engineering.
+However, I did learn quite a few technical things, so it also had it's upsides as well.
+
+### Down Sides
+
+One of the things I learned to dislike, stems from my reasoning for going into computer science, was the lack of a challenge. At first, it was fun in that I got to learn
+to use the Java Swing framework, which associated with it is the major disappointments and "work-arounds" needed just to develop a simple application. I personally love
+challenges, and the things I find challenging relate to academic research, which involves learning something completely new. I was no stranger to Java, and in fact it is
+my most fluent language next to C, and so there was no challenge there. The Java Swing framework, while is remotely "challenging", it's challenges stem from it's short-comings,
+such as the abundant amount of boilerplate code that one has to write to get even the most fundamental functionality. Another thing I disliked about it is that the project 
+it felt more like I was a contractor rather than a researcher.
+
+### Up Sides
+
+Quite a few things I've learned is that the process for taking a product from conception to production is a very daunting one. Even now, while the actual specifications of the
+application are fulfilled, there are plenty of bugs that need to be fixed and other potential features that need implementing before it can be considered "complete". It does
+give me new-found respect for the massive amount of patience it takes to do just that, and as well I think the "80:20" rule definitely applies in this case.
+
+Another thing I've learned is to actually plan out the design of software first, and even while writing this report I've even "simplified" the model to the point where it can be
+described in the diagrams below, and which are significant changes and refactorings I can make to the project. Stemming from this, I know now that while design patterns are
+helpful, they are detrimental when used where not needed. I suppose it could be said I learned the "K.I.S.S", which simply put, means to "keep it simple".
+
+<P style="page-break-before: always">
+
 ## Summary
 
 Code Glosser is an academic-enrichment tool that provides a user-friendly way for instructors to markup student assignments and provide the necessary feedback
@@ -165,7 +194,7 @@ class Event {
 The `tag` lets us know what kind of event this is, and the `data` serves as an opaque handler for passing around data, of which the `tag` can
 be used to identify the type of. For example, if the `tag` is `CREATE_MARKUP` and we know that this can only be sent from the View, we know then
 that `data` holds the type `List<Bounds>` object, and we may safely cast to that. Events such as this can be used to create even more events and 
-pass these Events around. The reasoning behind not using subclasses of this type is simple: Unlike other languages, Java does allow pattern matching
+pass these Events around. The reasoning behind not using subclasses of this type is simple: Unlike other languages, Java does not allow pattern matching
 based on it's type. Sure, we can use `instanceof`, to determine the exact type, but that's a lot more long-winded than just doing it by tag. As well,
 `Event` is a POJO object: A Plain Old Java Object, and as such does not need that much complexity.
 
