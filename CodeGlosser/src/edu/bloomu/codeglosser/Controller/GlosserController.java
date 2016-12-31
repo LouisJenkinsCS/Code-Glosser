@@ -21,6 +21,8 @@ import edu.bloomu.codeglosser.Utils.Bounds;
 import edu.bloomu.codeglosser.Events.MarkupColorChangeEvent;
 import edu.bloomu.codeglosser.Events.NoteSelectedChangeEvent;
 import edu.bloomu.codeglosser.Model.Markup;
+import edu.bloomu.codeglosser.Utils.IdentifierGenerator;
+import io.reactivex.subjects.PublishSubject;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,10 +40,24 @@ import org.openide.util.Exceptions;
  * @author Louis
  */
 public class GlosserController {
-
+    
+    // MarkupProperties events
+    private static final int NEW_MARKUP = 1 << 0;
+    private static final int REMOVE_MARKUP = 1 << 1;
+    
+    // MarkupView events
+    private static final int REMOVE_HIGHLIGHTS = 1 << 0;
+    
     private static final Logger LOG = Logger.getLogger(GlosserController.class.getName());
     
     private final HashMap<String, Markup> markupMap = new HashMap<>();
+    private Markup currentMarkup = null;
+    
+    // Handles generation of the identifiers for markups. All markups must have a unique
+    // identifier for it to map correctly, so the current tag must be unique.
+    private final IdentifierGenerator idGen = new IdentifierGenerator("Markup");
+    
+    private final PublishSubject event = PublishSubject.create();
     
     public GlosserController(Observable<Event> source) {
         source
@@ -55,7 +71,7 @@ public class GlosserController {
                                     createMarkup((Bounds []) e.data);
                                     break;
                                 case MarkupView1.DELETE_MARKUP:
-                                    deleteMarkup((Bounds []) e.data);
+                                    deleteMarkup();
                                     break;
                                 case MarkupView1.EXPORT_PROJECT:
                                     exportProject();
@@ -158,13 +174,30 @@ public class GlosserController {
             throw new RuntimeException(ex);
         }
     }
-
+    
+    /**
+     * Handle events to create a new markup. The new markup is given a unique identifier
+     * and as well becomes the current selected Markup. This event is also forwarded to
+     * the MarkupProperties component.
+     * @param bounds Boundary of the created markup.
+     */
     private void createMarkup(Bounds[] bounds) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // Create a new markup
+        String id = idGen.getNextId();
+        currentMarkup = new Markup("", id, bounds);
+        markupMap.put(id, currentMarkup);
+        
+        // Notify the MarkupProperties to display new Markup.
+        sendEventToProperties(NEW_MARKUP, currentMarkup);
     }
-
-    private void deleteMarkup(Bounds[] bounds) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    
+    /**
+     * Delete the current markup, if one is selected. If one is selected, we inform
+     * the MarkupView that it should delete it's highlights, and then tell MarkupProperties
+     * to remove it's own attributes.
+     */
+    private void deleteMarkup() {
+        // We can only delete the markup if one is currently selected
     }
     
     /**
@@ -202,5 +235,9 @@ public class GlosserController {
 
     private void saveSession() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private void sendEventToProperties(int eventTag, Object data) {
+        event.onNext(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, eventTag, data));
     }
 }
