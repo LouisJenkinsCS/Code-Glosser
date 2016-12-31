@@ -21,14 +21,14 @@ import org.apache.logging.log4j.util.Strings;
  * 
  * Model for the the NotePad view.
  */
-public class GlosserModel {
+public class MarkupViewModel {
     
-    private static final Logger LOG = Logger.getLogger(GlosserModel.class.getName());
+    private static final Logger LOG = Logger.getLogger(MarkupViewModel.class.getName());
     private String text = "";
     private String title = "";
 
-    public GlosserModel() {
-        LOG.info("Initialized...");
+    public MarkupViewModel() {
+        LOG.info("MarkupViewModel initialized...");
     }
     
     /**

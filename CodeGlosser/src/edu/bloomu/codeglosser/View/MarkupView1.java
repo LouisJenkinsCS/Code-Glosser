@@ -9,10 +9,9 @@ import edu.bloomu.codeglosser.Utils.Bounds;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.logging.Logger;
-import edu.bloomu.codeglosser.Controller.GlosserController;
 import edu.bloomu.codeglosser.Events.Event;
+import edu.bloomu.codeglosser.Model.MarkupViewModel;
 import edu.bloomu.codeglosser.Utils.ColorUtils;
-import edu.bloomu.codeglosser.Utils.HTMLGenerator;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import java.awt.event.MouseAdapter;
@@ -26,7 +25,6 @@ import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
 import javax.swing.text.Highlighter.HighlightPainter;
-import org.openide.util.Exceptions;
 
 
 /**
@@ -40,7 +38,7 @@ import org.openide.util.Exceptions;
  * The MarkupView is, currently, only connected to the MarkupController.
  * 
  */
-public class MarkupView1 extends javax.swing.JPanel implements IMarkupView {
+public class MarkupView1 extends javax.swing.JPanel {
     
     // The events we send
     public static final int CREATE_MARKUP = 1 << 0;
@@ -55,18 +53,19 @@ public class MarkupView1 extends javax.swing.JPanel implements IMarkupView {
     
     private static final Logger LOG = Logger.getLogger(MarkupView1.class.getName());
     
+    // The model for this view; the model handles the computational work such as segmentation of highlighting
+    private final MarkupViewModel model = new MarkupViewModel();
+    
     // Our multiplexer event-notification stream
     private final PublishSubject<Event> event = PublishSubject.create();
     
+    // The highlighter and it's respective mapping of highlights
     private final Highlighter highlighter;
     private final HashMap<Bounds, Highlight> hMap = new HashMap<>();
     
     // Our contextual popup menu
     private final JPopupMenu popup = new JPopupMenu();
-    
-    /**
-     * Creates new form NotePad
-     */
+
     public MarkupView1() {
         LOG.info("Initializing MarkupView...");
         
@@ -96,16 +95,12 @@ public class MarkupView1 extends javax.swing.JPanel implements IMarkupView {
                 // cursor's range to that of the markup itself.
                 if (e.getClickCount() == 2 && !e.isConsumed()) {
                     LOG.info("Double Click!");
-                    event.onNext(
-                        Event.of(
-                                Event.MARKUP_VIEW, Event.MARKUP_CONTROLLER, GET_MARKUP_SELECTION,
-                                getSelected()
-                        )
-                    );
+                    doubleClickHandler(() -> e.consume());
                 }
                 
                 // On Triple Click: Changes the cursor's range to the entire line.
                 if (e.getClickCount() >= 3 && !e.isConsumed()) {
+                    LOG.info("Triple Click!");
                     tripleClickHandler();
                     e.consume();
                 }
@@ -125,6 +120,19 @@ public class MarkupView1 extends javax.swing.JPanel implements IMarkupView {
                 }
             }
         });
+        
+        // Handle receiving of events
+        event
+                .filter(this::eventForUs)
+                .subscribe(e -> {
+                   switch (e.getSender()) {
+                       case Event.MARKUP_CONTROLLER:
+                           switch (e.getCustom()) {
+                               // TODO
+                           }
+                           break;
+                   }
+                });
     }
     
     private void initializePopup() {
@@ -148,7 +156,7 @@ public class MarkupView1 extends javax.swing.JPanel implements IMarkupView {
                 return;
             }
             
-            event.onNext(Event.of(Event.MARKUP_VIEW, Event.MARKUP_CONTROLLER, CREATE_MARKUP, b));
+            sendEventToController(CREATE_MARKUP, b);
         });
         
         deleteMarkup.addActionListener(e -> {
@@ -158,7 +166,7 @@ public class MarkupView1 extends javax.swing.JPanel implements IMarkupView {
         
         preview.addActionListener(e -> {
             LOG.info("Propogating PREVIEW_HTML event...");
-            sendEventToController(PREVIEW_HTML, null);
+            sendEventToController(PREVIEW_HTML, model);
         });
         
         exportProject.addActionListener(e -> {
@@ -218,11 +226,41 @@ public class MarkupView1 extends javax.swing.JPanel implements IMarkupView {
         return event;
     }
     
-    public void tripleClickHandler() {
-        
+    /**
+     * On a double click, it will attempt to locate a markup that is within the
+     * selected boundary, and if one exists it will notify the MarkupController
+     * about it. If one does not exist, it simply ignores the user request. For
+     * simplicity, if we find one, we consume the click event so as not to trigger
+     * a triple click.
+     */
+    public void doubleClickHandler(Runnable consume) {
+        // We only consume the MouseEvent and inform MarkupController
+        // if double click refers to a valid highlight
+        if (highlightExists(getSelected())) {
+            consume.run();
+            sendEventToController(GET_MARKUP_SELECTION, getSelected());
+        }
     }
     
-    @Override
+    /**
+     * On a triple click, it will refocus the cursor to select the current line,
+     * excluding additional white space.
+     * 
+     * TODO: Perform work on background thread???
+     */
+    public void tripleClickHandler() {
+        setSelection(model.getLineBounds(textCode.getSelectionStart()));
+    }
+    
+    /**
+     * Predicate to determine if the event sent was meant for us.
+     * @param e Event
+     * @return If meant for us
+     */
+    private boolean eventForUs(Event e) {
+        return (e.getRecipient() & Event.MARKUP_VIEW) != 0;
+    }
+    
     public void addMarkup(Bounds ...bounds) {
         LOG.info(Stream
                 .of(bounds)
@@ -243,7 +281,6 @@ public class MarkupView1 extends javax.swing.JPanel implements IMarkupView {
                 });
     }
 
-    @Override
     public void removeMarkup(Bounds ...bounds) {
         LOG.info(Stream
                 .of(bounds)
@@ -258,7 +295,6 @@ public class MarkupView1 extends javax.swing.JPanel implements IMarkupView {
                 .forEach(highlighter::removeHighlight);
     }
 
-    @Override
     public void removeAllMarkups() {
         LOG.info("Removing all markups!");
         hMap.values().stream()
@@ -266,7 +302,6 @@ public class MarkupView1 extends javax.swing.JPanel implements IMarkupView {
         hMap.clear();
     }
 
-    @Override
     public void setMarkupColor(Bounds bounds, Color color) {
         // Save the currently selected offsets
         int start = textCode.getSelectionStart();
@@ -296,7 +331,6 @@ public class MarkupView1 extends javax.swing.JPanel implements IMarkupView {
         }
     }
 
-    @Override
     public void setSelection(Bounds bounds) {
         this.requestFocus(true);
         textCode.setSelectionStart(bounds.getStart());

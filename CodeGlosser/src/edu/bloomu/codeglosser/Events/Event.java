@@ -19,9 +19,12 @@ public class Event {
     public static final int PROPERTIES_FILES = 1 << 5;
     public static final int PROPERTIES_ATTRIBUTES = 1 << 6;
     
+    
     /*
         Helper bit shifts and masks to determine what is what.
     */
+    public static final int SENDER_MASK = 0xFF;
+    
     public static final int RECIPIENT_SHIFT = 8;
     public static final int RECIPIENT_MASK = 0xFF00;
     
@@ -56,5 +59,29 @@ public class Event {
     private Event(int tag, Object data) {
         this.tag = tag;
         this.data = data;
+    }
+    
+    /**
+     * Get the set sender bits only.
+     * @return Sender.
+     */
+    public int getSender() {
+        return this.tag & SENDER_MASK;
+    }
+    
+    /**
+     * Get the set recipient bits only. 
+     * @return Recipient.
+     */
+    public int getRecipient() {
+        return (this.tag & RECIPIENT_MASK) >> RECIPIENT_SHIFT;
+    }
+    
+    /**
+     * Get the set custom bits only.
+     * @return Custom.
+     */
+    public int getCustom() {
+        return (this.tag & CUSTOM_MASK) >> CUSTOM_SHIFT;
     }
 }
