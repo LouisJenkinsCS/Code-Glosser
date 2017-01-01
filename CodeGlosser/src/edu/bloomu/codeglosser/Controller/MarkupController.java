@@ -1,54 +1,70 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* BSD 3-Clause License
+ *
+ * Copyright (c) 2017, Louis Jenkins <LouisJenkinsCS@hotmail.com>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     - Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *
+ *     - Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *
+ *     - Neither the name of Louis Jenkins, Bloomsburg University nor the names of its 
+ *       contributors may be used to endorse or promote products derived
+ *       from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package edu.bloomu.codeglosser.Controller;
 
-import edu.bloomu.codeglosser.Session.MarkupManager;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import edu.bloomu.codeglosser.Events.Event;
-import edu.bloomu.codeglosser.Events.FileChangeEvent;
 import edu.bloomu.codeglosser.Model.MarkupViewModel;
-import edu.bloomu.codeglosser.Utils.DocumentHelper;
 import edu.bloomu.codeglosser.Utils.HTMLGenerator;
 import edu.bloomu.codeglosser.View.MarkupView1;
 import io.reactivex.Observable;
 import java.awt.Desktop;
 import java.io.BufferedOutputStream;
 import edu.bloomu.codeglosser.Utils.Bounds;
-import edu.bloomu.codeglosser.Events.MarkupColorChangeEvent;
-import edu.bloomu.codeglosser.Events.NoteSelectedChangeEvent;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Utils.IdentifierGenerator;
 import io.reactivex.subjects.PublishSubject;
-import java.awt.Color;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.swing.text.Document;
 import org.openide.util.Exceptions;
 
 /**
  *
  * @author Louis
  */
-public class GlosserController {
+public class MarkupController {
     
     // MarkupProperties events
-    private static final int NEW_MARKUP = 1 << 0;
-    private static final int REMOVE_MARKUP = 1 << 1;
+    public static final int NEW_MARKUP = 1 << 0;
+    public static final int REMOVE_MARKUP = 1 << 1;
     
     // MarkupView events
-    private static final int REMOVE_HIGHLIGHTS = 1 << 0;
+    public static final int REMOVE_HIGHLIGHTS = 1 << 0;
+    public static final int SET_CURSOR = 1 << 1;
     
-    private static final Logger LOG = Logger.getLogger(GlosserController.class.getName());
+    private static final Logger LOG = Logger.getLogger(MarkupController.class.getName());
     
     private final HashMap<String, Markup> markupMap = new HashMap<>();
     private Markup currentMarkup = null;
@@ -57,9 +73,11 @@ public class GlosserController {
     // identifier for it to map correctly, so the current tag must be unique.
     private final IdentifierGenerator idGen = new IdentifierGenerator("Markup");
     
+    // Our event multiplexer
     private final PublishSubject event = PublishSubject.create();
     
-    public GlosserController(Observable<Event> source) {
+    public MarkupController(Observable<Event> source) {
+        // Handle receiving events
         source
                 .filter(this::eventForUs)
                 .subscribe(e -> {
@@ -73,6 +91,9 @@ public class GlosserController {
                                 case MarkupView1.DELETE_MARKUP:
                                     deleteMarkup();
                                     break;
+                                case MarkupView1.GET_MARKUP_SELECTION:
+                                     getMarkupSelection((Bounds) e.data);
+                                     break;
                                 case MarkupView1.EXPORT_PROJECT:
                                     exportProject();
                                     break;
@@ -90,52 +111,6 @@ public class GlosserController {
                             }
                     }
                 });
-        
-        view.onPreviewHTML()
-                .subscribe((ignored) -> {
-                    String html = HTMLGenerator.generate(model.getTitle(), model.getText(), manager.getAllNotes());
-                    try {
-                        File f = new File("tmp.html");
-                        f.createNewFile();
-                        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(f));
-                        stream.write(html.getBytes());
-                        stream.flush();
-                        stream.close();
-                        Desktop.getDesktop().browse(f.toURI());
-                    } catch (IOException ex) {
-                        Exceptions.printStackTrace(ex);
-                    }
-                });
-        
-        view.onCreateSelection()
-                .doOnNext((b) -> LOG.info("onShowSelection: " + b.toString()))
-                .map(model::segmentRange)
-                .doOnNext(view::addMarkup)
-                .map(b -> manager.createNote(b))
-                .map(NoteSelectedChangeEvent::of)
-                .subscribe(bus::post);
-        
-        view.onDeleteSelection()
-                .doOnNext(b -> LOG.info("onDeleteSelection: " + b.toString()))
-                .map(b -> manager.getNote(b))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(Markup::getRange)
-                .doOnNext(view::removeMarkup)
-                .subscribe(b -> manager.deleteNote(b));
-        
-        view.onShowSelection()
-                .doOnNext((b) -> LOG.info("onShowSelection: " + b.toString()))
-                .map(b -> manager.getNote(b))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(NoteSelectedChangeEvent::of)
-                .subscribe(bus::post);
-        
-        view.onTripleClick()
-                .doOnNext(offset -> LOG.info("onTripleClick: " + offset))
-                .map(model::getLineBounds)
-                .subscribe(view::setSelection);
     }
     
     /**
@@ -147,34 +122,6 @@ public class GlosserController {
         return (e.getRecipient() & Event.MARKUP_CONTROLLER) != 0;
     }
     
-    @Subscribe
-    public void highlightColorChange(MarkupColorChangeEvent e) {
-        view.setMarkupColor(e.getBounds(), e.getColor());
-    }
-    
-    @Subscribe
-    public void noteSelectedChange(NoteSelectedChangeEvent e) {
-        if (e.getNote() != Markup.DEFAULT) {
-            view.setSelection(e.getNote().getRange());
-        }
-    }
-    
-    @Subscribe
-    public void handleFileChange(FileChangeEvent event) {
-        manager = MarkupManager.getInstance(event.getFileName());
-        view.removeAllMarkups();
-        try {
-            model.setText(event.getFileContents());
-            view.setText(model.toHTML());
-            manager.getAllNotes()
-                    .stream()
-                    .peek(n -> view.addMarkup(n.getOffsets()))
-                    .forEach((Markup n) -> view.setMarkupColor(n.getRange(), n.getHighlightColor()));
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-    
     /**
      * Handle events to create a new markup. The new markup is given a unique identifier
      * and as well becomes the current selected Markup. This event is also forwarded to
@@ -182,6 +129,7 @@ public class GlosserController {
      * @param bounds Boundary of the created markup.
      */
     private void createMarkup(Bounds[] bounds) {
+        LOG.info("Creating markup with offsets... " + bounds);
         // Create a new markup
         String id = idGen.getNextId();
         currentMarkup = new Markup("", id, bounds);
@@ -197,7 +145,20 @@ public class GlosserController {
      * to remove it's own attributes.
      */
     private void deleteMarkup() {
+        LOG.info("Deleting current markup...");
         // We can only delete the markup if one is currently selected
+        if (currentMarkup != null) {
+            LOG.log(Level.INFO, "Current Markup: {0}", currentMarkup.getId());
+            // Broadcast event
+            sendEventToView(REMOVE_HIGHLIGHTS, currentMarkup);
+            sendEventToProperties(REMOVE_MARKUP, currentMarkup);
+            
+            // Remove markup
+            markupMap.remove(currentMarkup.getId());
+            currentMarkup = null;
+        } else {
+            LOG.info("No current markup selected...");
+        }
     }
     
     /**
@@ -208,7 +169,7 @@ public class GlosserController {
      * @param model The model used for generating HTML.
      */
     private void previewHTML(MarkupViewModel model) {
-        LOG.info("Generating HTML preview for " + model.getTitle());
+        LOG.log(Level.INFO, "Generating HTML preview for {0}", model.getTitle());
         String html = HTMLGenerator.generate(
                 model.getTitle(), model.getText(), 
                 markupMap.values().stream().collect(Collectors.toList())
@@ -239,5 +200,25 @@ public class GlosserController {
 
     private void sendEventToProperties(int eventTag, Object data) {
         event.onNext(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, eventTag, data));
+    }
+    
+    private void sendEventToView(int eventTag, Object data) {
+        event.onNext(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, eventTag, data));
+    }
+
+    /**
+     * Notify the MarkupView of the boundary of a markup that is in range of the
+     * selection.
+     * @param b Bounds to check.
+     */
+    private void getMarkupSelection(Bounds b) {
+        LOG.log(Level.INFO, "Obtaining Markup Selection for boundary: {0}", b);
+        markupMap
+                .values()
+                .stream()
+                .filter(markup -> markup.inRange(b))
+                .map(Markup::getRange)
+                .findAny()
+                .ifPresent(bounds -> sendEventToView(SET_CURSOR, bounds));
     }
 }

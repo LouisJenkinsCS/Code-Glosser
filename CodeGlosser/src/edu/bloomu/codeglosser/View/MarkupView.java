@@ -6,7 +6,7 @@
 package edu.bloomu.codeglosser.View;
 
 import com.google.common.eventbus.EventBus;
-import edu.bloomu.codeglosser.Controller.GlosserController;
+import edu.bloomu.codeglosser.Controller.MarkupController;
 import edu.bloomu.codeglosser.Events.FileChangeEvent;
 import edu.bloomu.codeglosser.Session.MarkupManager;
 import java.io.File;
@@ -22,7 +22,7 @@ public class MarkupView extends javax.swing.JPanel {
     private static final Logger LOG = Logger.getLogger(MarkupView.class.getName());
     
     
-    private final GlosserController npController;
+    private final MarkupController npController;
     private final EventBus eventBus;
     private final File project;
     
@@ -34,7 +34,7 @@ public class MarkupView extends javax.swing.JPanel {
         this.project = project;
         MarkupManager.setURIPrefix(project.toURI());
         initComponents();
-        npController = new GlosserController(eventBus, notePadView1);
+        npController = new MarkupController(eventBus, notePadView1);
         
         // Display standalone files immediately
         if (project.isFile()) {
