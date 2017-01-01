@@ -216,7 +216,7 @@ public class MarkupController {
         markupMap
                 .values()
                 .stream()
-                .filter(markup -> markup.inRange(b))
+                .filter(markup -> !markup.inRange(b))
                 .map(Markup::getRange)
                 .findAny()
                 .ifPresent(bounds -> sendEventToView(SET_CURSOR, bounds));

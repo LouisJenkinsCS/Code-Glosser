@@ -75,8 +75,6 @@ public class MarkupView1 extends javax.swing.JPanel {
     public static final int PREVIEW_HTML = 1 << 4;
     public static final int EXPORT_PROJECT = 1 << 5;
     
-    // The lower machine WORD (16-bits) of event tag. The MarkupView can only communicate with the MarkupController as recipient.
-    private static final int toController = Event.MARKUP_VIEW | (Event.MARKUP_CONTROLLER << Event.RECIPIENT_SHIFT);
     
     private static final Logger LOG = Logger.getLogger(MarkupView1.class.getName());
     

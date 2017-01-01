@@ -7,6 +7,7 @@ package edu.bloomu.codeglosser.View;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import edu.bloomu.codeglosser.Events.Event;
 import edu.bloomu.codeglosser.Session.MarkupManager;
 import edu.bloomu.codeglosser.Events.FileChangeEvent;
 import edu.bloomu.codeglosser.Model.Markup;
@@ -15,25 +16,22 @@ import edu.bloomu.codeglosser.Events.NoteSelectedChangeEvent;
 import edu.bloomu.codeglosser.Events.NoteUpdateChangeEvent;
 import edu.bloomu.codeglosser.Model.ProjectBranch;
 import edu.bloomu.codeglosser.Model.ProjectLeaf;
-import edu.bloomu.codeglosser.Model.Templates.TemplateBranch;
 import edu.bloomu.codeglosser.Model.Templates.TemplateLeaf;
 import edu.bloomu.codeglosser.Model.Templates.TemplateNodeFactory;
 import edu.bloomu.codeglosser.Model.TreeViewBranch;
 import edu.bloomu.codeglosser.Model.TreeViewNode;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.subjects.PublishSubject;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.openide.util.Exceptions;
-import org.reactivestreams.Subscription;
 
 /**
  *
@@ -43,21 +41,12 @@ public class MarkupPropertiesView extends javax.swing.JPanel implements IMarkupP
 
     private static final Logger LOG = Logger.getLogger(MarkupPropertiesView.class.getName());
     
-    
-    Disposable managerUpdateSubscription;
-    Disposable managerAddOrRemoveSubscription;
-    private MarkupManager manager;
-    private Markup note;
-    private EventBus bus;
-    
-    /**
-     * Creates new form NoteDescriptorPane
-     */
+    // Event multiplexer
+    PublishSubject<Event> event = PublishSubject.create();
+
     public MarkupPropertiesView(File project, EventBus bus) {
+        // Initialize NetBeans generated GUI
         initComponents();
-        
-        this.bus = bus;
-        bus.register(this);
         
         propertyMessage3.setMessage("");
         propertyMessage3.observe()
