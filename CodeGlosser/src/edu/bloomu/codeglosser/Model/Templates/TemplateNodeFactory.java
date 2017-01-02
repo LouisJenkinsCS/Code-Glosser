@@ -39,16 +39,16 @@ import org.json.simple.JSONObject;
  */
 public class TemplateNodeFactory {
     public static TreeViewNode getTemplateNode(JSONObject obj) {
-        TreeViewNode node;
+        TreeViewNode node = null;
         
-        // Bootstrap the recursive process: Categories get recursively resolved
-        if (obj.containsKey(TemplateBranch.KEY_CATEGORY)) {
-            node = new TemplateBranch(obj);
-        } else {
-            MarkupTemplate template = new MarkupTemplate();
-            template.deserialize(obj);
-            node = new TemplateLeaf(template);
-        }
+//        // Bootstrap the recursive process: Categories get recursively resolved
+//        if (obj.containsKey(TemplateBranch.KEY_CATEGORY)) {
+//            node = new TemplateBranch(obj);
+//        } else {
+//            MarkupTemplate template = new MarkupTemplate();
+//            template.deserialize(obj);
+//            node = new TemplateLeaf(template);
+//        }
         
         return node;
     }

@@ -31,7 +31,6 @@
 package edu.bloomu.codeglosser.Utils;
 
 import edu.bloomu.codeglosser.Model.Markup;
-import edu.bloomu.codeglosser.Session.MarkupManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -57,71 +56,71 @@ public class HTMLGenerator {
         return "";
     }
     
-    public static String relativeFileName(File f) {
-        LOG.info("Relativized Filename: " + f.getName() + " to " + MarkupManager.getURIPrefix().relativize(f.toURI()).getPath());
-        return MarkupManager.getURIPrefix().relativize(f.toURI()).getPath();
-    }
-    
-    public static boolean isValidDirectory(File dir) {
-        for (File f : dir.listFiles()) {
-            if (f.isDirectory() && isValidDirectory(f)) {
-                return true;
-            } else if (MarkupManager.instanceExists(relativeFileName(f))) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    public static void generateDirectory(File dir, ZipOutputStream stream) throws IOException {
-        // Only generate if directory contains a file that is marked up.
-        if (!isValidDirectory(dir)) {
-            return;
-        }
-        
-        // Directories must end with a slash.
-        String name = relativeFileName(dir);
-        name = name.endsWith("/") ? name : name + "/";
-        stream.putNextEntry(new ZipEntry(name));
-        
-        for (final File f : dir.listFiles()) {
-            if (f.isDirectory()) {
-                generateDirectory(f, stream);
-            } else if (MarkupManager.instanceExists(relativeFileName(f))){
-                generateFile(f, stream);
-            }
-        }
-    }
-    
-    public static void generateFile(File file, ZipOutputStream ostream) {
-        try {
-            // Copy contents into zip file (We replace carriage returns for standard newlines)
-            String title = relativeFileName(file);
-            
-            String code = new String(Files.readAllBytes(file.toPath())).replace("\r\n", "\n");
-            String result = generate(title, code, MarkupManager.getInstance(title).getAllNotes());
-            ostream.putNextEntry(new ZipEntry(title + ".html"));
-            ostream.write(result.getBytes());
-            ostream.closeEntry();
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-    }
-    
-    public static void generateAll() {
-        try(ZipOutputStream stream = new ZipOutputStream(new FileOutputStream(new File(MarkupManager.getURIPrefix().getPath() + "/exported.zip")))) {
-            File dir = new File(MarkupManager.getURIPrefix());
-            for (final File f : dir.listFiles()) {
-                if (f.isDirectory()) {
-                    generateDirectory(f, stream);
-                } else if (f.getName().toLowerCase().endsWith(".java")){
-                    generateFile(f, stream);
-                }
-        }
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-    }
+//    public static String relativeFileName(File f) {
+//        LOG.info("Relativized Filename: " + f.getName() + " to " + MarkupManager.getURIPrefix().relativize(f.toURI()).getPath());
+//        return MarkupManager.getURIPrefix().relativize(f.toURI()).getPath();
+//    }
+//    
+//    public static boolean isValidDirectory(File dir) {
+//        for (File f : dir.listFiles()) {
+//            if (f.isDirectory() && isValidDirectory(f)) {
+//                return true;
+//            } else if (MarkupManager.instanceExists(relativeFileName(f))) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+//    
+//    public static void generateDirectory(File dir, ZipOutputStream stream) throws IOException {
+//        // Only generate if directory contains a file that is marked up.
+//        if (!isValidDirectory(dir)) {
+//            return;
+//        }
+//        
+//        // Directories must end with a slash.
+//        String name = relativeFileName(dir);
+//        name = name.endsWith("/") ? name : name + "/";
+//        stream.putNextEntry(new ZipEntry(name));
+//        
+//        for (final File f : dir.listFiles()) {
+//            if (f.isDirectory()) {
+//                generateDirectory(f, stream);
+//            } else if (MarkupManager.instanceExists(relativeFileName(f))){
+//                generateFile(f, stream);
+//            }
+//        }
+//    }
+//    
+//    public static void generateFile(File file, ZipOutputStream ostream) {
+//        try {
+//            // Copy contents into zip file (We replace carriage returns for standard newlines)
+//            String title = relativeFileName(file);
+//            
+//            String code = new String(Files.readAllBytes(file.toPath())).replace("\r\n", "\n");
+//            String result = generate(title, code, MarkupManager.getInstance(title).getAllNotes());
+//            ostream.putNextEntry(new ZipEntry(title + ".html"));
+//            ostream.write(result.getBytes());
+//            ostream.closeEntry();
+//        } catch (IOException ex) {
+//            Exceptions.printStackTrace(ex);
+//        }
+//    }
+//    
+//    public static void generateAll() {
+//        try(ZipOutputStream stream = new ZipOutputStream(new FileOutputStream(new File(MarkupManager.getURIPrefix().getPath() + "/exported.zip")))) {
+//            File dir = new File(MarkupManager.getURIPrefix());
+//            for (final File f : dir.listFiles()) {
+//                if (f.isDirectory()) {
+//                    generateDirectory(f, stream);
+//                } else if (f.getName().toLowerCase().endsWith(".java")){
+//                    generateFile(f, stream);
+//                }
+//        }
+//        } catch (IOException ex) {
+//            Exceptions.printStackTrace(ex);
+//        }
+//    }
     
     public static String generate(String title, String code, List<Markup> notes) {
         StringBuilder builder = new StringBuilder();

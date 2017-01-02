@@ -6,7 +6,6 @@
 package edu.bloomu.codeglosser.View;
 
 import com.google.common.eventbus.EventBus;
-import edu.bloomu.codeglosser.Session.MarkupManager;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.util.logging.Logger;
@@ -25,11 +24,11 @@ public class MarkupTopComponent extends TopComponent {
     
 
     public MarkupTopComponent(File fileOrProject) {
-        setDisplayName("Markup Window");
-        setLayout(new BorderLayout());
-        LOG.info("URI: " + fileOrProject.toURI());
-        MarkupManager.setURIPrefix(fileOrProject.toURI());
-        MarkupView v = new MarkupView(fileOrProject, bus);
-        add(v, BorderLayout.CENTER);
+//        setDisplayName("Markup Window");
+//        setLayout(new BorderLayout());
+//        LOG.info("URI: " + fileOrProject.toURI());
+//        MarkupManager.setURIPrefix(fileOrProject.toURI());
+//        MarkupView v = new MarkupView(fileOrProject, bus);
+//        add(v, BorderLayout.CENTER);
     }
 }

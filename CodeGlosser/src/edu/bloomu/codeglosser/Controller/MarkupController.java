@@ -33,7 +33,7 @@ package edu.bloomu.codeglosser.Controller;
 import edu.bloomu.codeglosser.Events.Event;
 import edu.bloomu.codeglosser.Model.MarkupViewModel;
 import edu.bloomu.codeglosser.Utils.HTMLGenerator;
-import edu.bloomu.codeglosser.View.MarkupView1;
+import edu.bloomu.codeglosser.View.MarkupView;
 import io.reactivex.Observable;
 import java.awt.Desktop;
 import java.io.BufferedOutputStream;
@@ -85,22 +85,22 @@ public class MarkupController {
                         case Event.MARKUP_VIEW:
                             switch (e.getCustom()) {
                                 // Handle MarkupView's events
-                                case MarkupView1.CREATE_MARKUP:
+                                case MarkupView.CREATE_MARKUP:
                                     createMarkup((Bounds []) e.data);
                                     break;
-                                case MarkupView1.DELETE_MARKUP:
+                                case MarkupView.DELETE_MARKUP:
                                     deleteMarkup();
                                     break;
-                                case MarkupView1.GET_MARKUP_SELECTION:
+                                case MarkupView.GET_MARKUP_SELECTION:
                                      getMarkupSelection((Bounds) e.data);
                                      break;
-                                case MarkupView1.EXPORT_PROJECT:
+                                case MarkupView.EXPORT_PROJECT:
                                     exportProject();
                                     break;
-                                case MarkupView1.PREVIEW_HTML:
+                                case MarkupView.PREVIEW_HTML:
                                     previewHTML((MarkupViewModel) e.data);
                                     break;
-                                case MarkupView1.SAVE_SESSION:
+                                case MarkupView.SAVE_SESSION:
                                     saveSession();
                                     break;
                             }

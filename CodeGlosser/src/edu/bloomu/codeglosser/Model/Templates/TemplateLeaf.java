@@ -44,19 +44,18 @@ public class TemplateLeaf implements TreeViewLeaf {
     
     private static final Logger LOG = Logger.getLogger(TemplateLeaf.class.getName());
     
-    private final MarkupTemplate template;
+//    private final MarkupTemplate template;
 
-    public TemplateLeaf(MarkupTemplate template) {
-        LOG.info("Parsing Leaf:" + template);
-        this.template = template;
+    public TemplateLeaf(Object data) {
+
     }
 
-    public MarkupTemplate getTemplate() {
-        return template;
+    public Object getTemplate() {
+        return null;
     }
 
     @Override
     public String toString() {
-        return template.toString();
+        return super.toString();
     }
 }
