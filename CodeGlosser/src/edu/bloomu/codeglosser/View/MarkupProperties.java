@@ -31,23 +31,57 @@
 package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Events.Event;
+import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 
 /**
  *
  * @author Louis Jenkins
+ * 
+ * The parent of all properties, which manages PropertiesFile, PropertiesTemplate,
+ * PropertiesAttributes, and PropertiesSelector. Due to technical difficulties
+ * with NetBeans, we reserve space for all attributes and add them manually. 
  */
 public class MarkupProperties extends javax.swing.JPanel {
     
     // Event Multiplexer
-    PublishSubject<Event> event = PublishSubject.create();
+    private final PublishSubject<Event> event = PublishSubject.create();
 
-    /**
-     * Creates new form MarkupProperties
-     */
     public MarkupProperties() {
         initComponents();
         
+        // Handle receiving events
+        
+        
+    }
+    
+    /**
+     * Registers the following observable as an event source. This must be called
+     * to receive events from other components.
+     * @param source 
+     */
+    public void addEventSource(Observable<Event> source) {
+        source.subscribe(event::onNext);
+    }
+    
+    private void sendEventToFiles(int eventTag, Object data) {
+        event.onNext(Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_FILES, eventTag, data));
+    }
+    
+    private void sendEventToTemplates(int eventTag, Object data) {
+        event.onNext(Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_TEMPLATES, eventTag, data));
+    }
+    
+    private void sendEventToAttributes(int eventTag, Object data) {
+        event.onNext(Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_ATTRIBUTES, eventTag, data));
+    }
+    
+    private void sendEventToSelector(int eventTag, Object data) {
+        event.onNext(Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_SELECTOR, eventTag, data));
+    }
+    
+    private void sendEventToController(int eventTag, Object data) {
+        event.onNext(Event.of(Event.MARKUP_PROPERTIES, Event.MARKUP_CONTROLLER, eventTag, data));
     }
 
     /**
@@ -60,50 +94,36 @@ public class MarkupProperties extends javax.swing.JPanel {
     private void initComponents() {
 
         jInternalFrame1 = new javax.swing.JInternalFrame();
-        TabbedTreeView = new javax.swing.JTabbedPane();
-        ColorPanel = new javax.swing.JPanel();
-        MessagePanel = new javax.swing.JPanel();
+        propertySelector = new edu.bloomu.codeglosser.View.propertyNoteName();
+        propertyAttributes = new edu.bloomu.codeglosser.View.PropertyAttributes();
+        tabbedTreeView = new javax.swing.JTabbedPane();
+        propertyFiles = new edu.bloomu.codeglosser.View.PropertyTreeView();
+        propertyTemplates = new edu.bloomu.codeglosser.View.PropertyTreeView();
 
         jInternalFrame1.setVisible(true);
 
-        javax.swing.GroupLayout ColorPanelLayout = new javax.swing.GroupLayout(ColorPanel);
-        ColorPanel.setLayout(ColorPanelLayout);
-        ColorPanelLayout.setHorizontalGroup(
-            ColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        ColorPanelLayout.setVerticalGroup(
-            ColorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-
-        javax.swing.GroupLayout MessagePanelLayout = new javax.swing.GroupLayout(MessagePanel);
-        MessagePanel.setLayout(MessagePanelLayout);
-        MessagePanelLayout.setHorizontalGroup(
-            MessagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        MessagePanelLayout.setVerticalGroup(
-            MessagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 160, Short.MAX_VALUE)
-        );
+        tabbedTreeView.addTab(org.openide.util.NbBundle.getMessage(MarkupProperties.class, "MarkupProperties.propertyFiles.TabConstraints.tabTitle"), propertyFiles); // NOI18N
+        tabbedTreeView.addTab(org.openide.util.NbBundle.getMessage(MarkupProperties.class, "MarkupProperties.propertyTemplates.TabConstraints.tabTitle"), propertyTemplates); // NOI18N
 
         javax.swing.GroupLayout jInternalFrame1Layout = new javax.swing.GroupLayout(jInternalFrame1.getContentPane());
         jInternalFrame1.getContentPane().setLayout(jInternalFrame1Layout);
         jInternalFrame1Layout.setHorizontalGroup(
             jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(TabbedTreeView, javax.swing.GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
-            .addComponent(ColorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(MessagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                .addComponent(propertySelector, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(propertyAttributes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(tabbedTreeView)
         );
         jInternalFrame1Layout.setVerticalGroup(
             jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jInternalFrame1Layout.createSequentialGroup()
-                .addComponent(ColorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(jInternalFrame1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(propertySelector, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(propertyAttributes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(MessagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0)
-                .addComponent(TabbedTreeView, javax.swing.GroupLayout.PREFERRED_SIZE, 333, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(tabbedTreeView, javax.swing.GroupLayout.PREFERRED_SIZE, 383, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -120,9 +140,11 @@ public class MarkupProperties extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel ColorPanel;
-    private javax.swing.JPanel MessagePanel;
-    private javax.swing.JTabbedPane TabbedTreeView;
     private javax.swing.JInternalFrame jInternalFrame1;
+    private edu.bloomu.codeglosser.View.PropertyAttributes propertyAttributes;
+    private edu.bloomu.codeglosser.View.PropertyTreeView propertyFiles;
+    private edu.bloomu.codeglosser.View.propertyNoteName propertySelector;
+    private edu.bloomu.codeglosser.View.PropertyTreeView propertyTemplates;
+    private javax.swing.JTabbedPane tabbedTreeView;
     // End of variables declaration//GEN-END:variables
 }

@@ -49,13 +49,13 @@ public class PropertyAttributes extends javax.swing.JPanel {
     // Event Multiplexer
     private final PublishSubject<Event> event = PublishSubject.create();
 
-    public PropertyAttributes(Observable<Event> source) {
+    public PropertyAttributes() {
         // Initialize GUI components
         initComponents();
         setColor(Color.YELLOW);
         
         // Handle receiving events
-        source
+        event
                 .filter(this::eventForUs)
                 .subscribe(e -> {
                    switch (e.getSender()) {
@@ -119,16 +119,16 @@ public class PropertyAttributes extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(labelName)
+                        .addComponent(labelName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(labelRGB)
+                        .addComponent(labelRGB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(labelColor, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(labelColor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(textLabel)
+                        .addComponent(textLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jScrollPane1)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -137,16 +137,16 @@ public class PropertyAttributes extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(labelName, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(labelName, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
                             .addComponent(labelRGB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(labelColor, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(19, 19, 19)
+                        .addComponent(labelColor, javax.swing.GroupLayout.DEFAULT_SIZE, 19, Short.MAX_VALUE)
                         .addGap(18, 18, 18)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(textLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -158,6 +158,15 @@ public class PropertyAttributes extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_labelColorMousePressed
 
+    /**
+     * Registers the following observable as an event source. This must be called
+     * to receive events from other components.
+     * @param source 
+     */
+    public void addEventSource(Observable<Event> source) {
+        source.subscribe(event::onNext);
+    }
+    
     public Color getColor() {
         return labelColor.getBackground();
     }
