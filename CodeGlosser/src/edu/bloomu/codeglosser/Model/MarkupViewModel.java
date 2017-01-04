@@ -38,7 +38,6 @@ import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Logger;
-import org.apache.logging.log4j.util.Strings;
 
 /**
  *

@@ -30,20 +30,18 @@
  */
 package edu.bloomu.codeglosser.Model;
 
-import com.google.common.collect.Lists;
 import edu.bloomu.codeglosser.Utils.Bounds;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.apache.logging.log4j.util.Strings;
 
 /**
  *
  * @author Louis
  */
 public class Markup {
-    public static Markup DEFAULT = new Markup(Strings.EMPTY, "<None Selected>");
+    public static Markup DEFAULT = new Markup("", "<None Selected>");
     
     private String msg;
     private String id;
@@ -54,7 +52,7 @@ public class Markup {
     public Markup(String msg, String id, Bounds ...offsets) {
         this.msg = msg;
         this.id = id;
-        this.offsets.addAll(Lists.newArrayList(offsets));
+        Collections.addAll(this.offsets, offsets);
         Collections.sort(this.offsets);
         this.highlightColor = Color.YELLOW;
         this.textColor = Color.BLACK;

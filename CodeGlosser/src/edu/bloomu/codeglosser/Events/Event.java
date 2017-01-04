@@ -30,6 +30,8 @@
  */
 package edu.bloomu.codeglosser.Events;
 
+import io.reactivex.Observable;
+
 /**
  *
  * @author Louis
@@ -63,7 +65,6 @@ public class Event {
     
     
     
-    
     // Special flags; The lowest 8 bits are used to represent WHO the sender is,
     // the next 8 bits are used to represent WHO the intended recipients are.
     // The next 16 bits can be used for other purposes.
@@ -84,6 +85,17 @@ public class Event {
      */
     public static Event of(int from, int to, int customTag, Object data) {
         return new Event(from | (to << RECIPIENT_SHIFT) | (customTag << CUSTOM_SHIFT), data);
+    }
+    
+    /**
+     * Ignores the passed parameter in favor of returning an empty Observable. This
+     * is needed for when handling events that do not need propagation without needing
+     * to interrupt the control flow with explicit checks.
+     * @param ignored
+     * @return 
+     */
+    public static Observable<Event> empty(Object ignored) {
+        return Observable.empty();
     }
     
     private Event(int tag, Object data) {

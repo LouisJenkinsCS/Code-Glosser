@@ -5,7 +5,6 @@
  */
 package edu.bloomu.codeglosser.View;
 
-import com.google.common.eventbus.EventBus;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.util.logging.Logger;
@@ -20,7 +19,6 @@ public class MarkupTopComponent extends TopComponent {
     private static final Logger LOG = Logger.getLogger(MarkupTopComponent.class.getName());
     
     private static final char SYM = '\u2691'; // flag
-    private final EventBus bus = new EventBus();
     
 
     public MarkupTopComponent(File fileOrProject) {
