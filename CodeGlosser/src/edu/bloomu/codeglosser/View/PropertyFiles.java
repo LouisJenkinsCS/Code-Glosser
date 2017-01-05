@@ -66,6 +66,8 @@ public class PropertyFiles extends javax.swing.JPanel {
         initComponents();
         initFileTree();
         initListener();
+        
+        event.onNext(Event.of(0, 0, 0, null));
     }
     
     private void initListener() {
@@ -79,7 +81,7 @@ public class PropertyFiles extends javax.swing.JPanel {
                     if (e.getClickCount() == 2) {
                         TreeViewNode selectedNode = (TreeViewNode) ((DefaultMutableTreeNode)selPath.getLastPathComponent()).getUserObject();
                         if (selectedNode != null && selectedNode instanceof TreeViewLeaf) {
-                            event.onNext(Event.of(Event.PROPERTIES_FILES, Event.MARKUP_PROPERTIES, FILE_SELECTED, ((ProjectLeaf) selectedNode).getFile().getPath()));
+                            event.onNext(Event.of(Event.PROPERTIES_FILES, Event.MARKUP_PROPERTIES, FILE_SELECTED, ((ProjectLeaf) selectedNode).getFile().toPath()));
                         }
                     }
                 }
@@ -122,7 +124,7 @@ public class PropertyFiles extends javax.swing.JPanel {
      * @return If meant for us
      */
     private boolean eventForUs(Event e) {
-        return e.getRecipient() == Event.PROPERTIES_FILES;
+        return e.getSender() != Event.PROPERTIES_FILES && e.getRecipient() == Event.PROPERTIES_FILES;
     }
     
     /**
@@ -131,7 +133,7 @@ public class PropertyFiles extends javax.swing.JPanel {
      * @param source 
      */
     public void addEventSource(Observable<Event> source) {
-        source.subscribe(event::onNext);
+        source.filter(this::eventForUs).subscribe(event::onNext);
     }
     
     /**

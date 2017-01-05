@@ -65,6 +65,7 @@ public class MarkupProperties extends javax.swing.JPanel {
         // Handle receiving events
         event
                 .filter(this::eventForUs)
+                .doOnNext(e -> LOG.info("Processing Event..."))
                 .flatMap(e -> {
                     switch (e.getSender()) {
                         case Event.MARKUP_CONTROLLER:
@@ -98,7 +99,7 @@ public class MarkupProperties extends javax.swing.JPanel {
      * @return If meant for us
      */
     private boolean eventForUs(Event e) {
-        return (e.getRecipient() == Event.MARKUP_PROPERTIES);
+        return e.getSender() != Event.MARKUP_PROPERTIES && e.getRecipient() == Event.MARKUP_PROPERTIES;
     }
     
     /**
@@ -107,7 +108,7 @@ public class MarkupProperties extends javax.swing.JPanel {
      * @param source 
      */
     public void addEventSource(Observable<Event> source) {
-        source.subscribe(event::onNext);
+        source.filter(this::eventForUs).subscribe(event::onNext);
     }
     
     /**

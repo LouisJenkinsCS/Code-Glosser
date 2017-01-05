@@ -36,6 +36,7 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.logging.Logger;
 import edu.bloomu.codeglosser.Events.Event;
+import edu.bloomu.codeglosser.HTML.Java2HTML;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Model.MarkupViewModel;
 import edu.bloomu.codeglosser.Utils.ColorUtils;
@@ -109,6 +110,7 @@ public class MarkupView extends javax.swing.JPanel {
         // Handle receiving of events
         event
                 .filter(this::eventForUs)
+                .doOnNext(e -> LOG.info("Processing Event..."))
                 .flatMap(e -> {
                     switch (e.getSender()) {
                         case Event.MARKUP_CONTROLLER:
@@ -247,12 +249,22 @@ public class MarkupView extends javax.swing.JPanel {
     }
 
     /**
+     * Predicate to determine if the event sent was meant for us.
+     *
+     * @param e Event
+     * @return If meant for us
+     */
+    private boolean eventForUs(Event e) {
+        return e.getSender() != Event.MARKUP_VIEW && e.getRecipient() == Event.MARKUP_VIEW;
+    }
+    
+    /**
      * Registers the following observable as an event source. This must be called
      * to receive events from other components.
      * @param source 
      */
     public void addEventSource(Observable<Event> source) {
-        source.subscribe(event::onNext);
+        source.filter(this::eventForUs).subscribe(event::onNext);
     }
     
     /**
@@ -264,15 +276,6 @@ public class MarkupView extends javax.swing.JPanel {
         return event;
     }
     
-    /**
-     * Predicate to determine if the event sent was meant for us.
-     *
-     * @param e Event
-     * @return If meant for us
-     */
-    private boolean eventForUs(Event e) {
-        return (e.getRecipient() == Event.MARKUP_VIEW);
-    }
     
     /**
      * Helper method to send an event to the MarkupController.
@@ -461,7 +464,13 @@ public class MarkupView extends javax.swing.JPanel {
     private Observable<Event> fileSelected(String fileContents) {
         return Observable
                 .just(fileContents)
+                // Handle syntax highlighting in background
+                .observeOn(Schedulers.computation())
+                .map(contents -> new Java2HTML().translate(contents))
+                // Display text on UI Thread
+                .observeOn(SwingScheduler.getInstance())
                 .doOnNext(this::setText)
+                // We have handled the event, so no need for anything else.
                 .flatMap(Event::empty);
     }
     

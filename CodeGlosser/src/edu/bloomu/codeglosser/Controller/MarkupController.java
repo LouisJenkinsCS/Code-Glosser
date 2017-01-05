@@ -86,6 +86,7 @@ public class MarkupController {
         // Handle receiving events
         event
                 .filter(this::eventForUs)
+                .doOnNext(e -> LOG.info("Processing Event..."))
                 .flatMap(e -> {
                     switch (e.getSender()) {
                         case Event.MARKUP_VIEW:
@@ -122,20 +123,21 @@ public class MarkupController {
     
     /**
      * Predicate to determine if the event sent was meant for us.
+     *
      * @param e Event
      * @return If meant for us
      */
     private boolean eventForUs(Event e) {
-        return (e.getRecipient() & Event.MARKUP_CONTROLLER) != 0;
+        return e.getSender() != Event.MARKUP_CONTROLLER && e.getRecipient() == Event.MARKUP_CONTROLLER;
     }
     
     /**
      * Registers the following observable as an event source. This must be called
      * to receive events from other components.
-     * @param source Their event source
+     * @param source 
      */
     public void addEventSource(Observable<Event> source) {
-        source.subscribe(event::onNext);
+        source.filter(this::eventForUs).subscribe(event::onNext);
     }
     
     /**
