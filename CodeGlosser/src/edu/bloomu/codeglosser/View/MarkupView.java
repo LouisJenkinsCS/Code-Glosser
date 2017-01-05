@@ -39,6 +39,7 @@ import edu.bloomu.codeglosser.Events.Event;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Model.MarkupViewModel;
 import edu.bloomu.codeglosser.Utils.ColorUtils;
+import edu.bloomu.codeglosser.Utils.SwingScheduler;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
@@ -54,7 +55,6 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
 import javax.swing.text.Highlighter.HighlightPainter;
 import org.javatuples.Pair;
-import rx.schedulers.SwingScheduler;
 
 /**
  *
@@ -103,51 +103,9 @@ public class MarkupView extends javax.swing.JPanel {
         highlighter = textCode.getHighlighter();
         textCode.setEditable(false);
         initializePopup();
+        initializeListeners();
 
-        // We handle displaying the contextual menu, as well certain other actions detailed below,
-        // based on the user's click events. Since the 'popup trigger' is dependent on the OS,
-        // the safest way is to check all mouse events for a popup trigger event and handle it
-        // accordingly.
-        textCode.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                // We show popups on the architectural-dependent popup trigger, I.E: Right Click
-                if (e.isPopupTrigger()) {
-                    popup.show(e.getComponent(), e.getX(), e.getY());
-                }
-
-                // On Double Click: If the user's selection contains a markup, the
-                // controller will respond with an event telling us to update the
-                // cursor's range to that of the markup itself.
-                if (e.getClickCount() == 2 && !e.isConsumed()) {
-                    LOG.info("Double Click!");
-                    doubleClickHandler(() -> e.consume());
-                }
-
-                // On Triple Click: Changes the cursor's range to the entire line.
-                if (e.getClickCount() >= 3 && !e.isConsumed()) {
-                    LOG.info("Triple Click!");
-                    tripleClickHandler();
-                    e.consume();
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    popup.show(e.getComponent(), e.getX(), e.getY());
-                }
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    popup.show(e.getComponent(), e.getX(), e.getY());
-                }
-            }
-        });
-
+        
         // Handle receiving of events
         event
                 .filter(this::eventForUs)
@@ -159,6 +117,8 @@ public class MarkupView extends javax.swing.JPanel {
                                     return removeHighlight((Markup) e.data);
                                 case MarkupController.SET_CURSOR:
                                     return setCursorPosition((Bounds) e.data);
+                                case MarkupController.FILE_SELECTED:
+                                    return fileSelected((String) e.data);
                                 default:
                                     throw new RuntimeException("Bad Custom Tag!");
                             }
@@ -220,6 +180,52 @@ public class MarkupView extends javax.swing.JPanel {
         popup.add(exportProject);
         popup.add(saveSession);
     }
+    
+    private void initializeListeners() {
+        // We handle displaying the contextual menu, as well certain other actions detailed below,
+        // based on the user's click events. Since the 'popup trigger' is dependent on the OS,
+        // the safest way is to check all mouse events for a popup trigger event and handle it
+        // accordingly.
+        textCode.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // We show popups on the architectural-dependent popup trigger, I.E: Right Click
+                if (e.isPopupTrigger()) {
+                    popup.show(e.getComponent(), e.getX(), e.getY());
+                }
+
+                // On Double Click: If the user's selection contains a markup, the
+                // controller will respond with an event telling us to update the
+                // cursor's range to that of the markup itself.
+                if (e.getClickCount() == 2 && !e.isConsumed()) {
+                    LOG.info("Double Click!");
+                    doubleClickHandler(() -> e.consume());
+                }
+
+                // On Triple Click: Changes the cursor's range to the entire line.
+                if (e.getClickCount() >= 3 && !e.isConsumed()) {
+                    LOG.info("Triple Click!");
+                    tripleClickHandler();
+                    e.consume();
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    popup.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    popup.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
+    }
 
     /**
      * Converts the range of currently selected text to Bounds.
@@ -241,6 +247,34 @@ public class MarkupView extends javax.swing.JPanel {
     }
 
     /**
+     * Registers the following observable as an event source. This must be called
+     * to receive events from other components.
+     * @param source 
+     */
+    public void addEventSource(Observable<Event> source) {
+        source.subscribe(event::onNext);
+    }
+    
+    /**
+     * Returns our own Subject as an event source for listeners. This must be used
+     * to receive events from this component.
+     * @return Our event source
+     */
+    public Observable<Event> getEventSource() {
+        return event;
+    }
+    
+    /**
+     * Predicate to determine if the event sent was meant for us.
+     *
+     * @param e Event
+     * @return If meant for us
+     */
+    private boolean eventForUs(Event e) {
+        return (e.getRecipient() == Event.MARKUP_VIEW);
+    }
+    
+    /**
      * Helper method to send an event to the MarkupController.
      *
      * @param eventTag Event description
@@ -253,15 +287,6 @@ public class MarkupView extends javax.swing.JPanel {
     public void setText(String str) {
         LOG.info("Text changed...");
         textCode.setText("<html><head></head><body>" + str.trim() + "</body></html>");
-    }
-
-    /**
-     * Listen for events.
-     *
-     * @return Observable that emits events.
-     */
-    public Observable<Event> listen() {
-        return event;
     }
 
     /**
@@ -288,16 +313,6 @@ public class MarkupView extends javax.swing.JPanel {
      */
     public void tripleClickHandler() {
         setSelection(model.getLineBounds(textCode.getSelectionStart()));
-    }
-
-    /**
-     * Predicate to determine if the event sent was meant for us.
-     *
-     * @param e Event
-     * @return If meant for us
-     */
-    private boolean eventForUs(Event e) {
-        return (e.getRecipient() & Event.MARKUP_VIEW) != 0;
     }
 
     public void addMarkup(Bounds... bounds) {
@@ -443,6 +458,13 @@ public class MarkupView extends javax.swing.JPanel {
                 
     }
     
+    private Observable<Event> fileSelected(String fileContents) {
+        return Observable
+                .just(fileContents)
+                .doOnNext(this::setText)
+                .flatMap(Event::empty);
+    }
+    
     /**
      * Removes the requested markup's highlights. All highlights that the markup
      * contains are removed from both the highlight map and from the GUI as well,
@@ -472,5 +494,7 @@ public class MarkupView extends javax.swing.JPanel {
                 // We have handled the event, so no need for anything else.
                 .flatMap(Event::empty);
     }
+
+    
 
 }

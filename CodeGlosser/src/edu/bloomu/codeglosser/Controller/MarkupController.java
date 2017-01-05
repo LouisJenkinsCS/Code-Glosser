@@ -40,10 +40,15 @@ import java.io.BufferedOutputStream;
 import edu.bloomu.codeglosser.Utils.Bounds;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Utils.IdentifierGenerator;
+import edu.bloomu.codeglosser.Utils.SwingScheduler;
+import edu.bloomu.codeglosser.View.MarkupProperties;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,6 +68,7 @@ public class MarkupController {
     // MarkupView events
     public static final int REMOVE_HIGHLIGHTS = 1 << 0;
     public static final int SET_CURSOR = 1 << 1;
+    public static final int FILE_SELECTED = 1 << 2;
     
     private static final Logger LOG = Logger.getLogger(MarkupController.class.getName());
     
@@ -74,43 +80,44 @@ public class MarkupController {
     private final IdentifierGenerator idGen = new IdentifierGenerator("Markup");
     
     // Our event multiplexer
-    private final PublishSubject event = PublishSubject.create();
+    private final PublishSubject<Event> event = PublishSubject.create();
     
-    public MarkupController(Observable<Event> source) {
+    public MarkupController() {
         // Handle receiving events
-        source
+        event
                 .filter(this::eventForUs)
-                .subscribe(e -> {
+                .flatMap(e -> {
                     switch (e.getSender()) {
                         case Event.MARKUP_VIEW:
                             switch (e.getCustom()) {
                                 // Handle MarkupView's events
                                 case MarkupView.CREATE_MARKUP:
-                                    createMarkup((Bounds []) e.data);
-                                    break;
+                                    return createMarkup((Bounds []) e.data);
                                 case MarkupView.DELETE_MARKUP:
-                                    deleteMarkup();
-                                    break;
+                                    return deleteMarkup();
                                 case MarkupView.GET_MARKUP_SELECTION:
-                                     getMarkupSelection((Bounds) e.data);
-                                     break;
+                                     return getMarkupSelection((Bounds) e.data);
                                 case MarkupView.EXPORT_PROJECT:
-                                    exportProject();
-                                    break;
+                                    return exportProject();
                                 case MarkupView.PREVIEW_HTML:
-                                    previewHTML((MarkupViewModel) e.data);
-                                    break;
+                                    return previewHTML((MarkupViewModel) e.data);
                                 case MarkupView.SAVE_SESSION:
-                                    saveSession();
-                                    break;
+                                    return saveSession();
+                                default:
+                                    throw new RuntimeException("Bad Custom Tag for MarkupView!");
                             }
-                            break;
                         case Event.MARKUP_PROPERTIES:
                             switch (e.getCustom()) {
-                                // TODO
+                                case MarkupProperties.FILE_SELECTED:
+                                    return fileSelected((Path) e.data);
+                                default:
+                                    throw new RuntimeException("Bad Custom Tag for MarkupProperties!");
                             }
+                        default:
+                            throw new RuntimeException("Bad Sender!");
                     }
-                });
+                })
+                .subscribe(event::onNext);
     }
     
     /**
@@ -123,12 +130,30 @@ public class MarkupController {
     }
     
     /**
+     * Registers the following observable as an event source. This must be called
+     * to receive events from other components.
+     * @param source Their event source
+     */
+    public void addEventSource(Observable<Event> source) {
+        source.subscribe(event::onNext);
+    }
+    
+    /**
+     * Returns our own Subject as an event source for listeners. This must be used
+     * to receive events from this component.
+     * @return Our event source
+     */
+    public Observable<Event> getEventSource() {
+        return event;
+    }
+    
+    /**
      * Handle events to create a new markup. The new markup is given a unique identifier
      * and as well becomes the current selected Markup. This event is also forwarded to
      * the MarkupProperties component.
      * @param bounds Boundary of the created markup.
      */
-    private void createMarkup(Bounds[] bounds) {
+    private Observable<Event> createMarkup(Bounds[] bounds) {
         LOG.info("Creating markup with offsets... " + bounds);
         // Create a new markup
         String id = idGen.getNextId();
@@ -137,6 +162,9 @@ public class MarkupController {
         
         // Notify the MarkupProperties to display new Markup.
         sendEventToProperties(NEW_MARKUP, currentMarkup);
+        
+        // TODO
+        return null;
     }
     
     /**
@@ -144,7 +172,7 @@ public class MarkupController {
      * the MarkupView that it should delete it's highlights, and then tell MarkupProperties
      * to remove it's own attributes.
      */
-    private void deleteMarkup() {
+    private Observable<Event> deleteMarkup() {
         LOG.info("Deleting current markup...");
         // We can only delete the markup if one is currently selected
         if (currentMarkup != null) {
@@ -159,6 +187,9 @@ public class MarkupController {
         } else {
             LOG.info("No current markup selected...");
         }
+        
+        // TODO
+        return null;
     }
     
     /**
@@ -168,7 +199,7 @@ public class MarkupController {
      * for the user and display a preview.
      * @param model The model used for generating HTML.
      */
-    private void previewHTML(MarkupViewModel model) {
+    private Observable<Event> previewHTML(MarkupViewModel model) {
         LOG.log(Level.INFO, "Generating HTML preview for {0}", model.getTitle());
         String html = HTMLGenerator.generate(
                 model.getTitle(), model.getText(), 
@@ -188,13 +219,33 @@ public class MarkupController {
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
+        
+        // TODO
+        return null;
     }
 
-    private void exportProject() {
+    private Observable<Event> fileSelected(Path filePath) {
+        LOG.info("Handling file change event for " + filePath);
+        
+        // Notify MarkupView of file
+        return Observable
+                .just(filePath)
+                // Handle reading on IO thread
+                .observeOn(Schedulers.io())
+                .map(Files::readAllLines)
+                // Handle computation on computation thread
+                .observeOn(Schedulers.computation())
+                .map(list -> list.stream().collect(Collectors.joining("\n")))
+                .map(fileContents -> Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, FILE_SELECTED, fileContents))
+                // Switch back to Swing UI thread
+                .observeOn(SwingScheduler.getInstance());
+    }
+    
+    private Observable<Event> exportProject() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-    private void saveSession() {
+    
+    private Observable<Event> saveSession() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -211,7 +262,7 @@ public class MarkupController {
      * selection.
      * @param b Bounds to check.
      */
-    private void getMarkupSelection(Bounds b) {
+    private Observable<Event> getMarkupSelection(Bounds b) {
         LOG.log(Level.INFO, "Obtaining Markup Selection for boundary: {0}", b);
         markupMap
                 .values()
@@ -220,5 +271,8 @@ public class MarkupController {
                 .filter(bounds -> !bounds.collidesWith(b))
                 .findAny()
                 .ifPresent(bounds -> sendEventToView(SET_CURSOR, bounds));
+        
+        // TODO
+        return null;
     }
 }
