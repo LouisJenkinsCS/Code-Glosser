@@ -1,0 +1,109 @@
+{
+    "LANG_NAME": "Pike",
+    "COMMENT_SINGLE": {
+        "1": "\/\/"
+    },
+    "COMMENT_MULTI": {
+        "\/*": "*\/"
+    },
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [
+        "\""
+    ],
+    "ESCAPE_CHAR": "\\",
+    "KEYWORDS": {
+        "1": [
+            "goto",
+            "break",
+            "continue",
+            "return",
+            "case",
+            "default",
+            "if",
+            "else",
+            "switch",
+            "while",
+            "foreach",
+            "do",
+            "for",
+            "gauge",
+            "destruct",
+            "lambda",
+            "inherit",
+            "import",
+            "typeof",
+            "catch",
+            "inline",
+            "nomask",
+            "private",
+            "protected",
+            "public",
+            "static"
+        ]
+    },
+    "SYMBOLS": {
+        "1": [
+            "(",
+            ")",
+            "{",
+            "}",
+            "[",
+            "]",
+            "+",
+            "-",
+            "*",
+            "\/",
+            "%",
+            "=",
+            "!",
+            "&",
+            "|",
+            "?",
+            ";"
+        ]
+    },
+    "CASE_SENSITIVE": [
+        false,
+        true
+    ],
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #b1b100;"
+        },
+        "COMMENTS": {
+            "1": "color: #666666; font-style: italic;",
+            "MULTI": "color: #666666; font-style: italic;"
+        },
+        "ESCAPE_CHAR": [
+            "color: #000099; font-weight: bold;"
+        ],
+        "BRACKETS": [
+            "color: #009900;"
+        ],
+        "STRINGS": [
+            "color: #0000ff;"
+        ],
+        "NUMBERS": [
+            "color: #cc66cc;"
+        ],
+        "METHODS": [
+            "color: #004000;"
+        ],
+        "SYMBOLS": {
+            "1": "color: #339933;"
+        },
+        "REGEXPS": [],
+        "SCRIPT": []
+    },
+    "URLS": {
+        "1": ""
+    },
+    "OOLANG": true,
+    "OBJECT_SPLITTERS": {
+        "1": "."
+    },
+    "REGEXPS": [],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": []
+}

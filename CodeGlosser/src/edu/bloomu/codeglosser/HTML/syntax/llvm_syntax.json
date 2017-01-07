@@ -1,0 +1,406 @@
+{
+    "LANG_NAME": "LLVM Intermediate Representation",
+    "COMMENT_SINGLE": {
+        "1": ";"
+    },
+    "COMMENT_MULTI": [],
+    "HARDQUOTE": [
+        "\"",
+        "\""
+    ],
+    "HARDESCAPE": [
+        "\"",
+        "\\"
+    ],
+    "HARDCHAR": "\\",
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [
+        "\""
+    ],
+    "ESCAPE_CHAR": "",
+    "ESCAPE_REGEXP": [],
+    "NUMBERS": 528385,
+    "KEYWORDS": [
+        [
+            "to",
+            "nuw",
+            "nsw",
+            "align",
+            "inbounds",
+            "entry",
+            "return"
+        ],
+        [
+            "ret",
+            "br",
+            "switch",
+            "indirectbr",
+            "invoke",
+            "unwind",
+            "unreachable"
+        ],
+        [
+            "add",
+            "fadd",
+            "sub",
+            "fsub",
+            "mul",
+            "fmul",
+            "udiv",
+            "sdiv",
+            "fdiv",
+            "urem",
+            "frem",
+            "srem"
+        ],
+        [
+            "shl",
+            "lshr",
+            "ashr",
+            "and",
+            "or",
+            "xor"
+        ],
+        [
+            "extractelement",
+            "insertelement",
+            "shufflevector"
+        ],
+        [
+            "extractvalue",
+            "insertvalue"
+        ],
+        [
+            "alloca",
+            "load",
+            "store",
+            "getelementptr"
+        ],
+        [
+            "trunc",
+            "zext",
+            "sext",
+            "fptrunc",
+            "fpext",
+            "fptoui",
+            "fptosi",
+            "uitofp",
+            "sitofp",
+            "ptrtoint",
+            "inttoptr",
+            "bitcast"
+        ],
+        [
+            "icmp",
+            "fcmp",
+            "phi",
+            "select",
+            "call",
+            "va_arg"
+        ],
+        [
+            "private",
+            "linker_private",
+            "linker_private_weak",
+            "linker_private_weak_def_auto",
+            "internal",
+            "available_externally",
+            "linkonce",
+            "common",
+            "weak",
+            "appending",
+            "extern_weak",
+            "linkonce_odr",
+            "weak_odr",
+            "externally visible",
+            "dllimport",
+            "dllexport"
+        ],
+        [
+            "ccc",
+            "fastcc",
+            "coldcc",
+            "cc 10"
+        ],
+        [
+            "type"
+        ],
+        [
+            "zeroext",
+            "signext",
+            "inreg",
+            "byval",
+            "sret",
+            "noalias",
+            "nocapture",
+            "nest"
+        ],
+        [
+            "alignstack",
+            "alwaysinline",
+            "inlinehint",
+            "naked",
+            "noimplicitfloat",
+            "noinline",
+            "noredzone",
+            "noreturn",
+            "nounwind",
+            "optsize",
+            "readnone",
+            "readonly",
+            "ssp",
+            "sspreq"
+        ],
+        [
+            "module asm"
+        ],
+        [
+            "target datalayout"
+        ],
+        [
+            "x86mmx",
+            "void",
+            "label",
+            "metadata",
+            "opaque"
+        ],
+        [
+            "float",
+            "double",
+            "fp128",
+            "x86_fp80",
+            "ppc_fp128"
+        ],
+        [
+            "false",
+            "true",
+            "null"
+        ],
+        [
+            "global",
+            "addrspace",
+            "constant",
+            "section"
+        ],
+        [
+            "declare",
+            "define"
+        ],
+        [
+            "zeroinitializer"
+        ],
+        [
+            "undef"
+        ],
+        [
+            "blockaddress"
+        ],
+        [
+            "default",
+            "hidden",
+            "protected"
+        ],
+        [
+            "volatile"
+        ],
+        [
+            "tail"
+        ]
+    ],
+    "SYMBOLS": [
+        [
+            "(",
+            ")",
+            "[",
+            "]",
+            "{",
+            "}",
+            "!",
+            "@",
+            "%",
+            "&",
+            "|",
+            "\/",
+            "<",
+            ">",
+            "=",
+            "-",
+            "+",
+            "*",
+            ".",
+            ":",
+            ",",
+            ";"
+        ]
+    ],
+    "CASE_SENSITIVE": [
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+    ],
+    "STYLES": {
+        "KEYWORDS": [
+            "color: #209090;",
+            "color: #0000F0;",
+            "color: #00F000; font-weight: bold;",
+            "color: #F00000;",
+            "color: #00F0F0; font-weight: bold;",
+            "color: #F000F0; font-weight: bold;",
+            "color: #403020; font-weight: bold;",
+            "color: #909090; font-weight: bold;",
+            "color: #009090; font-weight: bold;",
+            "color: #900090; font-weight: bold;",
+            "color: #909000; font-weight: bold;",
+            "color: #000090; font-weight: bold;",
+            "color: #900000; font-weight: bold;",
+            "color: #009000; font-weight: bold;",
+            "color: #F0F090; font-weight: bold;",
+            "color: #F090F0; font-weight: bold;",
+            "color: #90F0F0; font-weight: bold;",
+            "color: #9090F0; font-weight: bold;",
+            "color: #90F090; font-weight: bold;",
+            "color: #F09090; font-weight: bold;",
+            "color: #4040F0; font-weight: bold;",
+            "color: #40F040; font-weight: bold;",
+            "color: #F04040; font-weight: bold;",
+            "color: #F0F040; font-weight: bold;",
+            "color: #F040F0; font-weight: bold;",
+            "color: #40F0F0; font-weight: bold;",
+            "color: #904040; font-weight: bold;"
+        ],
+        "COMMENTS": {
+            "1": "color: #666666; font-style: italic;",
+            "MULTI": "color: #666666; font-style: italic;"
+        },
+        "ESCAPE_CHAR": {
+            "0": "color: #000099; font-weight: bold;",
+            "1": "color: #000099; font-weight: bold;",
+            "2": "color: #660099; font-weight: bold;",
+            "3": "color: #660099; font-weight: bold;",
+            "4": "color: #006699; font-weight: bold;",
+            "5": "color: #006699; font-weight: bold; font-style: italic;",
+            "6": "color: #009933; font-weight: bold;",
+            "HARD": "color: #000099; font-weight: bold;"
+        },
+        "BRACKETS": [
+            "color: #009900;"
+        ],
+        "STRINGS": {
+            "0": "color: #0000ff;",
+            "HARD": "color: #0000ff;"
+        },
+        "NUMBERS": {
+            "0": "color: #cc66cc;",
+            "256": "color: #208080;",
+            "4096": "color: #208080;",
+            "524288": "color:#800080;"
+        },
+        "METHODS": {
+            "1": "color: #004000;",
+            "2": "color: #004000;"
+        },
+        "SYMBOLS": [
+            "color: #339933;"
+        ],
+        "REGEXPS": {
+            "0": "color: #007088;",
+            "1": "color: #007088;",
+            "3": "color: #700088;",
+            "4": "color: #010088;",
+            "9": "color: #6109F8;"
+        },
+        "SCRIPT": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]
+    },
+    "URLS": [
+        "",
+        "http:\/\/llvm.org\/docs\/LangRef.html#i_{FNAME}",
+        "http:\/\/llvm.org\/docs\/LangRef.html#i_{FNAME}",
+        "http:\/\/llvm.org\/docs\/LangRef.html#i_{FNAME}",
+        "http:\/\/llvm.org\/docs\/LangRef.html#i_{FNAME}",
+        "http:\/\/llvm.org\/docs\/LangRef.html#i_{FNAME}",
+        "http:\/\/llvm.org\/docs\/LangRef.html#i_{FNAME}",
+        "http:\/\/llvm.org\/docs\/LangRef.html#i_{FNAME}",
+        "http:\/\/llvm.org\/docs\/LangRef.html#i_{FNAME}",
+        "http:\/\/llvm.org\/docs\/LangRef.html#linkage_{FNAME}",
+        "http:\/\/llvm.org\/docs\/LangRef.html#callingconv",
+        "http:\/\/llvm.org\/docs\/LangRef.html#namedtypes",
+        "http:\/\/llvm.org\/docs\/LangRef.html#paramattrs",
+        "http:\/\/llvm.org\/docs\/LangRef.html#fnattrs",
+        "http:\/\/llvm.org\/docs\/LangRef.html#moduleasm",
+        "http:\/\/llvm.org\/docs\/LangRef.html#datalayout",
+        "http:\/\/llvm.org\/docs\/LangRef.html#t_{FNAME}",
+        "http:\/\/llvm.org\/docs\/LangRef.html#t_floating",
+        "http:\/\/llvm.org\/docs\/LangRef.html#simpleconstants",
+        "http:\/\/llvm.org\/docs\/LangRef.html#globalvars",
+        "http:\/\/llvm.org\/docs\/LangRef.html#functionstructure",
+        "http:\/\/llvm.org\/docs\/LangRef.html#complexconstants",
+        "http:\/\/llvm.org\/docs\/LangRef.html#undefvalues",
+        "http:\/\/llvm.org\/docs\/LangRef.html#blockaddress",
+        "http:\/\/llvm.org\/docs\/LangRef.html#visibility",
+        "http:\/\/llvm.org\/docs\/LangRef.html#volatile",
+        "http:\/\/llvm.org\/docs\/LangRef.html#i_call"
+    ],
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "REGEXPS": {
+        "0": "%[-a-zA-Z$\\._][-a-zA-Z$\\._0-9]*",
+        "1": "(?<!\\w)[\\-\\w\\$\\.]+:(?![^\">]*<)",
+        "3": "%[-]?[0-9]+",
+        "4": [
+            "(?<!\\w)i\\d+(?!\\w)",
+            "\\0",
+            "",
+            "<a href=\"http:\/\/llvm.org\/docs\/LangRef.html#t_integer\">",
+            "<\/a>"
+        ],
+        "9": [
+            "@[-a-zA-Z$\\._][-a-zA-Z$\\._0-9]*",
+            "\\0",
+            "",
+            "<a href=\"http:\/\/llvm.org\/docs\/LangRef.html#globalvars\">",
+            "<\/a>"
+        ]
+    },
+    "STRICT_MODE_APPLIES": 1,
+    "HIGHLIGHT_STRICT_BLOCK": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+    ],
+    "SCRIPT_DELIMITERS": [],
+    "TAB_WIDTH": 4
+}

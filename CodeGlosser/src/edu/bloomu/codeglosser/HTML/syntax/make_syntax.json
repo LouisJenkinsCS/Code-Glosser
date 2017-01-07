@@ -1,0 +1,140 @@
+{
+    "LANG_NAME": "GNU make",
+    "COMMENT_SINGLE": {
+        "1": "#"
+    },
+    "COMMENT_REGEXP": {
+        "2": "\/\\\\['\"]\/siU"
+    },
+    "COMMENT_MULTI": [],
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [
+        "'",
+        "\""
+    ],
+    "ESCAPE_CHAR": "\\",
+    "KEYWORDS": {
+        "1": [
+            "ifeq",
+            "else",
+            "endif",
+            "ifneq",
+            "ifdef",
+            "ifndef",
+            "include",
+            "vpath",
+            "export",
+            "unexport",
+            "override",
+            "info",
+            "warning",
+            "error"
+        ],
+        "2": [
+            ".SUFFIXES",
+            ".PHONY",
+            ".DEFAULT",
+            ".PRECIOUS",
+            ".IGNORE",
+            ".SILENT",
+            ".EXPORT_ALL_VARIABLES",
+            ".KEEP_STATE",
+            ".LIBPATTERNS",
+            ".NOTPARALLEL",
+            ".DELETE_ON_ERROR",
+            ".INTERMEDIATE",
+            ".POSIX",
+            ".SECONDARY"
+        ]
+    },
+    "SYMBOLS": [
+        "(",
+        ")",
+        "[",
+        "]",
+        "{",
+        "}",
+        "!",
+        "@",
+        "%",
+        "&",
+        "|",
+        "\/",
+        "<",
+        ">",
+        "=",
+        "-",
+        "+",
+        "*",
+        ".",
+        ":",
+        ",",
+        ";",
+        "$"
+    ],
+    "CASE_SENSITIVE": [
+        false,
+        false,
+        false
+    ],
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #666622; font-weight: bold;",
+            "2": "color: #990000;"
+        },
+        "COMMENTS": {
+            "1": "color: #339900; font-style: italic;",
+            "2": "color: #000099; font-weight: bold;",
+            "MULTI": ""
+        },
+        "ESCAPE_CHAR": [
+            "color: #000099; font-weight: bold;"
+        ],
+        "BRACKETS": [
+            "color: #004400;"
+        ],
+        "STRINGS": [
+            "color: #CC2200;"
+        ],
+        "NUMBERS": [
+            "color: #CC2200;"
+        ],
+        "SYMBOLS": [
+            "color: #004400;"
+        ],
+        "REGEXPS": [
+            "color: #000088; font-weight: bold;",
+            "color: #0000CC; font-weight: bold;",
+            "color: #000088;"
+        ],
+        "SCRIPT": [],
+        "METHODS": []
+    },
+    "URLS": {
+        "1": "",
+        "2": ""
+    },
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "REGEXPS": [
+        "\\$(?:[^{(&]|&(?:amp|lt|gt);)",
+        [
+            "(\\$[({])(subst|addprefix|addsuffix|basename|call|dir|error|eval|filter-out|filter,|findstring|firstword|foreach|if|join|notdir|origin|patsubst|shell|sort|strip,|suffix|warning|wildcard|word|wordlist|words)([ })])",
+            "\\2",
+            "",
+            "\\1",
+            "\\3"
+        ],
+        [
+            "(\\$[({])([A-Za-z_][A-Za-z_0-9]*)([ })])",
+            "\\2",
+            "",
+            "\\1",
+            "\\3"
+        ]
+    ],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": [],
+    "TAB_WIDTH": 8
+}

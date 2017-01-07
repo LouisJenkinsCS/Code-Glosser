@@ -1,0 +1,91 @@
+{
+    "LANG_NAME": "YAML",
+    "COMMENT_SINGLE": [],
+    "COMMENT_MULTI": [],
+    "COMMENT_REGEXP": [
+        "\/(?<=\\s[\\|>]\\n)(\\s+)(.*)((?=[\\n$])(([\\n^](\\1(.*)|(?=[\\n$])))*)|$)\/",
+        "\/#(.*)\/",
+        "\/%(.*)\/",
+        "\/(^|\\n)([^#%^\\n]+?)(?=: )\/",
+        "\/(^|\\n)([^#%^\\n]+?)(?=:\\n)\/",
+        "\/(?<=^---)(\\s*)!(\\S+)\/",
+        "\/(?<=: )(\\s*)\\&(\\S+)\/",
+        "\/(?<=: )(\\s*)\\*(\\S+)\/",
+        "\/!!(\\w+)\/"
+    ],
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [
+        "\""
+    ],
+    "ESCAPE_CHAR": "",
+    "NUMBERS": [],
+    "KEYWORDS": {
+        "1": [
+            "all",
+            "any",
+            "none",
+            "yes",
+            "no"
+        ]
+    },
+    "SYMBOLS": {
+        "1": [
+            "---",
+            "..."
+        ],
+        "2": [
+            ": ",
+            ">\n",
+            "|\n",
+            "<<:",
+            ":\n"
+        ]
+    },
+    "CASE_SENSITIVE": [
+        false,
+        false
+    ],
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "font-weight: bold;"
+        },
+        "COMMENTS": [
+            "color: #303050;background-color: #F5F5F5",
+            "color: blue;",
+            "font-weight: bold; color: red;",
+            "color: green;",
+            "color: #007F45;",
+            "color: #7f7fFF;",
+            "color: #FF7000;",
+            "color: #FF45C0;",
+            "font-weight: bold; color: #005F5F;"
+        ],
+        "ESCAPE_CHAR": [],
+        "BRACKETS": [],
+        "STRINGS": [
+            "color: #CF00CF;"
+        ],
+        "NUMBERS": [],
+        "METHODS": {
+            "1": "",
+            "2": ""
+        },
+        "SYMBOLS": {
+            "1": "color: cyan;",
+            "2": "font-weight: bold; color: brown;"
+        },
+        "REGEXPS": [],
+        "SCRIPT": [
+            ""
+        ]
+    },
+    "URLS": {
+        "1": ""
+    },
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "REGEXPS": [],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": []
+}

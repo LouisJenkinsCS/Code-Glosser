@@ -1,0 +1,99 @@
+{
+    "LANG_NAME": "MXML",
+    "COMMENT_SINGLE": [],
+    "COMMENT_MULTI": {
+        "<!--": "-->"
+    },
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [
+        "'",
+        "\""
+    ],
+    "ESCAPE_CHAR": "",
+    "KEYWORDS": [],
+    "SYMBOLS": [],
+    "CASE_SENSITIVE": [
+        false
+    ],
+    "STYLES": {
+        "KEYWORDS": [],
+        "COMMENTS": {
+            "MULTI": "color: #808080; font-style: italic;"
+        },
+        "ESCAPE_CHAR": [
+            "color: #000099; font-weight: bold;"
+        ],
+        "BRACKETS": [
+            "color: #66cc66;"
+        ],
+        "STRINGS": [
+            "color: #ff0000;"
+        ],
+        "NUMBERS": [
+            "color: #cc66cc;"
+        ],
+        "METHODS": [],
+        "SYMBOLS": [
+            "color: #66cc66;"
+        ],
+        "SCRIPT": [
+            "color: #00bbdd;",
+            "color: #ddbb00;",
+            "color: #339933;",
+            "color: #000000;"
+        ],
+        "REGEXPS": [
+            "font-weight: bold; color: black;",
+            "color: #7400FF;",
+            "color: #7400FF;"
+        ]
+    },
+    "URLS": [],
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "REGEXPS": [
+        [
+            "(&lt;[\\\/?|(\\?xml)]?[a-z0-9_\\-:]*(\\?&gt;))",
+            "\\1",
+            "i",
+            "",
+            ""
+        ],
+        [
+            "(&lt;\\\/?[a-z]+:[a-z]+)",
+            "\\1",
+            "i",
+            "",
+            ""
+        ],
+        [
+            "(\\\/?&gt;)",
+            "\\1",
+            "i",
+            "",
+            ""
+        ]
+    ],
+    "STRICT_MODE_APPLIES": 2,
+    "SCRIPT_DELIMITERS": [
+        {
+            "<!DOCTYPE": ">"
+        },
+        {
+            "&": ";"
+        },
+        {
+            "<mx:Script>": "<\/mx:Script>"
+        },
+        {
+            "<": ">"
+        }
+    ],
+    "HIGHLIGHT_STRICT_BLOCK": [
+        false,
+        false,
+        false,
+        true
+    ],
+    "TAB_WIDTH": 4
+}

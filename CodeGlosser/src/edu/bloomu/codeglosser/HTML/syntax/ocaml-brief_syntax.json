@@ -1,0 +1,145 @@
+{
+    "LANG_NAME": "OCaml (brief)",
+    "COMMENT_SINGLE": [],
+    "COMMENT_MULTI": {
+        "(*": "*)"
+    },
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [
+        "\""
+    ],
+    "ESCAPE_CHAR": "",
+    "KEYWORDS": {
+        "1": [
+            "and",
+            "as",
+            "asr",
+            "begin",
+            "class",
+            "closed",
+            "constraint",
+            "do",
+            "done",
+            "downto",
+            "else",
+            "end",
+            "exception",
+            "external",
+            "failwith",
+            "false",
+            "flush",
+            "for",
+            "fun",
+            "function",
+            "functor",
+            "if",
+            "in",
+            "include",
+            "inherit",
+            "incr",
+            "land",
+            "let",
+            "load",
+            "los",
+            "lsl",
+            "lsr",
+            "lxor",
+            "match",
+            "method",
+            "mod",
+            "module",
+            "mutable",
+            "new",
+            "not",
+            "of",
+            "open",
+            "option",
+            "or",
+            "parser",
+            "private",
+            "ref",
+            "rec",
+            "raise",
+            "regexp",
+            "sig",
+            "struct",
+            "stdout",
+            "stdin",
+            "stderr",
+            "then",
+            "to",
+            "true",
+            "try",
+            "type",
+            "val",
+            "virtual",
+            "when",
+            "while",
+            "with"
+        ]
+    },
+    "SYMBOLS": [
+        ";",
+        "!",
+        ":",
+        ".",
+        "=",
+        "%",
+        "^",
+        "*",
+        "-",
+        "\/",
+        "+",
+        ">",
+        "<",
+        "(",
+        ")",
+        "[",
+        "]",
+        "&",
+        "|",
+        "#",
+        "'"
+    ],
+    "CASE_SENSITIVE": [
+        false,
+        false
+    ],
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #06c; font-weight: bold;"
+        },
+        "COMMENTS": {
+            "MULTI": "color: #5d478b; font-style: italic;"
+        },
+        "ESCAPE_CHAR": [],
+        "BRACKETS": [
+            "color: #6c6;"
+        ],
+        "STRINGS": [
+            "color: #3cb371;"
+        ],
+        "NUMBERS": [
+            "color: #c6c;"
+        ],
+        "METHODS": {
+            "1": "color: #060;"
+        },
+        "REGEXPS": [],
+        "SYMBOLS": [
+            "color: #a52a2a;"
+        ],
+        "SCRIPT": []
+    },
+    "URLS": {
+        "1": ""
+    },
+    "OOLANG": true,
+    "OBJECT_SPLITTERS": {
+        "1": "."
+    },
+    "REGEXPS": [],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": []
+}

@@ -1,0 +1,105 @@
+{
+    "LANG_NAME": "XML",
+    "COMMENT_SINGLE": [],
+    "COMMENT_MULTI": [],
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [
+        "'",
+        "\""
+    ],
+    "ESCAPE_CHAR": "",
+    "KEYWORDS": [],
+    "SYMBOLS": [],
+    "CASE_SENSITIVE": [
+        false
+    ],
+    "STYLES": {
+        "KEYWORDS": [],
+        "COMMENTS": [],
+        "ESCAPE_CHAR": [
+            "color: #000099; font-weight: bold;"
+        ],
+        "BRACKETS": [
+            "color: #66cc66;"
+        ],
+        "STRINGS": [
+            "color: #ff0000;"
+        ],
+        "NUMBERS": [
+            "color: #cc66cc;"
+        ],
+        "METHODS": [],
+        "SYMBOLS": [
+            "color: #66cc66;"
+        ],
+        "SCRIPT": {
+            "-1": "color: #808080; font-style: italic;",
+            "0": "color: #00bbdd;",
+            "1": "color: #ddbb00;",
+            "2": "color: #339933;",
+            "3": "color: #009900;"
+        },
+        "REGEXPS": [
+            "color: #000066;",
+            "color: #000000; font-weight: bold;",
+            "color: #000000; font-weight: bold;"
+        ]
+    },
+    "URLS": [],
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "REGEXPS": [
+        [
+            "([a-z_:][\\w\\-\\.:]*)(=)",
+            "\\1",
+            "i",
+            "",
+            "\\2"
+        ],
+        [
+            "(&lt;[\\\/?|(\\?xml)]?[a-z_:][\\w\\-\\.:]*(\\??&gt;)?)",
+            "\\1",
+            "i",
+            "",
+            ""
+        ],
+        [
+            "(([\\\/|\\?])?&gt;)",
+            "\\1",
+            "i",
+            "",
+            ""
+        ]
+    ],
+    "STRICT_MODE_APPLIES": 2,
+    "SCRIPT_DELIMITERS": {
+        "-1": {
+            "<!--": "-->"
+        },
+        "0": {
+            "<!DOCTYPE": ">"
+        },
+        "1": {
+            "&": ";"
+        },
+        "2": {
+            "<![CDATA[": "]]>"
+        },
+        "3": {
+            "<": ">"
+        }
+    },
+    "HIGHLIGHT_STRICT_BLOCK": {
+        "-1": false,
+        "0": false,
+        "1": false,
+        "2": false,
+        "3": true
+    },
+    "TAB_WIDTH": 2,
+    "PARSER_CONTROL": {
+        "ENABLE_FLAGS": {
+            "NUMBERS": 0
+        }
+    }
+}

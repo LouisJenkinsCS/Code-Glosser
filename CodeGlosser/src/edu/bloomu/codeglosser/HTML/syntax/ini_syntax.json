@@ -1,0 +1,77 @@
+{
+    "LANG_NAME": "INI",
+    "COMMENT_SINGLE": [],
+    "COMMENT_MULTI": [],
+    "COMMENT_REGEXP": [
+        "\/^\\s*;.*?$\/m"
+    ],
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [
+        "\""
+    ],
+    "ESCAPE_CHAR": "",
+    "KEYWORDS": [],
+    "SYMBOLS": [
+        "[",
+        "]",
+        "="
+    ],
+    "CASE_SENSITIVE": [
+        false
+    ],
+    "STYLES": {
+        "KEYWORDS": [],
+        "COMMENTS": [
+            "color: #666666; font-style: italic;"
+        ],
+        "ESCAPE_CHAR": [
+            ""
+        ],
+        "BRACKETS": [
+            ""
+        ],
+        "STRINGS": [
+            "color: #933;"
+        ],
+        "NUMBERS": [
+            ""
+        ],
+        "METHODS": [
+            ""
+        ],
+        "SYMBOLS": [
+            "color: #000066; font-weight:bold;"
+        ],
+        "REGEXPS": [
+            "color: #000066; font-weight:bold;",
+            "color: #000099;",
+            "color: #660066;"
+        ],
+        "SCRIPT": [
+            ""
+        ]
+    },
+    "URLS": [],
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "REGEXPS": [
+        "\\[.+\\]",
+        [
+            "^(\\s*)([a-zA-Z0-9_\\-]+)(\\s*=)",
+            "\\2",
+            "m",
+            "\\1",
+            "\\3"
+        ],
+        [
+            "([<>\";a-zA-Z0-9_]+\\s*)=(.*)",
+            "\\2",
+            "",
+            "\\1=",
+            ""
+        ]
+    ],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": []
+}

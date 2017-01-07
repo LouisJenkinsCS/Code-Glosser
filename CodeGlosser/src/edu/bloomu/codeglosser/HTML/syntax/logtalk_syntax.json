@@ -1,0 +1,393 @@
+{
+    "LANG_NAME": "Logtalk",
+    "COMMENT_SINGLE": {
+        "1": "%"
+    },
+    "COMMENT_MULTI": {
+        "\/*": "*\/"
+    },
+    "COMMENT_REGEXP": {
+        "2": "\/0'.\/sim"
+    },
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [
+        "'"
+    ],
+    "HARDQUOTE": [
+        "\"",
+        "\""
+    ],
+    "HARDESCAPE": [],
+    "ESCAPE_CHAR": "",
+    "ESCAPE_REGEXP": {
+        "1": "#\\\\[\\\\abfnrtv\\'\"?\n]#i",
+        "2": "#\\\\x[\\da-fA-F]+\\\\#",
+        "3": "#\\\\[0-7]+\\\\#"
+    },
+    "NUMBERS": 594497,
+    "KEYWORDS": {
+        "1": [
+            "encoding",
+            "ensure_loaded",
+            "set_logtalk_flag",
+            "set_prolog_flag",
+            "category",
+            "object",
+            "protocol",
+            "private",
+            "protected",
+            "public",
+            "elif",
+            "if",
+            "calls",
+            "initialization",
+            "op",
+            "uses",
+            "alias",
+            "coinductive",
+            "discontiguous",
+            "dynamic",
+            "mode",
+            "info",
+            "meta_predicate",
+            "multifile",
+            "synchronized",
+            "export",
+            "module",
+            "reexport",
+            "use_module"
+        ],
+        "2": [
+            "dynamic",
+            "synchronized",
+            "threaded",
+            "end_category",
+            "end_object",
+            "end_protocol",
+            "else",
+            "endif"
+        ],
+        "3": [
+            "complements",
+            "extends",
+            "imports",
+            "implements",
+            "instantiates",
+            "specializes"
+        ],
+        "4": [
+            "after",
+            "before",
+            "parameter",
+            "self",
+            "sender",
+            "this",
+            "current_predicate",
+            "predicate_property",
+            "expand_goal",
+            "expand_term",
+            "goal_expansion",
+            "phrase",
+            "term_expansion",
+            "abolish_category",
+            "abolish_object",
+            "abolish_protocol",
+            "create_category",
+            "create_object",
+            "create_protocol",
+            "current_category",
+            "current_object",
+            "current_protocol",
+            "category_property",
+            "object_property",
+            "protocol_property",
+            "complements_object",
+            "conforms_to_protocol",
+            "extends_category",
+            "extends_object",
+            "extends_protocol",
+            "implements_protocol",
+            "imports_category",
+            "instantiates_class",
+            "specializes_class",
+            "abolish_events",
+            "current_event",
+            "define_events",
+            "current_logtalk_flag",
+            "set_logtalk_flag",
+            "current_prolog_flag",
+            "set_prolog_flag",
+            "logtalk_compile",
+            "logtalk_library_path",
+            "logtalk_load",
+            "abolish",
+            "asserta",
+            "assertz",
+            "clause",
+            "retract",
+            "retractall",
+            "call",
+            "catch",
+            "ignore",
+            "once",
+            "throw",
+            "bagof",
+            "findall",
+            "forall",
+            "setof",
+            "threaded",
+            "threaded_call",
+            "threaded_once",
+            "threaded_ignore",
+            "threaded_exit",
+            "threaded_peek",
+            "threaded_wait",
+            "threaded_notify",
+            "unify_with_occurs_check",
+            "atom_chars",
+            "atom_codes",
+            "atom_concat",
+            "atom_length",
+            "number_chars",
+            "number_codes",
+            "char_code",
+            "arg",
+            "copy_term",
+            "functor",
+            "numbervars",
+            "atom",
+            "atomic",
+            "callable",
+            "compound",
+            "float",
+            "ground",
+            "integer",
+            "nonvar",
+            "number",
+            "sub_atom",
+            "var",
+            "compare",
+            "current_input",
+            "current_output",
+            "set_input",
+            "set_output",
+            "open",
+            "close",
+            "flush_output",
+            "stream_property",
+            "at_end_of_stream",
+            "set_stream_position",
+            "get_byte",
+            "get_char",
+            "get_code",
+            "peek_byte",
+            "peek_char",
+            "peek_code",
+            "put_byte",
+            "put_char",
+            "put_code",
+            "nl",
+            "current_op",
+            "op",
+            "write",
+            "writeq",
+            "write_canonical",
+            "write_term",
+            "read",
+            "read_term",
+            "char_conversion",
+            "current_char_conversion",
+            "halt",
+            "keysort",
+            "sort"
+        ],
+        "5": [
+            "fail",
+            "repeat",
+            "true",
+            "nl",
+            "halt",
+            "is",
+            "at_end_of_stream",
+            "flush_output"
+        ],
+        "6": [
+            "float_integer_part",
+            "float_fractional_part",
+            "rem",
+            "mod",
+            "abs",
+            "sign",
+            "floor",
+            "truncate",
+            "round",
+            "ceiling",
+            "cos",
+            "atan",
+            "exp",
+            "log",
+            "sin",
+            "sqrt"
+        ],
+        "7": [
+            "e",
+            "pi",
+            "mod",
+            "rem"
+        ]
+    },
+    "SYMBOLS": [
+        [
+            "{",
+            "}"
+        ],
+        [
+            "=:=",
+            "=\\=",
+            "<",
+            "=<",
+            ">=",
+            ">",
+            "<<",
+            ">>",
+            "\/\\",
+            "\\\/",
+            "\\",
+            "==",
+            "\\==",
+            "@<",
+            "@=<",
+            "@>=",
+            "@>",
+            "+",
+            "-",
+            "*",
+            "\/",
+            "**",
+            "!",
+            "\\+",
+            ";",
+            "::",
+            "^^",
+            ":",
+            "-->",
+            "->",
+            "@",
+            "?",
+            "=..",
+            "=",
+            "\\="
+        ],
+        [
+            ":-"
+        ]
+    ],
+    "CASE_SENSITIVE": [
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+    ],
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #2e4dc9;",
+            "2": "color: #2e4dc9;",
+            "3": "color: #2e4dc9;",
+            "4": "color: #9d4f37;",
+            "5": "color: #9d4f37;",
+            "6": "color: #9d4f37;",
+            "7": "color: #9d4f37;"
+        },
+        "NUMBERS": [
+            "color: #430000;"
+        ],
+        "COMMENTS": {
+            "1": "color: #60a0b0; font-style: italic;",
+            "2": "color: #430000;",
+            "MULTI": "color: #60a0b0; font-style: italic;"
+        },
+        "ESCAPE_CHAR": {
+            "0": "color: #9f0000; font-weight: bold;",
+            "1": "color: #9f0000; font-weight: bold;",
+            "2": "color: #9f0000; font-weight: bold;",
+            "3": "color: #9f0000; font-weight: bold;",
+            "HARD": ""
+        },
+        "SYMBOLS": [
+            "color: #666666;font-weight: bold;",
+            "color: #666666;font-weight: bold;",
+            "color: #000000;"
+        ],
+        "BRACKETS": [
+            "color: #000000;"
+        ],
+        "STRINGS": {
+            "0": "color: #9f0000;",
+            "HARD": "color: #9f0000;"
+        },
+        "METHODS": [],
+        "REGEXPS": [
+            "color: #848484;"
+        ],
+        "SCRIPT": []
+    },
+    "URLS": {
+        "1": "",
+        "2": "",
+        "3": "",
+        "4": "",
+        "5": "",
+        "6": "",
+        "7": ""
+    },
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": {
+        "1": "::"
+    },
+    "REGEXPS": [
+        "\\b(?!(?:PIPE|SEMI|REG3XP\\d*)[^a-zA-Z0-9_])[A-Z_][a-zA-Z0-9_]*(?![a-zA-Z0-9_])"
+    ],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": [],
+    "TAB_WIDTH": 4,
+    "PARSER_CONTROL": {
+        "ENABLE_FLAGS": {
+            "BRACKETS": 0
+        },
+        "KEYWORDS": {
+            "1": {
+                "DISALLOWED_BEFORE": "(?<=:-\\s)",
+                "DISALLOWED_AFTER": "(?=\\()"
+            },
+            "2": {
+                "DISALLOWED_BEFORE": "(?<=:-\\s)",
+                "DISALLOWED_AFTER": "(?=\\.)"
+            },
+            "3": {
+                "DISALLOWED_BEFORE": "(?<![a-zA-Z0-9\\$_\\|\\#>|^&'\"])",
+                "DISALLOWED_AFTER": "(?=\\()"
+            },
+            "4": {
+                "DISALLOWED_BEFORE": "(?<![a-zA-Z0-9\\$_\\|\\#>|^&'\"])",
+                "DISALLOWED_AFTER": "(?=\\()"
+            },
+            "5": {
+                "DISALLOWED_BEFORE": "(?<![a-zA-Z0-9\\$_\\|\\#>|^&'\"])",
+                "DISALLOWED_AFTER": "(?![a-zA-Z0-9_\\|%\\-&'\"])"
+            },
+            "6": {
+                "DISALLOWED_BEFORE": "(?<![a-zA-Z0-9\\$_\\|\\#;>|^&'\"])",
+                "DISALLOWED_AFTER": "(?=\\()"
+            },
+            "7": {
+                "DISALLOWED_BEFORE": "(?<![a-zA-Z0-9\\$_\\|\\#;>|^&'\"])",
+                "DISALLOWED_AFTER": "(?![a-zA-Z0-9_\\|%\\-&'\"])"
+            }
+        }
+    }
+}

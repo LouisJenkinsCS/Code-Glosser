@@ -1,0 +1,130 @@
+{
+    "LANG_NAME": "Diff",
+    "COMMENT_SINGLE": [],
+    "COMMENT_MULTI": [],
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [],
+    "ESCAPE_CHAR": " ",
+    "KEYWORDS": {
+        "1": [
+            "\\ No newline at end of file"
+        ]
+    },
+    "SYMBOLS": [],
+    "CASE_SENSITIVE": {
+        "1": false
+    },
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #aaaaaa; font-style: italic;"
+        },
+        "COMMENTS": [],
+        "ESCAPE_CHAR": [
+            ""
+        ],
+        "BRACKETS": [
+            ""
+        ],
+        "STRINGS": [
+            ""
+        ],
+        "NUMBERS": [
+            ""
+        ],
+        "METHODS": [
+            ""
+        ],
+        "SYMBOLS": [
+            ""
+        ],
+        "SCRIPT": [
+            ""
+        ],
+        "REGEXPS": [
+            "color: #440088;",
+            "color: #991111;",
+            "color: #00b000;",
+            "color: #888822;",
+            "color: #888822;",
+            "color: #0011dd;",
+            "color: #440088;",
+            "color: #991111;",
+            "color: #00b000;",
+            "color: #888822;"
+        ]
+    },
+    "URLS": {
+        "1": ""
+    },
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "REGEXPS": [
+        "[0-9,]+[acd][0-9,]+",
+        [
+            "(^|(?<=\\A\\s))\\&lt;.*$",
+            "\\0",
+            "m",
+            "",
+            ""
+        ],
+        [
+            "(^|(?<=\\A\\s))\\&gt;.*$",
+            "\\0",
+            "m",
+            "",
+            ""
+        ],
+        [
+            "(^|(?<=\\A\\s))-{3}\\s.*$",
+            "\\0",
+            "m",
+            "",
+            ""
+        ],
+        [
+            "(^|(?<=\\A\\s))(\\+){3}\\s.*$",
+            "\\0",
+            "m",
+            "",
+            ""
+        ],
+        [
+            "(^|(?<=\\A\\s))\\!.*$",
+            "\\0",
+            "m",
+            "",
+            ""
+        ],
+        [
+            "(^|(?<=\\A\\s))[\\@]{2}.*$",
+            "\\0",
+            "m",
+            "",
+            ""
+        ],
+        [
+            "(^|(?<=\\A\\s))\\-.*$",
+            "\\0",
+            "m",
+            "",
+            ""
+        ],
+        [
+            "(^|(?<=\\A\\s))\\+.*$",
+            "\\0",
+            "m",
+            "",
+            ""
+        ],
+        [
+            "(^|(?<=\\A\\s))(\\*){3}\\s.*$",
+            "\\0",
+            "m",
+            "",
+            ""
+        ]
+    ],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": []
+}

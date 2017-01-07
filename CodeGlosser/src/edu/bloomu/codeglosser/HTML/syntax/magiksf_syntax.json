@@ -1,0 +1,228 @@
+{
+    "ESCAPE_CHAR": "",
+    "LANG_NAME": "MagikSF",
+    "COMMENT_SINGLE": {
+        "1": "##",
+        "2": "#%",
+        "3": "#"
+    },
+    "COMMENT_MULTI": {
+        "_pragma(": ")"
+    },
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [
+        "'",
+        "\""
+    ],
+    "KEYWORDS": {
+        "1": [
+            "_block",
+            "_endblock",
+            "_proc",
+            "_endproc",
+            "_loop",
+            "_endloop",
+            "_method",
+            "_endmethod",
+            "_protect",
+            "_endprotect",
+            "_protection",
+            "_locking",
+            "_continue"
+        ],
+        "2": [
+            "_self",
+            "_thisthread",
+            "_pragma",
+            "_private",
+            "_abstract",
+            "_local",
+            "_global",
+            "_dynamic",
+            "_package",
+            "_constant",
+            "_import",
+            "_iter",
+            "_lock",
+            "_optional",
+            "_recursive",
+            "_super"
+        ],
+        "3": [
+            "_if",
+            "_endif",
+            "_then",
+            "_else",
+            "_elif",
+            "_orif",
+            "_andif",
+            "_for",
+            "_over",
+            "_try",
+            "_endtry",
+            "_when",
+            "_throw",
+            "_catch",
+            "_endcatch",
+            "_handling",
+            "_finally",
+            "_loopbody",
+            "_return",
+            "_leave",
+            "_with"
+        ],
+        "4": [
+            "_false",
+            "_true",
+            "_maybe",
+            "_unset",
+            "_no_way"
+        ],
+        "5": [
+            "_mod",
+            "_div",
+            "_or",
+            "_and",
+            "_cf",
+            "_is",
+            "_isnt",
+            "_not",
+            "_gather",
+            "_scatter",
+            "_allresults",
+            "_clone",
+            "_xor"
+        ],
+        "6": [
+            "def_slotted_exemplar",
+            "write_string",
+            "write",
+            "condition",
+            "record_transaction",
+            "gis_program_manager",
+            "perform",
+            "define_shared_constant",
+            "property_list",
+            "rope",
+            "def_property",
+            "def_mixin"
+        ]
+    },
+    "SYMBOLS": [
+        "(",
+        ")",
+        "{",
+        "}",
+        "[",
+        "]",
+        "+",
+        "-",
+        "*",
+        "\/",
+        "**",
+        "=",
+        "<",
+        ">",
+        "<<",
+        ">>",
+        ",",
+        "$"
+    ],
+    "CASE_SENSITIVE": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+    ],
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #000000; font-weight: bold;",
+            "2": "color: #ff3f3f;",
+            "3": "color: #3f7f3f; font-weight: bold;",
+            "4": "color: #cc66cc;",
+            "5": "color: #ff3fff; font-weight: bold;",
+            "6": "font-weight: bold;"
+        },
+        "COMMENTS": {
+            "1": "color: #339933; font-weight: bold;",
+            "2": "color: #993333;",
+            "3": "color: #339933;",
+            "MULTI": "color: #7f7f7f; font-style: italic"
+        },
+        "ESCAPE_CHAR": [
+            "color: #000099; font-weight: bold;"
+        ],
+        "BRACKETS": [
+            "color: #ff3f3f;"
+        ],
+        "STRINGS": [
+            "color: #ff0000;"
+        ],
+        "NUMBERS": [
+            "color: #cc66cc;"
+        ],
+        "METHODS": {
+            "1": "color: #202020;",
+            "2": "color: #202020;"
+        },
+        "SYMBOLS": [
+            "color: #ff3f3f;"
+        ],
+        "REGEXPS": {
+            "1": "color: #3f3fff;",
+            "2": "color: #3f3fff;",
+            "3": "color: #cc66cc;",
+            "4": "color: #7f3f7f; font-style: italic;"
+        },
+        "SCRIPT": []
+    },
+    "URLS": {
+        "1": "",
+        "2": "",
+        "3": "",
+        "4": "",
+        "5": "",
+        "6": ""
+    },
+    "OOLANG": true,
+    "OBJECT_SPLITTERS": {
+        "1": "."
+    },
+    "REGEXPS": {
+        "1": [
+            "\\b[a-zA-Z0-9_]+:",
+            "\\0",
+            "",
+            "",
+            ""
+        ],
+        "2": [
+            ":(?:[a-zA-Z0-9!?_]+|(?:[<pipe>].*?[<pipe>]))*",
+            "\\0",
+            "",
+            "",
+            ""
+        ],
+        "3": [
+            "%space|%tab|%newline|%.",
+            "\\0",
+            "",
+            "",
+            ""
+        ],
+        "4": [
+            "@(?:[a-zA-Z0-9!?_]+|(?:[<pipe>].*?[<pipe>]))*",
+            "\\0",
+            "",
+            "",
+            ""
+        ]
+    },
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": [],
+    "TAB_WIDTH": 4
+}
