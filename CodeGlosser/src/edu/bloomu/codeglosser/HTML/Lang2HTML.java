@@ -43,7 +43,18 @@ import java.util.stream.Stream;
  * @author Louis
  */
 public abstract class Lang2HTML {
+    
     private HashMap<String, DisplayConfig> configMap = new HashMap<>();
+    
+    enum ParseState {
+        NORMAL,
+        SINGLE_LINE_COMMENT,
+        MULTI_LINE_COMMENT
+    }
+    
+    private ParseState state = ParseState.NORMAL;
+    
+    private Syntax syntax;
     
     protected abstract String[] getKeywordList();
     
@@ -68,69 +79,188 @@ public abstract class Lang2HTML {
                 .forEach((primitiveType) -> configMap.put(primitiveType, getPrimitiveTypeColor()));
     }
     
-    public String translate(String code) {
-        StringBuffer buf = new StringBuffer();
-        StringCharacterIterator it = new StringCharacterIterator(code.trim());
-        for(char c = it.current(); c != CharacterIterator.DONE; c = it.next()) {
-            switch (c) {
-                case '>':
-                    buf.append("&gt;");
-                    break;
-                case '<':
-                    buf.append("&lt;");
-                    break;
-                case ' ':
-                    buf.append("&nbsp;");
-                    break;
-//                case '&':
-//                    buf.append("&amp;");
-//                    break;
-//                case '\"':
-//                    buf.append("&quot;");
-//                    break;
-//                case '\'':
-//                    buf.append("&apos;");
-//                    break;
-                case '\t':
-                    buf.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-                    break;
-                case '\r':
-                    if (it.next() != '\n')
-                        it.previous();
-                case '\n':
-                    buf.append(getNewLineStandin());
-                    break;
-                default: {
-                    if (!Character.isAlphabetic(c)) {
-                        buf.append(c);
-                        break;
-                    }
-                    StringBuilder tmp = new StringBuilder().append(c);
-                    char ch = it.next();
-                    while (Character.isAlphabetic(ch)) {
-                        tmp.append(ch);
-                        ch = it.next();
-                    }
-                    it.previous();
-                    
-                    String str = tmp.toString();
-                    DisplayConfig conf = configMap.get(str);
-                    if (conf != null) {
-                        LOG.fine("Found config for " + str);
-                        buf.append("<font color=\"#");
-                        buf.append(String.format("%06X",conf.getColor().getRGB() & 0xFFFFFF));
-                        buf.append("\">");
-                        
-                        if (conf.getFont() == HTMLFont.BOLD) {
-                            buf.append("<b>");
+    private String parseToken(StringCharacterIterator iterator) {
+        char ch = iterator.current();
+        switch (ch) {
+            // Spaces are translated into HTML entities
+            case ' ': {
+                return "&nbsp;";  
+            }
+            // Tabs are represented as a sequence of HTML entity spaces
+            case '\t': {
+                return "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            }
+            // Based on the architecture, newline can be either \r, \r\n, or just \n
+            case '\r': {
+                    if (iterator.next() != '\n')
+                        iterator.previous();
+            }
+            // Handle newline character as HTML Entity
+            case '\n': {
+                return getNewLineStandin();
+            }
+            // Convert to HTML entities
+            case '>': {
+                return "&gt;";
+            }
+            // Convert to HTML entities
+            case '<': {
+                return "&lt;";
+            }
+            // The non-general cases which depend on which mode we are in
+            default: {
+                // Handle processing based on state.
+                switch (state) {
+                    case NORMAL: {
+                        switch (ch) {
+                            // Methods
+                            case '.': {
+                                char c = iterator.next();
+                                // Check if there is a word following this.
+                                 if (!Character.isAlphabetic(c)) {
+                                    break;
+                                }
+
+                                StringBuilder tmp = new StringBuilder(".").append(c);
+                                c = iterator.next();
+                                while (Character.isAlphabetic(c) || Character.isDigit(c) || c == '_') {
+                                    tmp.append(c);
+                                    c = iterator.next();
+                                }
+                                
+                                iterator.previous();
+                                return syntax.methodToHTMLTag(tmp.toString());
+                            }
+                            // Look for start of comment
+                            case '/': {                                
+                                // Next character determines if it is and what type
+                                switch (iterator.next()) {
+                                    // Single line...
+                                    case '/': {
+                                        state = ParseState.SINGLE_LINE_COMMENT;
+                                        return "//";
+                                    }
+                                    // Multi line...
+                                    case '*': {
+                                        state = ParseState.MULTI_LINE_COMMENT;
+                                        return "/*";
+                                    }
+                                    // Put back.
+                                    default: {
+                                        iterator.previous();
+                                        return "/";
+                                    }
+                                }
+                            }
+                            // Character
+                            case '\'': {
+                                // Handle string
+                                StringBuilder tmp = new StringBuilder().append(ch);
+                                char c = iterator.next();
+                                while (c != '\'' && c != CharacterIterator.DONE) {
+                                    // Handle escape sequence here
+                                    if (c == '\\') {
+                                        tmp.append(c);
+                                        c = iterator.next();
+                                    }
+                                    tmp.append(c);
+                                    c = iterator.next();
+                                }
+                                tmp.append(c);
+                                return syntax.stringToHTMLTag(tmp.toString());
+                            }
+                            // String
+                            case '\"': {
+                                // Handle string
+                                StringBuilder tmp = new StringBuilder().append(ch);
+                                char c = iterator.next();
+                                while (c != '\"' && c != CharacterIterator.DONE) {
+                                    // Handle escape sequence here
+                                    if (c == '\\') {
+                                        tmp.append(c);
+                                        c = iterator.next();
+                                    }
+                                    tmp.append(c);
+                                    c = iterator.next();
+                                }
+                                tmp.append(c);
+                                return syntax.stringToHTMLTag(tmp.toString());
+                            }
+                            // Look for potential keywords
+                            default: {
+                                if (!Character.isAlphabetic(ch)) {
+                                    return "" + ch;
+                                }
+
+                                StringBuilder tmp = new StringBuilder().append(ch);
+                                char c = iterator.next();
+                                while (Character.isAlphabetic(c) || Character.isDigit(c) || c == '_') {
+                                    tmp.append(c);
+                                    c = iterator.next();
+                                }
+
+                                iterator.previous();
+                                return syntax.wordToHTMLTag(tmp.toString());
+                            }
                         }
                     }
-                    buf.append(str);
-                    if (conf != null) {
-                        buf.append("</b></font>");
+
+                    case MULTI_LINE_COMMENT: {
+                        switch (ch) {
+                            case '*': {
+                                if (iterator.next() == '/') {
+                                    return "*/";
+                                } else {
+                                    iterator.previous();
+                                    return "*";
+                                }
+                            }
+                        }
+                    }
+                    case SINGLE_LINE_COMMENT: {
+                        return "" + ch;
                     }
                 }
+            }
+        }
+        
+        throw new RuntimeException("Did not handle character: " + ch);
+    }
+    
+    public String translate(String code) {
+        syntax = new Syntax();
+        StringBuffer buf = new StringBuffer();
+        StringBuffer tmp = new StringBuffer();
+        StringCharacterIterator it = new StringCharacterIterator(code.trim());
+        for(char c = it.current(); c != CharacterIterator.DONE; c = it.next()) {
+            String token = parseToken(it);
+            
+            
+            // Handle comments by buffering them.
+            switch (state) {
+                case NORMAL:
+                    buf.append(token);
+                    break;
+                case SINGLE_LINE_COMMENT:
+                    tmp.append(token);
+                    if (token.equals(getNewLineStandin())) {
+                        state = ParseState.NORMAL;
+                        buf.append(syntax.commentToHTMLTag(tmp.toString()));
+                        tmp.delete(0, tmp.length());
+                        tmp.trimToSize();
+                    }
                     
+                    break;
+                case MULTI_LINE_COMMENT:
+                    tmp.append(token);
+                    if (token.equals("*/")) {
+                        state = ParseState.NORMAL;
+                        buf.append(syntax.commentToHTMLTag(tmp.toString()));
+                        tmp.delete(0, tmp.length());
+                        tmp.trimToSize();
+                    }
+                    
+                    break;
             }
         }
         
