@@ -289,7 +289,7 @@ public class MarkupView extends javax.swing.JPanel {
 
     public void setText(String str) {
         LOG.info("Text changed...");
-        textCode.setText("<html><head></head><body>" + str.trim() + "</body></html>");
+        textCode.setText("<html><head></head><body style=\"font-size: 1.15em\">" + str.trim() + "</body></html>");
     }
 
     /**
@@ -466,6 +466,7 @@ public class MarkupView extends javax.swing.JPanel {
                 .just(fileContents)
                 // Handle syntax highlighting in background
                 .observeOn(Schedulers.computation())
+                .doOnNext(model::setText)
                 .map(contents -> new Java2HTML().translate(contents))
                 // Display text on UI Thread
                 .observeOn(SwingScheduler.getInstance())

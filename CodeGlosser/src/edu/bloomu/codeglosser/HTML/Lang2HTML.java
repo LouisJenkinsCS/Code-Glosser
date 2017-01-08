@@ -48,6 +48,8 @@ public abstract class Lang2HTML {
     
     enum ParseState {
         NORMAL,
+        STRING,
+        CHAR,
         SINGLE_LINE_COMMENT,
         MULTI_LINE_COMMENT
     }
@@ -107,11 +109,39 @@ public abstract class Lang2HTML {
             case '<': {
                 return "&lt;";
             }
+            case '&': {
+                return "&amp";
+            }
             // The non-general cases which depend on which mode we are in
             default: {
                 // Handle processing based on state.
                 switch (state) {
                     case NORMAL: {
+                        if (Character.isDigit(ch)) {
+                            StringBuilder tmp = new StringBuilder().append(ch);
+                            char c = iterator.next();
+                            
+                            // Check for hex
+                            if (ch == '0' && c == 'x') {
+                                tmp.append(c);
+                                c = iterator.next();
+                                while(Character.isDigit(c) || Character.isAlphabetic(c)) {
+                                    tmp.append(c);
+                                    c = iterator.next();
+                                }
+                                iterator.previous();
+                                return syntax.numberToHTMLTag(tmp.toString());
+                            } else {
+                                while (Character.isDigit(c) || c == '.') {
+                                    tmp.append(c);
+                                    c = iterator.next(); 
+                                }
+                                
+                                iterator.previous();
+                                return syntax.numberToHTMLTag(tmp.toString());
+                            }
+                        }
+                        
                         switch (ch) {
                             // Methods
                             case '.': {
@@ -154,37 +184,13 @@ public abstract class Lang2HTML {
                             }
                             // Character
                             case '\'': {
-                                // Handle string
-                                StringBuilder tmp = new StringBuilder().append(ch);
-                                char c = iterator.next();
-                                while (c != '\'' && c != CharacterIterator.DONE) {
-                                    // Handle escape sequence here
-                                    if (c == '\\') {
-                                        tmp.append(c);
-                                        c = iterator.next();
-                                    }
-                                    tmp.append(c);
-                                    c = iterator.next();
-                                }
-                                tmp.append(c);
-                                return syntax.stringToHTMLTag(tmp.toString());
+                                state = ParseState.CHAR;
+                                return "'";
                             }
                             // String
                             case '\"': {
-                                // Handle string
-                                StringBuilder tmp = new StringBuilder().append(ch);
-                                char c = iterator.next();
-                                while (c != '\"' && c != CharacterIterator.DONE) {
-                                    // Handle escape sequence here
-                                    if (c == '\\') {
-                                        tmp.append(c);
-                                        c = iterator.next();
-                                    }
-                                    tmp.append(c);
-                                    c = iterator.next();
-                                }
-                                tmp.append(c);
-                                return syntax.stringToHTMLTag(tmp.toString());
+                                state = ParseState.STRING;
+                                return "\"";
                             }
                             // Look for potential keywords
                             default: {
@@ -202,6 +208,34 @@ public abstract class Lang2HTML {
                                 iterator.previous();
                                 return syntax.wordToHTMLTag(tmp.toString());
                             }
+                        }
+                    }
+                    
+                    case STRING: {
+                        switch (ch) {
+                            // Escape
+                            case '\\':
+                                char c = iterator.next();
+                                if (c != CharacterIterator.DONE) {
+                                    return "" + ch + c;
+                                }
+                            // Other characters
+                            default:
+                                return "" + ch;
+                        }
+                    }
+                    
+                    case CHAR: {
+                        switch (ch) {
+                            // Escape
+                            case '\\':
+                                char c = iterator.next();
+                                if (c != CharacterIterator.DONE) {
+                                    return "" + ch + c;
+                                }
+                            // Other characters
+                            default:
+                                return "" + ch;
                         }
                     }
 
@@ -229,6 +263,7 @@ public abstract class Lang2HTML {
     
     public String translate(String code) {
         syntax = new Syntax();
+        boolean start = false;
         StringBuffer buf = new StringBuffer();
         StringBuffer tmp = new StringBuffer();
         StringCharacterIterator it = new StringCharacterIterator(code.trim());
@@ -258,6 +293,32 @@ public abstract class Lang2HTML {
                         buf.append(syntax.commentToHTMLTag(tmp.toString()));
                         tmp.delete(0, tmp.length());
                         tmp.trimToSize();
+                    }
+                    
+                    break;
+                case STRING:
+                    tmp.append(token);
+                    if (token.equals("\"") && start) {
+                        state = ParseState.NORMAL;
+                        buf.append(syntax.stringToHTMLTag(tmp.toString()));
+                        tmp.delete(0, tmp.length());
+                        tmp.trimToSize();
+                        start = false;
+                    } else {
+                        start = true;
+                    }
+                    
+                    break;
+                case CHAR:
+                    tmp.append(token);
+                    if (token.equals("\'") && start) {
+                        state = ParseState.NORMAL;
+                        buf.append(syntax.stringToHTMLTag(tmp.toString()));
+                        tmp.delete(0, tmp.length());
+                        tmp.trimToSize();
+                        start = false;
+                    } else {
+                        start = true;
                     }
                     
                     break;
