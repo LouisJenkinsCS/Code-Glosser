@@ -126,4 +126,10 @@ public class Event {
     public int getCustom() {
         return (this.tag & CUSTOM_MASK) >> CUSTOM_SHIFT;
     }
+
+    @Override
+    public String toString() {
+        return "Event: {Sender: " + getSender() + ", Recipient: " + getRecipient() + ", Custom: " + getCustom() + ", data=" + data + "}";
+    }
+    
 }

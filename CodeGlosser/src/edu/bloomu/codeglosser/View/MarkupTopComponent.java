@@ -39,10 +39,8 @@ public class MarkupTopComponent extends TopComponent {
         MarkupProperties properties = new MarkupProperties();
         
         // Connect the MarkupController to the MarkupView and MarkupProperty
-        controller.addEventSource(view.getEventSource());
-        controller.addEventSource(properties.getEventSource());
-        view.addEventSource(controller.getEventSource());
-        properties.addEventSource(controller.getEventSource());
+        controller.getEventEngine().register(view.getEventEngine());
+        controller.getEventEngine().register(properties.getEventEngine());
         
         add(view, BorderLayout.CENTER);
         add(properties, BorderLayout.LINE_END);

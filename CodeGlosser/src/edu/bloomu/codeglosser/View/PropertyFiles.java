@@ -31,6 +31,8 @@
 package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Events.Event;
+import edu.bloomu.codeglosser.Events.EventEngine;
+import edu.bloomu.codeglosser.Events.EventHandler;
 import edu.bloomu.codeglosser.Globals;
 import edu.bloomu.codeglosser.Model.ProjectBranch;
 import edu.bloomu.codeglosser.Model.ProjectLeaf;
@@ -52,12 +54,11 @@ import org.openide.util.Exceptions;
  *
  * @author Louis Jenkins
  */
-public class PropertyFiles extends javax.swing.JPanel {
+public class PropertyFiles extends javax.swing.JPanel implements EventHandler {
     
-    public static final int FILE_SELECTED = 1 << 0;
+    public static final int FILE_SELECTED = 0x1;
     
-    // Event Multiplexer
-    private PublishSubject<Event> event = PublishSubject.create();
+    private final EventEngine engine = new EventEngine(this, Event.PROPERTIES_FILES);
     
     /**
      * Creates new form PropertyFiles
@@ -66,8 +67,16 @@ public class PropertyFiles extends javax.swing.JPanel {
         initComponents();
         initFileTree();
         initListener();
-        
-        event.onNext(Event.of(0, 0, 0, null));
+    }
+    
+    @Override
+    public Observable<Event> handleEvent(Event e) {
+        return Observable.empty();
+    }
+
+    @Override
+    public EventEngine getEventEngine() {
+        return engine;
     }
     
     private void initListener() {
@@ -81,7 +90,7 @@ public class PropertyFiles extends javax.swing.JPanel {
                     if (e.getClickCount() == 2) {
                         TreeViewNode selectedNode = (TreeViewNode) ((DefaultMutableTreeNode)selPath.getLastPathComponent()).getUserObject();
                         if (selectedNode != null && selectedNode instanceof TreeViewLeaf) {
-                            event.onNext(Event.of(Event.PROPERTIES_FILES, Event.MARKUP_PROPERTIES, FILE_SELECTED, ((ProjectLeaf) selectedNode).getFile().toPath()));
+                            engine.broadcast(Event.MARKUP_PROPERTIES, FILE_SELECTED, ((ProjectLeaf) selectedNode).getFile().toPath());
                         }
                     }
                 }
@@ -115,34 +124,6 @@ public class PropertyFiles extends javax.swing.JPanel {
                 populateTree((TreeViewBranch) v, n);
             }
         }
-    }
-    
-    /**
-     * Predicate to determine if the event sent was meant for us.
-     *
-     * @param e Event
-     * @return If meant for us
-     */
-    private boolean eventForUs(Event e) {
-        return e.getSender() != Event.PROPERTIES_FILES && e.getRecipient() == Event.PROPERTIES_FILES;
-    }
-    
-    /**
-     * Registers the following observable as an event source. This must be called
-     * to receive events from other components.
-     * @param source 
-     */
-    public void addEventSource(Observable<Event> source) {
-        source.filter(this::eventForUs).subscribe(event::onNext);
-    }
-    
-    /**
-     * Returns our own Subject as an event source for listeners. This must be used
-     * to receive events from this component.
-     * @return Our event source
-     */
-    public Observable<Event> getEventSource() {
-        return event;
     }
 
     /**

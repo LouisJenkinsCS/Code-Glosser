@@ -36,6 +36,8 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.logging.Logger;
 import edu.bloomu.codeglosser.Events.Event;
+import edu.bloomu.codeglosser.Events.EventEngine;
+import edu.bloomu.codeglosser.Events.EventHandler;
 import edu.bloomu.codeglosser.Exceptions.InvalidTextSelectionException;
 import edu.bloomu.codeglosser.HTML.Java2HTML;
 import edu.bloomu.codeglosser.Model.Markup;
@@ -71,23 +73,22 @@ import org.openide.util.Exceptions;
  * The MarkupView is, currently, only connected to the MarkupController.
  *
  */
-public class MarkupView extends javax.swing.JPanel {
+public class MarkupView extends javax.swing.JPanel implements EventHandler {
 
     // The events we send
-    public static final int CREATE_MARKUP = 1 << 0;
-    public static final int DELETE_MARKUP = 1 << 1;
-    public static final int GET_MARKUP_SELECTION = 1 << 2;
-    public static final int SAVE_SESSION = 1 << 3;
-    public static final int PREVIEW_HTML = 1 << 4;
-    public static final int EXPORT_PROJECT = 1 << 5;
+    public static final int CREATE_MARKUP = 0x1;
+    public static final int DELETE_MARKUP = 0x2;
+    public static final int GET_MARKUP_SELECTION = 0x3;
+    public static final int SAVE_SESSION = 0x4;
+    public static final int PREVIEW_HTML = 0x5;
+    public static final int EXPORT_PROJECT = 0x6;
 
     private static final Logger LOG = Logger.getLogger(MarkupView.class.getName());
 
     // The model for this view; the model handles the computational work such as segmentation of highlighting
     private final MarkupViewModel model = new MarkupViewModel();
 
-    // Our multiplexer event-notification stream
-    private final PublishSubject<Event> event = PublishSubject.create();
+    private final EventEngine engine = new EventEngine(this, Event.MARKUP_VIEW);
 
     // The highlighter and it's respective mapping of highlights
     private final Highlighter highlighter;
@@ -107,32 +108,32 @@ public class MarkupView extends javax.swing.JPanel {
         textCode.setEditable(false);
         initializePopup();
         initializeListeners();
-
-        
-        // Handle receiving of events
-        event
-                .filter(this::eventForUs)
-                .doOnNext(e -> LOG.info("Processing Event..."))
-                .flatMap(e -> {
-                    switch (e.getSender()) {
-                        case Event.MARKUP_CONTROLLER:
-                            switch (e.getCustom()) {
-                                case MarkupController.REMOVE_HIGHLIGHTS:
-                                    return removeHighlight((Markup) e.data);
-                                case MarkupController.SET_CURSOR:
-                                    return setCursorPosition((Bounds) e.data);
-                                case MarkupController.FILE_SELECTED:
-                                    return fileSelected((String) e.data);
-                                default:
-                                    throw new RuntimeException("Bad Custom Tag!");
-                            }
-                        default:
-                            throw new RuntimeException("Bad Sender!");
-                    }
-                })
-                .subscribe(event::onNext);
     }
 
+    @Override
+    public Observable<Event> handleEvent(Event e) {
+        switch (e.getSender()) {
+            case Event.MARKUP_CONTROLLER:
+                switch (e.getCustom()) {
+                    case MarkupController.REMOVE_HIGHLIGHTS:
+                        return removeHighlight((Markup) e.data);
+                    case MarkupController.SET_CURSOR:
+                        return setCursorPosition((Bounds) e.data);
+                    case MarkupController.FILE_SELECTED:
+                        return fileSelected((String) e.data);
+                    default:
+                        throw new RuntimeException("Bad Custom Tag!");
+                }
+            default:
+                throw new RuntimeException("Bad Sender!");
+        }
+    }
+
+    @Override
+    public EventEngine getEventEngine() {
+        return engine;
+    }
+    
     private void initializePopup() {
         LOG.finer("Initializing PopupMenu...");
 
@@ -158,7 +159,7 @@ public class MarkupView extends javax.swing.JPanel {
                 // Segment boundary
                 Bounds[] bounds = model.segmentRange(b);
                 addMarkup(bounds);
-                sendEventToController(CREATE_MARKUP, bounds);
+                engine.broadcast(Event.MARKUP_CONTROLLER, CREATE_MARKUP, bounds);
             } catch (InvalidTextSelectionException ex) {
                 LOG.severe("Bad Bounds!!!");
                 return;
@@ -168,22 +169,22 @@ public class MarkupView extends javax.swing.JPanel {
 
         deleteMarkup.addActionListener(e -> {
             LOG.info("Propogating DELETE_MARKUP event...");
-            sendEventToController(DELETE_MARKUP, null);
+            engine.broadcast(Event.MARKUP_CONTROLLER, DELETE_MARKUP, null);
         });
 
         preview.addActionListener(e -> {
             LOG.info("Propogating PREVIEW_HTML event...");
-            sendEventToController(PREVIEW_HTML, model);
+            engine.broadcast(Event.MARKUP_CONTROLLER, PREVIEW_HTML, model);
         });
 
         exportProject.addActionListener(e -> {
             LOG.info("Propogating EXPORT_PROJECT event...");
-            sendEventToController(EXPORT_PROJECT, null);
+            engine.broadcast(Event.MARKUP_CONTROLLER, EXPORT_PROJECT, null);
         });
 
         saveSession.addActionListener(e -> {
             LOG.info("Propogating SAVE_SESSION event...");
-            sendEventToController(SAVE_SESSION, null);
+            engine.broadcast(Event.MARKUP_CONTROLLER, SAVE_SESSION, null);
         });
 
         // Add all menu items to the popup menu.
@@ -259,45 +260,6 @@ public class MarkupView extends javax.swing.JPanel {
         return highlightMap.keySet().stream().anyMatch(bounds::collidesWith);
     }
 
-    /**
-     * Predicate to determine if the event sent was meant for us.
-     *
-     * @param e Event
-     * @return If meant for us
-     */
-    private boolean eventForUs(Event e) {
-        return e.getSender() != Event.MARKUP_VIEW && e.getRecipient() == Event.MARKUP_VIEW;
-    }
-    
-    /**
-     * Registers the following observable as an event source. This must be called
-     * to receive events from other components.
-     * @param source 
-     */
-    public void addEventSource(Observable<Event> source) {
-        source.filter(this::eventForUs).subscribe(event::onNext);
-    }
-    
-    /**
-     * Returns our own Subject as an event source for listeners. This must be used
-     * to receive events from this component.
-     * @return Our event source
-     */
-    public Observable<Event> getEventSource() {
-        return event;
-    }
-    
-    
-    /**
-     * Helper method to send an event to the MarkupController.
-     *
-     * @param eventTag Event description
-     * @param data Event data
-     */
-    private void sendEventToController(int eventTag, Object data) {
-        event.onNext(Event.of(Event.MARKUP_VIEW, Event.MARKUP_CONTROLLER, eventTag, data));
-    }
-
     public void setText(String str) {
         LOG.info("Text changed...");
         textCode.setText("<html><head></head><body style=\"font-size: 1.15em\">" + str.trim() + "</body></html>");
@@ -315,7 +277,7 @@ public class MarkupView extends javax.swing.JPanel {
         // if double click refers to a valid highlight
         if (highlightExists(getSelected())) {
             consume.run();
-            sendEventToController(GET_MARKUP_SELECTION, getSelected());
+            engine.broadcast(Event.MARKUP_CONTROLLER, GET_MARKUP_SELECTION, getSelected());
         }
     }
 
@@ -515,7 +477,5 @@ public class MarkupView extends javax.swing.JPanel {
                 // We have handled the event, so no need for anything else.
                 .flatMap(Event::empty);
     }
-
-    
 
 }

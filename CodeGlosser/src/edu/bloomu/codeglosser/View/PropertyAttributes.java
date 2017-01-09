@@ -31,6 +31,8 @@
 package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Events.Event;
+import edu.bloomu.codeglosser.Events.EventEngine;
+import edu.bloomu.codeglosser.Events.EventHandler;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Utils.SwingScheduler;
 import io.reactivex.Observable;
@@ -47,7 +49,7 @@ import javax.swing.event.DocumentListener;
  *
  * @author Louis Jenkins
  */
-public class PropertyAttributes extends javax.swing.JPanel {
+public class PropertyAttributes extends javax.swing.JPanel implements EventHandler {
 
     private static final Logger LOG = Logger.getLogger(PropertyAttributes.class.getName());
     
@@ -62,35 +64,35 @@ public class PropertyAttributes extends javax.swing.JPanel {
     private Color color = Color.YELLOW;
     private String message = "";
     
-    // Event Multiplexer
-    private final PublishSubject<Event> event = PublishSubject.create();
+    private final EventEngine engine = new EventEngine(this, Event.PROPERTIES_ATTRIBUTES);
 
     public PropertyAttributes() {
         // Initialize GUI components
         initComponents();
         initListeners();
-        setColor(Color.YELLOW);
-        
-        // Handle receiving events
-        event
-                .filter(this::eventForUs)
-                .doOnNext(ignored -> LOG.info("Processing Event..."))
-                .flatMap(e -> {
-                   switch (e.getSender()) {
-                       case Event.MARKUP_PROPERTIES:
-                           switch (e.getCustom()) {
-                               case MarkupProperties.SET_ATTRIBUTES:
-                                   return setAttributes((Markup) e.data);
-                               case MarkupProperties.CLEAR_ATTRIBUTES:
-                                   return clearAttributes();
-                               default:
-                                   throw new RuntimeException("Bad Custom Tag from MarkupProperties!");
-                           }
-                       default:
-                           throw new RuntimeException("Bad Sender!");
-                   }
-                })
-                .subscribe(event::onNext);
+        setColor(Color.YELLOW);     
+    }
+    
+    @Override
+    public Observable<Event> handleEvent(Event e) {
+        switch (e.getSender()) {
+            case Event.MARKUP_PROPERTIES:
+                switch (e.getCustom()) {
+                    case MarkupProperties.SET_ATTRIBUTES:
+                        return setAttributes((Markup) e.data);
+                    case MarkupProperties.CLEAR_ATTRIBUTES:
+                        return clearAttributes();
+                    default:
+                        throw new RuntimeException("Bad Custom Tag from MarkupProperties!");
+                }
+            default:
+                throw new RuntimeException("Bad Sender!");
+        }
+    }
+
+    @Override
+    public EventEngine getEventEngine() {
+        return engine;
     }
     
     private void initListeners() {
@@ -104,10 +106,11 @@ public class PropertyAttributes extends javax.swing.JPanel {
                 .doOnNext(ignored -> LOG.info("Processing Text Change event"))
                 // We only proceed if the message != text, because 'setText' can trigger this
                 .filter(text -> !text.equals(message))
-                .map(text -> Event.of(Event.PROPERTIES_ATTRIBUTES, Event.MARKUP_PROPERTIES, TEXT_CHANGE, Markup.template(text)))
-                // Event handling and broadcasting are done on the UI Thread for simplicity
                 .observeOn(SwingScheduler.getInstance())
-                .subscribe(event::onNext);
+                // Event handling and broadcasting are done on the UI Thread for simplicity
+                .subscribe(text -> engine.broadcast(Event.MARKUP_PROPERTIES, TEXT_CHANGE, text));
+                
+                
         
         noteMsg.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -214,7 +217,7 @@ public class PropertyAttributes extends javax.swing.JPanel {
         Color c = JColorChooser.showDialog(null, "Highlighter Color...", color);
         if (c != null) {
             setColor(c);
-            sendEventToParent(COLOR_CHANGE, c);
+            engine.broadcast(Event.MARKUP_PROPERTIES, COLOR_CHANGE, c);
         }
     }//GEN-LAST:event_labelColorMousePressed
     
@@ -233,24 +236,6 @@ public class PropertyAttributes extends javax.swing.JPanel {
         setMessage("");
         
         return Observable.empty();
-    }
-    
-    /**
-     * Registers the following observable as an event source. This must be called
-     * to receive events from other components.
-     * @param source 
-     */
-    public void addEventSource(Observable<Event> source) {
-        source.filter(this::eventForUs).subscribe(event::onNext);
-    }
-    
-    /**
-     * Returns our own Subject as an event source for listeners. This must be used
-     * to receive events from this component.
-     * @return Our event source
-     */
-    public Observable<Event> getEventSource() {
-        return event;
     }
     
     public Color getColor() {
@@ -277,12 +262,4 @@ public class PropertyAttributes extends javax.swing.JPanel {
     private javax.swing.JTextArea noteMsg;
     private javax.swing.JLabel textLabel;
     // End of variables declaration//GEN-END:variables
-
-    private void sendEventToParent(int eventTag, Object data) {
-        event.onNext(Event.of(Event.PROPERTIES_ATTRIBUTES, Event.MARKUP_PROPERTIES, eventTag, data));
-    }
-    
-    private boolean eventForUs(Event e) {
-        return e.getSender() !=  Event.PROPERTIES_ATTRIBUTES && e.getRecipient() == Event.PROPERTIES_ATTRIBUTES;
-    }
 }

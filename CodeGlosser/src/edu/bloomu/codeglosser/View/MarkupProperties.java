@@ -32,6 +32,8 @@ package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Controller.MarkupController;
 import edu.bloomu.codeglosser.Events.Event;
+import edu.bloomu.codeglosser.Events.EventEngine;
+import edu.bloomu.codeglosser.Events.EventHandler;
 import edu.bloomu.codeglosser.Model.Markup;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
@@ -47,92 +49,63 @@ import java.util.logging.Logger;
  * PropertiesAttributes, and PropertiesSelector. Due to technical difficulties
  * with NetBeans, we reserve space for all attributes and add them manually. 
  */
-public class MarkupProperties extends javax.swing.JPanel {
+public class MarkupProperties extends javax.swing.JPanel implements EventHandler {
     
+    // MarkupController
     public static final int FILE_SELECTED = 0x1;
     public static final int APPLY_TEMPLATE = 0x2;
     
+    // PropertySelector
     public static final int CLEAR_SELECTION = 0x1;
     public static final int NEW_SELECTION = 0x2;
-
+    
+    // PropertyAttributes
     public static final int CLEAR_ATTRIBUTES = 0x1;
     public static final int SET_ATTRIBUTES = 0x2;
     
     private static final Logger LOG = Logger.getLogger(MarkupProperties.class.getName());
     
-    // Event Multiplexer
-    private final PublishSubject<Event> event = PublishSubject.create();
+    private final EventEngine engine = new EventEngine(this, Event.MARKUP_PROPERTIES);
 
     public MarkupProperties() {
         // Initialize components
         initComponents();
         initChildren();
-        
-        // Handle receiving events
-        event
-                .filter(this::eventForUs)
-                .doOnNext(e -> LOG.info("Processing Event..."))
-                .flatMap(e -> {
-                    switch (e.getSender()) {
-                        case Event.MARKUP_CONTROLLER:
-                            switch (e.getCustom()) {
-                                case MarkupController.NEW_MARKUP:
-                                    return newMarkup((Markup) e.data);
-                                default:
-                                    throw new RuntimeException("Bad Custom Tag!");
-                            }
-                        case Event.PROPERTIES_ATTRIBUTES:
-                            switch (e.getCustom()) {
-                                case PropertyAttributes.TEXT_CHANGE:
-                                    return textChange((String) e.data);
-                            }
-                        case Event.PROPERTIES_FILES:
-                            switch (e.getCustom()) {
-                                case PropertyFiles.FILE_SELECTED:
-                                    return fileSelected((Path) e.data);
-                            }
-                        default:
-                            throw new RuntimeException("Bad Sender!");
-                    }
-                })
-                .subscribe(event::onNext);
-                
-        
+    }
+    
+    @Override
+    public Observable<Event> handleEvent(Event e) {
+        switch (e.getSender()) {
+            case Event.MARKUP_CONTROLLER:
+                switch (e.getCustom()) {
+                    case MarkupController.NEW_MARKUP:
+                        return newMarkup((Markup) e.data);
+                    default:
+                        throw new RuntimeException("Bad Custom Tag!");
+                }
+            case Event.PROPERTIES_ATTRIBUTES:
+                switch (e.getCustom()) {
+                    case PropertyAttributes.TEXT_CHANGE:
+                        return textChange((String) e.data);
+                }
+            case Event.PROPERTIES_FILES:
+                switch (e.getCustom()) {
+                    case PropertyFiles.FILE_SELECTED:
+                        return fileSelected((Path) e.data);
+                }
+            default:
+                throw new RuntimeException("Bad Sender!");
+        }
+    }
+
+    @Override
+    public EventEngine getEventEngine() {
+        return engine;
     }
     
     private void initChildren() {
-        propertyFiles.addEventSource(event);
-        propertyFiles.getEventSource().subscribe(event::onNext);
-        propertyAttributes.addEventSource(event);
-        propertyAttributes.getEventSource().subscribe(event::onNext);
-    }
-    
-    /**
-     * Predicate to determine if the event sent was meant for us.
-     *
-     * @param e Event
-     * @return If meant for us
-     */
-    private boolean eventForUs(Event e) {
-        return e.getSender() != Event.MARKUP_PROPERTIES && e.getRecipient() == Event.MARKUP_PROPERTIES;
-    }
-    
-    /**
-     * Registers the following observable as an event source. This must be called
-     * to receive events from other components.
-     * @param source 
-     */
-    public void addEventSource(Observable<Event> source) {
-        source.filter(this::eventForUs).subscribe(event::onNext);
-    }
-    
-    /**
-     * Returns our own Subject as an event source for listeners. This must be used
-     * to receive events from this component.
-     * @return Our event source
-     */
-    public Observable<Event> getEventSource() {
-        return event;
+        engine.register(propertyFiles.getEventEngine());
+        engine.register(propertyAttributes.getEventEngine());
     }
     
     /**

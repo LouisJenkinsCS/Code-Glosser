@@ -31,6 +31,8 @@
 package edu.bloomu.codeglosser.Controller;
 
 import edu.bloomu.codeglosser.Events.Event;
+import edu.bloomu.codeglosser.Events.EventEngine;
+import edu.bloomu.codeglosser.Events.EventHandler;
 import edu.bloomu.codeglosser.Model.MarkupViewModel;
 import edu.bloomu.codeglosser.Utils.HTMLGenerator;
 import edu.bloomu.codeglosser.View.MarkupView;
@@ -51,6 +53,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,7 +64,7 @@ import org.openide.util.Exceptions;
  *
  * @author Louis
  */
-public class MarkupController {
+public class MarkupController implements EventHandler {
     
     // MarkupProperties events
     public static final int NEW_MARKUP = 0x1;
@@ -82,76 +85,49 @@ public class MarkupController {
     // identifier for it to map correctly, so the current tag must be unique.
     private final IdentifierGenerator idGen = new IdentifierGenerator("Markup");
     
-    // Our event multiplexer
-    private final PublishSubject<Event> event = PublishSubject.create();
+    private final EventEngine engine = new EventEngine(this, Event.MARKUP_CONTROLLER);
     
     public MarkupController() {
-        // Handle receiving events
-        event
-                .filter(this::eventForUs)
-                .doOnNext(e -> LOG.info("Processing Event..."))
-                .flatMap(e -> {
-                    switch (e.getSender()) {
-                        case Event.MARKUP_VIEW:
-                            switch (e.getCustom()) {
-                                // Handle MarkupView's events
-                                case MarkupView.CREATE_MARKUP:
-                                    return createMarkup((Bounds []) e.data);
-                                case MarkupView.DELETE_MARKUP:
-                                    return deleteMarkup();
-                                case MarkupView.GET_MARKUP_SELECTION:
-                                     return getMarkupSelection((Bounds) e.data);
-                                case MarkupView.EXPORT_PROJECT:
-                                    return exportProject();
-                                case MarkupView.PREVIEW_HTML:
-                                    return previewHTML((MarkupViewModel) e.data);
-                                case MarkupView.SAVE_SESSION:
-                                    return saveSession();
-                                default:
-                                    throw new RuntimeException("Bad Custom Tag for MarkupView!");
-                            }
-                        case Event.MARKUP_PROPERTIES:
-                            switch (e.getCustom()) {
-                                case MarkupProperties.FILE_SELECTED:
-                                    return fileSelected((Path) e.data);
-                                case MarkupProperties.APPLY_TEMPLATE:
-                                    return applyTemplate((Markup) e.data);
-                                default:
-                                    throw new RuntimeException("Bad Custom Tag for MarkupProperties!");
-                            }
-                        default:
-                            throw new RuntimeException("Bad Sender!");
-                    }
-                })
-                .subscribe(event::onNext);
+
     }
     
-    /**
-     * Predicate to determine if the event sent was meant for us.
-     *
-     * @param e Event
-     * @return If meant for us
-     */
-    private boolean eventForUs(Event e) {
-        return e.getSender() != Event.MARKUP_CONTROLLER && e.getRecipient() == Event.MARKUP_CONTROLLER;
+    @Override
+    public Observable<Event> handleEvent(Event e) {
+        switch (e.getSender()) {
+            case Event.MARKUP_VIEW:
+                switch (e.getCustom()) {
+                    case MarkupView.CREATE_MARKUP:
+                        return createMarkup((Bounds []) e.data);
+                    case MarkupView.DELETE_MARKUP:
+                        return deleteMarkup();
+                    case MarkupView.GET_MARKUP_SELECTION:
+                         return getMarkupSelection((Bounds) e.data);
+                    case MarkupView.EXPORT_PROJECT:
+                        return exportProject();
+                    case MarkupView.PREVIEW_HTML:
+                        return previewHTML((MarkupViewModel) e.data);
+                    case MarkupView.SAVE_SESSION:
+                        return saveSession();
+                    default:
+                        throw new RuntimeException("Bad Custom Tag for MarkupView!");
+                }
+            case Event.MARKUP_PROPERTIES:
+                switch (e.getCustom()) {
+                    case MarkupProperties.FILE_SELECTED:
+                        return fileSelected((Path) e.data);
+                    case MarkupProperties.APPLY_TEMPLATE:
+                        return applyTemplate((Markup) e.data);
+                    default:
+                        throw new RuntimeException("Bad Custom Tag for MarkupProperties!");
+                }
+            default:
+                throw new RuntimeException("Bad Sender!");
+        }
     }
-    
-    /**
-     * Registers the following observable as an event source. This must be called
-     * to receive events from other components.
-     * @param source 
-     */
-    public void addEventSource(Observable<Event> source) {
-        source.filter(this::eventForUs).subscribe(event::onNext);
-    }
-    
-    /**
-     * Returns our own Subject as an event source for listeners. This must be used
-     * to receive events from this component.
-     * @return Our event source
-     */
-    public Observable<Event> getEventSource() {
-        return event;
+
+    @Override
+    public EventEngine getEventEngine() {
+        return engine;
     }
     
     private Observable<Event> applyTemplate(Markup template) {
@@ -177,17 +153,15 @@ public class MarkupController {
      * @param bounds Boundary of the created markup.
      */
     private Observable<Event> createMarkup(Bounds[] bounds) {
-        LOG.info("Creating markup with offsets... " + bounds);
+        LOG.info("Creating markup with offsets... " + Arrays.toString(bounds));
+        
         // Create a new markup
         String id = idGen.getNextId();
         currentMarkup = new Markup("", id, bounds);
         markupMap.put(id, currentMarkup);
         
         // Notify the MarkupProperties to display new Markup.
-        sendEventToProperties(NEW_MARKUP, currentMarkup);
-        
-        // TODO
-        return null;
+        return Observable.just(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, NEW_MARKUP, currentMarkup));
     }
     
     /**
@@ -197,22 +171,29 @@ public class MarkupController {
      */
     private Observable<Event> deleteMarkup() {
         LOG.info("Deleting current markup...");
+        
+        Observable<Event> obs;
+        
         // We can only delete the markup if one is currently selected
         if (currentMarkup != null) {
-            LOG.log(Level.INFO, "Current Markup: {0}", currentMarkup.getId());
-            // Broadcast event
-            sendEventToView(REMOVE_HIGHLIGHTS, currentMarkup);
-            sendEventToProperties(REMOVE_MARKUP, currentMarkup);
-            
-            // Remove markup
-            markupMap.remove(currentMarkup.getId());
+            // Remove markup and propagate event
+            obs = Observable
+                    .just(currentMarkup)
+                    .doOnNext(markup -> LOG.log(Level.INFO, "Current Markup: {0}", markup))
+                    .doOnNext(markup -> markupMap.remove(markup.getId()))
+                    // Inform MarkupView and MarkupProperties
+                    .flatMap(markup -> Observable.just(
+                            Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, REMOVE_HIGHLIGHTS, markup),
+                            Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, REMOVE_MARKUP, markup)
+                    ));
+                    
             currentMarkup = null;
         } else {
             LOG.info("No current markup selected...");
+            obs = Observable.empty();
         }
         
-        // TODO
-        return null;
+        return obs;
     }
     
     /**
@@ -243,8 +224,7 @@ public class MarkupController {
             Exceptions.printStackTrace(ex);
         }
         
-        // TODO
-        return null;
+        return Observable.empty();
     }
 
     private Observable<Event> fileSelected(Path filePath) {
@@ -272,30 +252,25 @@ public class MarkupController {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    private void sendEventToProperties(int eventTag, Object data) {
-        event.onNext(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, eventTag, data));
-    }
-    
-    private void sendEventToView(int eventTag, Object data) {
-        event.onNext(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, eventTag, data));
-    }
-
     /**
      * Notify the MarkupView of the boundary of a markup that is in range of the
      * selection.
      * @param b Bounds to check.
      */
-    private Observable<Event> getMarkupSelection(Bounds b) {
-        LOG.log(Level.INFO, "Obtaining Markup Selection for boundary: {0}", b);
-        markupMap
-                .values()
-                .stream()
-                .map(Markup::getRange)
-                .filter(bounds -> !bounds.collidesWith(b))
-                .findAny()
-                .ifPresent(bounds -> sendEventToView(SET_CURSOR, bounds));
+    private Observable<Event> getMarkupSelection(Bounds bounds) {
+        LOG.log(Level.INFO, "Obtaining Markup Selection for boundary: {0}", bounds);
         
-        // TODO
-        return null;
+        // Return markup selections (if present)
+        return Observable
+                .fromIterable(markupMap.values())
+                // Handle in background
+                .observeOn(Schedulers.computation())
+                // Obtain the range from start to finish (not the segmented one)
+                .map(Markup::getRange)
+                .filter(bounds::collidesWith)
+                .take(1)
+                .map(bound -> Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, SET_CURSOR, bound))
+                // Switch back to Swing UI thread
+                .observeOn(SwingScheduler.getInstance());
     }
 }
