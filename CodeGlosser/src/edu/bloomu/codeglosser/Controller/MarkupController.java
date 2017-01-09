@@ -44,11 +44,13 @@ import edu.bloomu.codeglosser.Utils.SwingScheduler;
 import edu.bloomu.codeglosser.View.MarkupProperties;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
+import java.awt.Color;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,13 +64,14 @@ import org.openide.util.Exceptions;
 public class MarkupController {
     
     // MarkupProperties events
-    public static final int NEW_MARKUP = 1 << 0;
-    public static final int REMOVE_MARKUP = 1 << 1;
+    public static final int NEW_MARKUP = 0x1;
+    public static final int REMOVE_MARKUP = 0x2;
     
     // MarkupView events
-    public static final int REMOVE_HIGHLIGHTS = 1 << 0;
-    public static final int SET_CURSOR = 1 << 1;
-    public static final int FILE_SELECTED = 1 << 2;
+    public static final int REMOVE_HIGHLIGHTS = 0x1;
+    public static final int CHANGE_HIGHLIGHT_COLOR = 0x2;
+    public static final int SET_CURSOR = 0x3;
+    public static final int FILE_SELECTED = 0x4;
     
     private static final Logger LOG = Logger.getLogger(MarkupController.class.getName());
     
@@ -111,6 +114,8 @@ public class MarkupController {
                             switch (e.getCustom()) {
                                 case MarkupProperties.FILE_SELECTED:
                                     return fileSelected((Path) e.data);
+                                case MarkupProperties.APPLY_TEMPLATE:
+                                    return applyTemplate((Markup) e.data);
                                 default:
                                     throw new RuntimeException("Bad Custom Tag for MarkupProperties!");
                             }
@@ -147,6 +152,22 @@ public class MarkupController {
      */
     public Observable<Event> getEventSource() {
         return event;
+    }
+    
+    private Observable<Event> applyTemplate(Markup template) {
+        ArrayList<Event> events = new ArrayList<>();
+        Color c = template.getHighlightColor();
+        String msg = template.getMsg();
+        if (c != null) {
+            currentMarkup.setHighlightColor(c);
+            events.add(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, CHANGE_HIGHLIGHT_COLOR, c));
+        }
+        
+        if (msg != null) {
+            currentMarkup.setMsg(msg);
+        }
+        
+        return Observable.fromIterable(events);
     }
     
     /**

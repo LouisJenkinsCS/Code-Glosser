@@ -36,6 +36,7 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.logging.Logger;
 import edu.bloomu.codeglosser.Events.Event;
+import edu.bloomu.codeglosser.Exceptions.InvalidTextSelectionException;
 import edu.bloomu.codeglosser.HTML.Java2HTML;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Model.MarkupViewModel;
@@ -56,6 +57,7 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
 import javax.swing.text.Highlighter.HighlightPainter;
 import org.javatuples.Pair;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -151,8 +153,17 @@ public class MarkupView extends javax.swing.JPanel {
                 LOG.info("Markup already exists...");
                 return;
             }
-
-            sendEventToController(CREATE_MARKUP, b);
+            
+            try {
+                // Segment boundary
+                Bounds[] bounds = model.segmentRange(b);
+                addMarkup(bounds);
+                sendEventToController(CREATE_MARKUP, bounds);
+            } catch (InvalidTextSelectionException ex) {
+                LOG.severe("Bad Bounds!!!");
+                return;
+            }
+            
         });
 
         deleteMarkup.addActionListener(e -> {

@@ -43,6 +43,21 @@ import java.util.List;
 public class Markup {
     public static Markup DEFAULT = new Markup("", "<None Selected>");
     
+    public static Markup template(String msg, Color c) {
+        Markup m = new Markup(msg, null, new Bounds[] {});
+        m.setHighlightColor(null);
+        return m;
+        
+    }
+    
+    public static Markup template(String msg) {
+        return template(msg, null);
+    }
+    
+    public static Markup template(Color c) {
+        return template(null, c);
+    }
+    
     private String msg;
     private String id;
     private List<Bounds> offsets = new ArrayList<>();

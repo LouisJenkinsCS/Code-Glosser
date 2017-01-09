@@ -31,20 +31,36 @@
 package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Events.Event;
+import edu.bloomu.codeglosser.Model.Markup;
+import edu.bloomu.codeglosser.Utils.SwingScheduler;
 import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import java.awt.Color;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 import javax.swing.JColorChooser;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /**
  *
  * @author Louis Jenkins
  */
 public class PropertyAttributes extends javax.swing.JPanel {
+
+    private static final Logger LOG = Logger.getLogger(PropertyAttributes.class.getName());
     
-    public static final int COLOR_CHANGE = 1 << 0;
+    public static final int COLOR_CHANGE = 0x1;
+    public static final int TEXT_CHANGE = 0x2;
+    
+    // Determines how many milliseconds of time must pass between the last user input
+    // before automatically saving it. This is very useful in both performance and user
+    // experience.
+    private static final long TEXT_CHANGE_DEBOUNCE = 500;
     
     private Color color = Color.YELLOW;
+    private String message = "";
     
     // Event Multiplexer
     private final PublishSubject<Event> event = PublishSubject.create();
@@ -52,20 +68,64 @@ public class PropertyAttributes extends javax.swing.JPanel {
     public PropertyAttributes() {
         // Initialize GUI components
         initComponents();
+        initListeners();
         setColor(Color.YELLOW);
         
         // Handle receiving events
         event
                 .filter(this::eventForUs)
-                .subscribe(e -> {
+                .doOnNext(ignored -> LOG.info("Processing Event..."))
+                .flatMap(e -> {
                    switch (e.getSender()) {
                        case Event.MARKUP_PROPERTIES:
                            switch (e.getCustom()) {
-                               // TODO
+                               case MarkupProperties.SET_ATTRIBUTES:
+                                   return setAttributes((Markup) e.data);
+                               case MarkupProperties.CLEAR_ATTRIBUTES:
+                                   return clearAttributes();
+                               default:
+                                   throw new RuntimeException("Bad Custom Tag from MarkupProperties!");
                            }
-                           break;
+                       default:
+                           throw new RuntimeException("Bad Sender!");
                    }
-                });
+                })
+                .subscribe(event::onNext);
+    }
+    
+    private void initListeners() {
+        PublishSubject<String> textChange = PublishSubject.create();
+        
+        // Handle any text change events
+        textChange
+                // We throttle text change events from the user to relieve backpressure.
+                // As well, all internal work is kept off the UI Thread and on a CPU-Bound one.
+                .debounce(TEXT_CHANGE_DEBOUNCE, TimeUnit.MILLISECONDS, Schedulers.computation())
+                .doOnNext(ignored -> LOG.info("Processing Text Change event"))
+                // We only proceed if the message != text, because 'setText' can trigger this
+                .filter(text -> !text.equals(message))
+                .map(text -> Event.of(Event.PROPERTIES_ATTRIBUTES, Event.MARKUP_PROPERTIES, TEXT_CHANGE, Markup.template(text)))
+                // Event handling and broadcasting are done on the UI Thread for simplicity
+                .observeOn(SwingScheduler.getInstance())
+                .subscribe(event::onNext);
+        
+        noteMsg.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                textChange.onNext(noteMsg.getText());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                textChange.onNext(noteMsg.getText());
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                textChange.onNext(noteMsg.getText());
+            }
+            
+        });
     }
 
     /**
@@ -157,14 +217,40 @@ public class PropertyAttributes extends javax.swing.JPanel {
             sendEventToParent(COLOR_CHANGE, c);
         }
     }//GEN-LAST:event_labelColorMousePressed
-
+    
+    private Observable<Event> setAttributes(Markup markup) {
+        LOG.info("Setting attributes: " + markup);
+        setColor(markup.getHighlightColor());
+        setMessage(markup.getMsg());
+        
+        return Observable.empty();
+    }
+    
+    private Observable<Event> clearAttributes() {
+        LOG.info("Clearing attributes...");
+        
+        setColor(Color.YELLOW);
+        setMessage("");
+        
+        return Observable.empty();
+    }
+    
     /**
      * Registers the following observable as an event source. This must be called
      * to receive events from other components.
      * @param source 
      */
     public void addEventSource(Observable<Event> source) {
-        source.subscribe(event::onNext);
+        source.filter(this::eventForUs).subscribe(event::onNext);
+    }
+    
+    /**
+     * Returns our own Subject as an event source for listeners. This must be used
+     * to receive events from this component.
+     * @return Our event source
+     */
+    public Observable<Event> getEventSource() {
+        return event;
     }
     
     public Color getColor() {
@@ -176,6 +262,11 @@ public class PropertyAttributes extends javax.swing.JPanel {
        labelColor.setBackground(c);
        labelColor.setForeground(c);
        labelRGB.setText("(" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + ")");
+    }
+    
+    public void setMessage(String msg) {
+        message = msg;
+        noteMsg.setText(msg);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -192,6 +283,6 @@ public class PropertyAttributes extends javax.swing.JPanel {
     }
     
     private boolean eventForUs(Event e) {
-        return (e.getRecipient() & Event.PROPERTIES_ATTRIBUTES) != 0;
+        return e.getSender() !=  Event.PROPERTIES_ATTRIBUTES && e.getRecipient() == Event.PROPERTIES_ATTRIBUTES;
     }
 }

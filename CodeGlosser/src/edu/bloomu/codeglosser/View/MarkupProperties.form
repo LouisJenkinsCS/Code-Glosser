@@ -60,7 +60,7 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="edu.bloomu.codeglosser.View.propertyNoteName" name="propertySelector">
+        <Component class="edu.bloomu.codeglosser.View.PropertySelector" name="propertySelector">
         </Component>
         <Component class="edu.bloomu.codeglosser.View.PropertyAttributes" name="propertyAttributes">
         </Component>

@@ -30,9 +30,12 @@
  */
 package edu.bloomu.codeglosser.View;
 
+import edu.bloomu.codeglosser.Controller.MarkupController;
 import edu.bloomu.codeglosser.Events.Event;
+import edu.bloomu.codeglosser.Model.Markup;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
+import java.awt.Color;
 import java.nio.file.Path;
 import java.util.logging.Logger;
 
@@ -46,11 +49,14 @@ import java.util.logging.Logger;
  */
 public class MarkupProperties extends javax.swing.JPanel {
     
-    public static final int FILE_SELECTED = 1 << 0;
+    public static final int FILE_SELECTED = 0x1;
+    public static final int APPLY_TEMPLATE = 0x2;
     
-    public static final int CLEAR_SELECTION = 1 << 0;
+    public static final int CLEAR_SELECTION = 0x1;
+    public static final int NEW_SELECTION = 0x2;
 
-    public static final int CLEAR_ATTRIBUTES = 1 << 0;
+    public static final int CLEAR_ATTRIBUTES = 0x1;
+    public static final int SET_ATTRIBUTES = 0x2;
     
     private static final Logger LOG = Logger.getLogger(MarkupProperties.class.getName());
     
@@ -70,8 +76,15 @@ public class MarkupProperties extends javax.swing.JPanel {
                     switch (e.getSender()) {
                         case Event.MARKUP_CONTROLLER:
                             switch (e.getCustom()) {
+                                case MarkupController.NEW_MARKUP:
+                                    return newMarkup((Markup) e.data);
                                 default:
                                     throw new RuntimeException("Bad Custom Tag!");
+                            }
+                        case Event.PROPERTIES_ATTRIBUTES:
+                            switch (e.getCustom()) {
+                                case PropertyAttributes.TEXT_CHANGE:
+                                    return textChange((String) e.data);
                             }
                         case Event.PROPERTIES_FILES:
                             switch (e.getCustom()) {
@@ -90,6 +103,8 @@ public class MarkupProperties extends javax.swing.JPanel {
     private void initChildren() {
         propertyFiles.addEventSource(event);
         propertyFiles.getEventSource().subscribe(event::onNext);
+        propertyAttributes.addEventSource(event);
+        propertyAttributes.getEventSource().subscribe(event::onNext);
     }
     
     /**
@@ -120,24 +135,25 @@ public class MarkupProperties extends javax.swing.JPanel {
         return event;
     }
     
-    private void sendEventToFiles(int eventTag, Object data) {
-        event.onNext(Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_FILES, eventTag, data));
+    /**
+     * Forwards a partially filled template to the MarkupController. Is used for any changes
+     * to the current markup.
+     * @param template Partially filled Markup
+     * @return Observable to emit event.
+     */
+    private Observable<Event> applyTemplate(Markup template) {
+        LOG.info("Propagating event for applying template: " + template);
+        
+        // Make the change as a template
+        return Observable.just(Event.of(Event.MARKUP_PROPERTIES, Event.MARKUP_CONTROLLER, APPLY_TEMPLATE, template));
     }
     
-    private void sendEventToTemplates(int eventTag, Object data) {
-        event.onNext(Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_TEMPLATES, eventTag, data));
+    private Observable<Event> textChange(String text) {
+        return applyTemplate(Markup.template(text));
     }
     
-    private void sendEventToAttributes(int eventTag, Object data) {
-        event.onNext(Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_ATTRIBUTES, eventTag, data));
-    }
-    
-    private void sendEventToSelector(int eventTag, Object data) {
-        event.onNext(Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_SELECTOR, eventTag, data));
-    }
-    
-    private void sendEventToController(int eventTag, Object data) {
-        event.onNext(Event.of(Event.MARKUP_PROPERTIES, Event.MARKUP_CONTROLLER, eventTag, data));
+    private Observable<Event> colorChange(Color c) {
+        return applyTemplate(Markup.template(c));
     }
     
     /**
@@ -150,9 +166,24 @@ public class MarkupProperties extends javax.swing.JPanel {
         
         // Notify controller, selector, and attributes.
         return Observable.just(
+                Event.of(Event.MARKUP_PROPERTIES, Event.MARKUP_CONTROLLER, FILE_SELECTED, filePath),
                 Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_SELECTOR, CLEAR_SELECTION, null),
-                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_ATTRIBUTES, CLEAR_ATTRIBUTES, null),
-                Event.of(Event.MARKUP_PROPERTIES, Event.MARKUP_CONTROLLER, FILE_SELECTED, filePath)
+                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_ATTRIBUTES, CLEAR_ATTRIBUTES, null)                
+        );
+    }
+    
+    /**
+     * Updates the PropertyAttributes and PropertySelector components of new Markup.
+     * @param markup Markup
+     * @return 
+     */
+    private Observable<Event> newMarkup(Markup markup) {
+        LOG.info("Propagating event for new markup: " + markup);
+        
+        // Notify attributes and selector
+        return Observable.just(
+                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_ATTRIBUTES, SET_ATTRIBUTES, markup),
+                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_SELECTOR, NEW_SELECTION, markup)
         );
     }
 
@@ -166,7 +197,7 @@ public class MarkupProperties extends javax.swing.JPanel {
     private void initComponents() {
 
         jInternalFrame1 = new javax.swing.JInternalFrame();
-        propertySelector = new edu.bloomu.codeglosser.View.propertyNoteName();
+        propertySelector = new edu.bloomu.codeglosser.View.PropertySelector();
         propertyAttributes = new edu.bloomu.codeglosser.View.PropertyAttributes();
         tabbedTreeView = new javax.swing.JTabbedPane();
         propertyFiles = new edu.bloomu.codeglosser.View.PropertyFiles();
@@ -218,7 +249,7 @@ public class MarkupProperties extends javax.swing.JPanel {
     private javax.swing.JInternalFrame jInternalFrame1;
     private edu.bloomu.codeglosser.View.PropertyAttributes propertyAttributes;
     private edu.bloomu.codeglosser.View.PropertyFiles propertyFiles;
-    private edu.bloomu.codeglosser.View.propertyNoteName propertySelector;
+    private edu.bloomu.codeglosser.View.PropertySelector propertySelector;
     private edu.bloomu.codeglosser.View.PropertyTreeView propertyTemplates;
     private javax.swing.JTabbedPane tabbedTreeView;
     // End of variables declaration//GEN-END:variables
