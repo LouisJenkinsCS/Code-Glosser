@@ -54,10 +54,12 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
     // MarkupController
     public static final int FILE_SELECTED = 0x1;
     public static final int APPLY_TEMPLATE = 0x2;
+    public static final int SELECTED_ID = 0x3;
     
     // PropertySelector
     public static final int CLEAR_SELECTION = 0x1;
     public static final int NEW_SELECTION = 0x2;
+    public static final int SET_SELECTION = 0x3;
     
     // PropertyAttributes
     public static final int CLEAR_ATTRIBUTES = 0x1;
@@ -80,18 +82,31 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
                 switch (e.getCustom()) {
                     case MarkupController.NEW_MARKUP:
                         return newMarkup((Markup) e.data);
+                    case MarkupController.DISPLAY_MARKUP:
+                        return displayMarkup((Markup) e.data);
                     default:
-                        throw new RuntimeException("Bad Custom Tag!");
+                        throw new RuntimeException("Bad Custom Tag from MarkupController!");
                 }
             case Event.PROPERTIES_ATTRIBUTES:
                 switch (e.getCustom()) {
                     case PropertyAttributes.TEXT_CHANGE:
                         return textChange((String) e.data);
+                    default:
+                        throw new RuntimeException("Bad Custom Tag from PropertyAttributes!");
                 }
             case Event.PROPERTIES_FILES:
                 switch (e.getCustom()) {
                     case PropertyFiles.FILE_SELECTED:
                         return fileSelected((Path) e.data);
+                    default:
+                        throw new RuntimeException("Bad Custom Tag from PropertyFiles!");
+                }
+            case Event.PROPERTIES_SELECTOR:
+                switch (e.getCustom()) {
+                    case PropertySelector.SELECTED_ID:
+                        return selectedId((String) e.data);
+                    default:
+                        throw new RuntimeException("Bad Custom Tag from PropertySelector!");
                 }
             default:
                 throw new RuntimeException("Bad Sender!");
@@ -106,6 +121,22 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
     private void initChildren() {
         engine.register(propertyFiles.getEventEngine());
         engine.register(propertyAttributes.getEventEngine());
+        engine.register(propertySelector.getEventEngine());
+    }
+    
+    private Observable<Event> displayMarkup(Markup markup) {
+        LOG.info("Handling displaying Markup: " + markup);
+        
+        return Observable.just(
+                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_ATTRIBUTES, SET_ATTRIBUTES, markup),
+                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_SELECTOR, SET_SELECTION, markup.getId())
+        );
+    }
+    
+    private Observable<Event> selectedId(String id) {
+        LOG.info("Propagating event for markup selection: " + id);
+        
+        return Observable.just(Event.of(Event.MARKUP_PROPERTIES, Event.MARKUP_CONTROLLER, SELECTED_ID, id));
     }
     
     /**

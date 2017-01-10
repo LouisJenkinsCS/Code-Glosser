@@ -69,6 +69,7 @@ public class MarkupController implements EventHandler {
     // MarkupProperties events
     public static final int NEW_MARKUP = 0x1;
     public static final int REMOVE_MARKUP = 0x2;
+    public static final int DISPLAY_MARKUP = 0x3;
     
     // MarkupView events
     public static final int REMOVE_HIGHLIGHTS = 0x1;
@@ -117,6 +118,8 @@ public class MarkupController implements EventHandler {
                         return fileSelected((Path) e.data);
                     case MarkupProperties.APPLY_TEMPLATE:
                         return applyTemplate((Markup) e.data);
+                    case MarkupProperties.SELECTED_ID:
+                        return selectedId((String) e.data);
                     default:
                         throw new RuntimeException("Bad Custom Tag for MarkupProperties!");
                 }
@@ -128,6 +131,24 @@ public class MarkupController implements EventHandler {
     @Override
     public EventEngine getEventEngine() {
         return engine;
+    }
+    
+    private Observable<Event> selectedId(String id) {
+        LOG.info("Handling event for id selection: " + id);
+        
+        // MarkupView must update its cursor and MarkupProperties needs to be notified
+        return Observable
+                .just(id)
+                // Check if it is currently selected
+                .filter(id_ -> currentMarkup == null || !currentMarkup.getId().equals(id_))
+                // Find the markup's range
+                .map(markupMap::get)
+                // Set as currently selected
+                .doOnNext(markup -> currentMarkup = markup)
+                .flatMap(markup -> Observable.just(
+                        Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, SET_CURSOR, markup.getRange()),
+                        Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, DISPLAY_MARKUP, markup)
+                ));
     }
     
     private Observable<Event> applyTemplate(Markup template) {
@@ -260,17 +281,23 @@ public class MarkupController implements EventHandler {
     private Observable<Event> getMarkupSelection(Bounds bounds) {
         LOG.log(Level.INFO, "Obtaining Markup Selection for boundary: {0}", bounds);
         
-        // Return markup selections (if present)
+        // Return markup selections (if present) and notify MarkupProperties that selection changed
         return Observable
                 .fromIterable(markupMap.values())
                 // Handle in background
                 .observeOn(Schedulers.computation())
-                // Obtain the range from start to finish (not the segmented one)
-                .map(Markup::getRange)
-                .filter(bounds::collidesWith)
+                // Obtain the range from start to end of markup and check for collision
+                .filter(markup -> markup.getRange().collidesWith(bounds))
+                // Note: There should only ever be one, but just in case.
                 .take(1)
-                .map(bound -> Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, SET_CURSOR, bound))
                 // Switch back to Swing UI thread
-                .observeOn(SwingScheduler.getInstance());
+                .observeOn(SwingScheduler.getInstance())
+                // Set as current markup
+                .doOnNext(markup -> currentMarkup = markup)
+                // Broadcast events
+                .flatMap(markup -> Observable.just(
+                        Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, SET_CURSOR, markup.getRange()),
+                        Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, DISPLAY_MARKUP, markup)
+                ));
     }
 }
