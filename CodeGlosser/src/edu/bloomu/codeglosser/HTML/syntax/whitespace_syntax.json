@@ -1,0 +1,68 @@
+{
+    "LANG_NAME": "Whitespace",
+    "COMMENT_SINGLE": [],
+    "COMMENT_MULTI": [],
+    "COMMENT_REGEXP": {
+        "3": "\/[^\n \t]+\/s"
+    },
+    "CASE_KEYWORDS": 1,
+    "QUOTEMARKS": [],
+    "ESCAPE_CHAR": "",
+    "KEYWORDS": [],
+    "SYMBOLS": [],
+    "CASE_SENSITIVE": [
+        false
+    ],
+    "STYLES": {
+        "KEYWORDS": [],
+        "COMMENTS": {
+            "3": "color: #666666; font-style: italic;"
+        },
+        "BRACKETS": [
+            "color: #66cc66;"
+        ],
+        "STRINGS": [
+            "color: #ff0000;"
+        ],
+        "NUMBERS": [],
+        "METHODS": [],
+        "SYMBOLS": [],
+        "ESCAPE_CHAR": [],
+        "SCRIPT": [],
+        "REGEXPS": {
+            "2": "background-color: #FF9999;",
+            "3": "background-color: #9999FF;"
+        }
+    },
+    "URLS": [],
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "REGEXPS": {
+        "2": [
+            "(?<!\\A) ",
+            "&#32;",
+            "s",
+            "",
+            ""
+        ],
+        "3": [
+            "\t",
+            "&#9;",
+            "s",
+            "",
+            ""
+        ]
+    },
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": [],
+    "TAB_WIDTH": 4,
+    "PARSER_CONTROL": {
+        "ENABLE_FLAGS": {
+            "KEYWORDS": 0,
+            "SYMBOLS": 0,
+            "STRINGS": 0,
+            "NUMBERS": 0
+        }
+    }
+}

@@ -1,0 +1,105 @@
+{
+    "LANG_NAME": "INTERCAL",
+    "COMMENT_SINGLE": [],
+    "COMMENT_MULTI": [],
+    "COMMENT_REGEXP": [],
+    "CASE_KEYWORDS": 1,
+    "QUOTEMARKS": [],
+    "ESCAPE_CHAR": "",
+    "KEYWORDS": {
+        "1": [
+            "DO",
+            "DOES",
+            "DONT",
+            "DON'T",
+            "NOT",
+            "PLEASE",
+            "PLEASENT",
+            "PLEASEN'T",
+            "MAYBE"
+        ],
+        "2": [
+            "STASH",
+            "RETRIEVE",
+            "NEXT",
+            "RESUME",
+            "FORGET",
+            "ABSTAIN",
+            "ABSTAINING",
+            "COME",
+            "FROM",
+            "CALCULATING",
+            "REINSTATE",
+            "IGNORE",
+            "REMEMBER",
+            "WRITE",
+            "IN",
+            "READ",
+            "OUT",
+            "GIVE",
+            "UP"
+        ]
+    },
+    "SYMBOLS": [
+        ".",
+        ",",
+        ":",
+        ";",
+        "#",
+        "~",
+        "$",
+        "&",
+        "?",
+        "'",
+        "\"",
+        "<-"
+    ],
+    "CASE_SENSITIVE": [
+        false,
+        false,
+        false
+    ],
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #000080; font-weight: bold;",
+            "2": "color: #000080; font-weight: bold;"
+        },
+        "COMMENTS": [],
+        "BRACKETS": [
+            "color: #66cc66;"
+        ],
+        "STRINGS": [
+            "color: #ff0000;"
+        ],
+        "NUMBERS": [],
+        "METHODS": [],
+        "SYMBOLS": [
+            "color: #66cc66;"
+        ],
+        "ESCAPE_CHAR": [],
+        "SCRIPT": [],
+        "REGEXPS": {
+            "1": "color: #808080; font-style: italic;"
+        }
+    },
+    "URLS": {
+        "1": "",
+        "2": ""
+    },
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "REGEXPS": {
+        "1": "^\\(\\d+\\)"
+    },
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": [],
+    "TAB_WIDTH": 4,
+    "PARSER_CONTROL": {
+        "ENABLE_FLAGS": {
+            "COMMENTS": 0,
+            "STRINGS": 0,
+            "NUMBERS": 0
+        }
+    }
+}

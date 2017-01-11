@@ -1,0 +1,167 @@
+{
+    "LANG_NAME": "Modula-2",
+    "COMMENT_MULTI": {
+        "(*": "*)"
+    },
+    "COMMENT_SINGLE": [],
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [
+        "\""
+    ],
+    "HARDQUOTE": [
+        "'",
+        "'"
+    ],
+    "HARDESCAPE": [
+        "''"
+    ],
+    "ESCAPE_CHAR": "\\",
+    "KEYWORDS": {
+        "1": [
+            "AND",
+            "ARRAY",
+            "BEGIN",
+            "BY",
+            "CASE",
+            "CONST",
+            "DEFINITION",
+            "DIV",
+            "DO",
+            "ELSE",
+            "ELSIF",
+            "END",
+            "EXIT",
+            "EXPORT",
+            "FOR",
+            "FROM",
+            "IF",
+            "IMPLEMENTATION",
+            "IMPORT",
+            "IN",
+            "LOOP",
+            "MOD",
+            "MODULE",
+            "NOT",
+            "OF",
+            "OR",
+            "POINTER",
+            "PROCEDURE",
+            "QUALIFIED",
+            "RECORD",
+            "REPEAT",
+            "RETURN",
+            "SET",
+            "THEN",
+            "TO",
+            "TYPE",
+            "UNTIL",
+            "VAR",
+            "WHILE",
+            "WITH"
+        ],
+        "2": [
+            "NIL",
+            "FALSE",
+            "TRUE"
+        ],
+        "3": [
+            "BITSET",
+            "CAP",
+            "CHR",
+            "DEC",
+            "DISPOSE",
+            "EXCL",
+            "FLOAT",
+            "HALT",
+            "HIGH",
+            "INC",
+            "INCL",
+            "MAX",
+            "MIN",
+            "NEW",
+            "ODD",
+            "ORD",
+            "SIZE",
+            "TRUNC",
+            "VAL"
+        ],
+        "4": [
+            "ABS",
+            "BOOLEAN",
+            "CARDINAL",
+            "CHAR",
+            "INTEGER",
+            "LONGCARD",
+            "LONGINT",
+            "LONGREAL",
+            "PROC",
+            "REAL"
+        ]
+    },
+    "SYMBOLS": [
+        ",",
+        ":",
+        "=",
+        "+",
+        "-",
+        "*",
+        "\/",
+        "#",
+        "~"
+    ],
+    "CASE_SENSITIVE": [
+        false,
+        true,
+        true,
+        true,
+        true
+    ],
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #000000; font-weight: bold;",
+            "2": "color: #000000; font-weight: bold;",
+            "3": "color: #000066;",
+            "4": "color: #000066; font-weight: bold;"
+        },
+        "COMMENTS": {
+            "MULTI": "color: #666666; font-style: italic;"
+        },
+        "ESCAPE_CHAR": {
+            "0": "color: #000099; font-weight: bold;",
+            "HARD": "color: #000099; font-weight: bold;"
+        },
+        "BRACKETS": [
+            "color: #009900;"
+        ],
+        "STRINGS": {
+            "0": "color: #ff0000;",
+            "HARD": "color: #ff0000;"
+        },
+        "NUMBERS": [
+            "color: #cc66cc;"
+        ],
+        "METHODS": {
+            "1": "color: #0066ee;"
+        },
+        "SYMBOLS": [
+            "color: #339933;"
+        ],
+        "REGEXPS": [],
+        "SCRIPT": []
+    },
+    "URLS": {
+        "1": "",
+        "2": "",
+        "3": "",
+        "4": ""
+    },
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": {
+        "1": ""
+    },
+    "REGEXPS": [],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": [],
+    "TAB_WIDTH": 4
+}

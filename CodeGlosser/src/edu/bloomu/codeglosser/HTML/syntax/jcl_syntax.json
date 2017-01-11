@@ -1,0 +1,185 @@
+{
+    "LANG_NAME": "JCL",
+    "COMMENT_SINGLE": [],
+    "COMMENT_MULTI": [],
+    "COMMENT_REGEXP": {
+        "3": "\\\/\\\/\\*[^%](.*?)(\n)"
+    },
+    "CASE_KEYWORDS": 1,
+    "QUOTEMARKS": [
+        "'",
+        "\""
+    ],
+    "ESCAPE_CHAR": "",
+    "KEYWORDS": {
+        "1": [
+            "COMMAND",
+            "CNTL",
+            "DD",
+            "ENDCNTL",
+            "EXEC",
+            "IF",
+            "THEN",
+            "ELSE",
+            "ENDIF",
+            "JCLLIB",
+            "JOB",
+            "OUTPUT",
+            "PEND",
+            "PROC",
+            "SET",
+            "XMIT"
+        ],
+        "2": [
+            "PGM",
+            "CLASS",
+            "NOTIFY",
+            "MSGCLASS",
+            "DSN",
+            "KEYLEN",
+            "LABEL",
+            "LIKE",
+            "RECFM",
+            "LRECL",
+            "DCB",
+            "DSORG",
+            "BLKSIZE",
+            "SPACE",
+            "STORCLAS",
+            "DUMMY",
+            "DYNAM",
+            "AVGREC",
+            "BURST",
+            "DISP",
+            "UNIT",
+            "VOLUME",
+            "MSGLEVEL",
+            "REGION"
+        ],
+        "3": [
+            "ALTSEQ",
+            "DEBUG",
+            "END",
+            "INCLUDE",
+            "INREC",
+            "MERGE",
+            "MODS",
+            "OMIT",
+            "OPTION",
+            "OUTFIL",
+            "OUTREC",
+            "RECORD",
+            "SORT",
+            "SUM",
+            "COPY",
+            "COUNT",
+            "DEFAULTS",
+            "DISPLAY",
+            "MODE",
+            "OCCUR",
+            "RANGE",
+            "SELECT",
+            "STATS",
+            "UNIQUE",
+            "VERIFY"
+        ],
+        "4": [
+            "ALTER",
+            "BLDINDEX",
+            "CNVTCAT",
+            "DEFINE",
+            "ALIAS",
+            "ALTERNATEINDEX",
+            "CLUSTER",
+            "GENERATIONDATAGROUP",
+            "GDG",
+            "NONVSAM",
+            "PAGESPACE",
+            "PATH",
+            "USERCATALOG",
+            "DELETE",
+            "EXAMINE",
+            "EXPORT",
+            "DISCONNECT",
+            "EXPORTRA",
+            "IMPORT",
+            "CONNECT",
+            "IMPORTRA",
+            "LISTCAT",
+            "LISTCRA",
+            "PRINT",
+            "REPRO",
+            "RESETCAT"
+        ]
+    },
+    "SYMBOLS": [
+        "(",
+        ")",
+        "=",
+        ",",
+        ">",
+        "<"
+    ],
+    "CASE_SENSITIVE": [
+        false,
+        false,
+        false,
+        false,
+        false
+    ],
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #FF0000;",
+            "2": "color: #21A502;",
+            "3": "color: #FF00FF;",
+            "4": "color: #876C00;"
+        },
+        "COMMENTS": {
+            "0": "color: #0000FF;",
+            "3": "color: #0000FF;"
+        },
+        "ESCAPE_CHAR": [
+            ""
+        ],
+        "BRACKETS": [
+            "color: #FF7400;"
+        ],
+        "STRINGS": [
+            "color: #66CC66;"
+        ],
+        "NUMBERS": [
+            "color: #336633;"
+        ],
+        "METHODS": {
+            "1": "",
+            "2": ""
+        },
+        "SYMBOLS": [
+            "color: #FF7400;"
+        ],
+        "REGEXPS": [
+            "color: #6B1F6B;",
+            "color: #6B1F6B;",
+            "color: #6B1F6B;"
+        ],
+        "SCRIPT": [
+            ""
+        ]
+    },
+    "URLS": {
+        "1": "",
+        "2": "",
+        "3": "",
+        "4": ""
+    },
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "REGEXPS": [
+        "&amp;&amp;[a-zA-Z]{1,8}[0-9]{0,}",
+        "&amp;[a-zA-Z]{1,8}[0-9]{0,}",
+        "&amp;|\\?|%[a-zA-Z]{1,8}[0-9]{0,}"
+    ],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": []
+}

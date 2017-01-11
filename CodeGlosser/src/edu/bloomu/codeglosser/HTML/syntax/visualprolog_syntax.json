@@ -1,0 +1,167 @@
+{
+    "LANG_NAME": "Visual Prolog",
+    "COMMENT_SINGLE": {
+        "1": "%"
+    },
+    "COMMENT_MULTI": {
+        "\/*": "*\/"
+    },
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [
+        "'",
+        "\""
+    ],
+    "HARDQUOTE": [
+        "@\"",
+        "\""
+    ],
+    "HARDESCAPE": [
+        "\"\""
+    ],
+    "ESCAPE_CHAR": "\\",
+    "KEYWORDS": {
+        "1": [
+            "clauses",
+            "constants",
+            "constructors",
+            "delegate",
+            "domains",
+            "facts",
+            "goal",
+            "guards",
+            "inherits",
+            "monitor",
+            "namespace",
+            "open",
+            "predicates",
+            "properties",
+            "resolve",
+            "supports"
+        ],
+        "2": [
+            "align",
+            "and",
+            "anyflow",
+            "as",
+            "bitsize",
+            "catch",
+            "determ",
+            "digits",
+            "div",
+            "do",
+            "else",
+            "elseif",
+            "erroneous",
+            "externally",
+            "failure",
+            "finally",
+            "from",
+            "language",
+            "mod",
+            "multi",
+            "nondeterm",
+            "or",
+            "procedure",
+            "quot",
+            "rem",
+            "single",
+            "then",
+            "to"
+        ],
+        "3": [
+            "#bininclude",
+            "#else",
+            "#elseif",
+            "#endif",
+            "#error",
+            "#export",
+            "#externally",
+            "#if",
+            "#import",
+            "#include",
+            "#message",
+            "#options",
+            "#orrequires",
+            "#requires",
+            "#then",
+            "#warning"
+        ]
+    },
+    "SYMBOLS": [
+        "+",
+        "-",
+        "*",
+        "?",
+        "=",
+        "\/",
+        ">",
+        "<",
+        "^",
+        "!",
+        ":",
+        "(",
+        ")",
+        "{",
+        "}",
+        "[",
+        "]"
+    ],
+    "CASE_SENSITIVE": [
+        true,
+        true,
+        true,
+        true
+    ],
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #808000;",
+            "2": "color: #333399;",
+            "3": "color: #800080;"
+        },
+        "COMMENTS": {
+            "1": "color: #AA77BD",
+            "MULTI": "color: #AA77BD"
+        },
+        "ESCAPE_CHAR": [
+            "color: #008080;"
+        ],
+        "BRACKETS": [
+            "color: #000000;"
+        ],
+        "STRINGS": [
+            "color: #00B7B7;"
+        ],
+        "NUMBERS": [
+            "color: #0000FF;"
+        ],
+        "METHODS": [],
+        "SYMBOLS": [
+            "color: #000000;"
+        ],
+        "SCRIPT": [],
+        "REGEXPS": [
+            "color: #008000;",
+            "color: #808000;",
+            "color: #333399;"
+        ]
+    },
+    "URLS": {
+        "1": "",
+        "2": "",
+        "3": ""
+    },
+    "OOLANG": true,
+    "OBJECT_SPLITTERS": {
+        "1": ":",
+        "2": "::"
+    },
+    "REGEXPS": [
+        "(?<![a-zA-Z0-9_])(?!(?:PIPE|SEMI)>)[A-Z_]\\w*(?!\\w)",
+        "\\b(end\\s+)?(implement|class|interface)\\b",
+        "\\b(end\\s+)?(foreach|if|try)\\b"
+    ],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": [],
+    "TAB_WIDTH": 4
+}

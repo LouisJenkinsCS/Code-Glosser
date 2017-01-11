@@ -1,0 +1,107 @@
+{
+    "LANG_NAME": "FreeSWITCH",
+    "COMMENT_SINGLE": {
+        "1": "#"
+    },
+    "COMMENT_MULTI": [],
+    "COMMENT_REGEXP": {
+        "1": "\/^Comment:.*?$\/m"
+    },
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [],
+    "ESCAPE_CHAR": "",
+    "KEYWORDS": [],
+    "SYMBOLS": [],
+    "CASE_SENSITIVE": [
+        false
+    ],
+    "STYLES": {
+        "KEYWORDS": [],
+        "COMMENTS": {
+            "1": "color: #808080; font-style: italic;"
+        },
+        "ESCAPE_CHAR": [
+            "color: #000099; font-weight: bold;"
+        ],
+        "BRACKETS": [],
+        "STRINGS": [],
+        "NUMBERS": [],
+        "METHODS": [],
+        "SYMBOLS": [],
+        "REGEXPS": [
+            "color: firebrick; font-weight: bold;",
+            "color: cornflowerblue; font-weight: bold;",
+            "color: goldenrod; font-weight: bold;",
+            "color: green; font-weight: bold;",
+            "color: dimgrey; font-style: italic;",
+            "color: green; font-weight: bold;",
+            "color: firebrick; font-weight: bold;",
+            "color: indigo; font-weight: italic;"
+        ],
+        "SCRIPT": []
+    },
+    "URLS": [],
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "REGEXPS": [
+        [
+            "(^.*ERROR.*)",
+            "\\1",
+            "im",
+            "",
+            ""
+        ],
+        [
+            "(^.*NOTICE.*)",
+            "\\1",
+            "im",
+            "",
+            ""
+        ],
+        [
+            "(^.*DEBUG.*)",
+            "\\1",
+            "m",
+            "",
+            ""
+        ],
+        [
+            "(^.*INFO.*|.*info\\(.*|^Channel.*|^Caller.*|^variable.*)",
+            "\\1",
+            "m",
+            "",
+            ""
+        ],
+        [
+            "(^Dialplan.*)",
+            "\\1",
+            "im",
+            "",
+            ""
+        ],
+        [
+            "(Regex\\ \\(PASS\\))",
+            "\\1",
+            "",
+            "",
+            ""
+        ],
+        [
+            "(Regex\\ \\(FAIL\\))",
+            "\\1",
+            "",
+            "",
+            ""
+        ],
+        [
+            "(\\d{7,15})",
+            "\\1",
+            "",
+            "",
+            ""
+        ]
+    ],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": []
+}

@@ -1,0 +1,190 @@
+{
+    "LANG_NAME": "LOLcode",
+    "COMMENT_SINGLE": [
+        "BTW"
+    ],
+    "COMMENT_MULTI": [
+        "BTW",
+        "WTB"
+    ],
+    "COMMENT_REGEXP": {
+        "1": "\/\\bBTW\\b.*$\/im",
+        "2": "\/(^|\\b)(?:OBTW\\b.+?\\bTLDR|LOL\\b.+?\\\/LOL)(\\b|$)\/si"
+    },
+    "CASE_KEYWORDS": 1,
+    "QUOTEMARKS": [
+        "\""
+    ],
+    "ESCAPE_CHAR": "",
+    "ESCAPE_REGEXP": {
+        "1": "\/:[)>o\":]\/",
+        "2": "\/:\\([\\da-f]+\\)\/i",
+        "3": "\/:\\{\\w+\\}\/i",
+        "4": "\/:\\[\\w+\\]\/i"
+    },
+    "KEYWORDS": {
+        "1": [
+            "VISIBLE",
+            "HAI",
+            "KTHX",
+            "KTHXBYE",
+            "SMOOSH",
+            "GIMMEH",
+            "PLZ",
+            "ON",
+            "INVISIBLE",
+            "R",
+            "ITZ",
+            "GTFO",
+            "COMPLAIN",
+            "GIMME",
+            "OPEN",
+            "FILE",
+            "I HAS A",
+            "AWSUM THX",
+            "O NOES",
+            "CAN",
+            "HAS",
+            "HAZ",
+            "HOW DOES I",
+            "IF U SAY SO",
+            "FOUND YR",
+            "BORROW",
+            "OWN",
+            "ALONG",
+            "WITH",
+            "WIT",
+            "LOOK",
+            "AT",
+            "AWSUM",
+            "THX"
+        ],
+        "2": [
+            "IZ",
+            "YARLY",
+            "NOWAI",
+            "WTF?",
+            "MEBBE",
+            "OMG",
+            "OMGWTF",
+            "ORLY?",
+            "OF",
+            "NOPE",
+            "SO",
+            "IM",
+            "MAI",
+            "O RLY?",
+            "SUM",
+            "BOTH SAEM",
+            "DIFFRINT",
+            "BOTH",
+            "EITHER",
+            "WON",
+            "DIFF",
+            "PRODUKT",
+            "QUOSHUNT",
+            "MOD",
+            "MKAY",
+            "OK",
+            "THING",
+            "BIGNESS"
+        ],
+        "3": [
+            "IN",
+            "OUTTA",
+            "LOOP",
+            "WHILE"
+        ],
+        "4": [
+            "AN",
+            "AND",
+            "NOT",
+            "UP",
+            "YR",
+            "UPPIN",
+            "NERF",
+            "NERFIN",
+            "NERFZ",
+            "SMASHING",
+            "UR",
+            "KINDA",
+            "LIKE",
+            "SAEM",
+            "BIG",
+            "SMALL",
+            "BIGGR",
+            "SMALLR",
+            "BIGGER",
+            "SMALLER",
+            "GOOD",
+            "CUTE",
+            "THAN"
+        ]
+    },
+    "SYMBOLS": [
+        ".",
+        ",",
+        "?",
+        "!!"
+    ],
+    "CASE_SENSITIVE": [
+        false,
+        false,
+        false,
+        false,
+        false
+    ],
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #008000;",
+            "2": "color: #000080;",
+            "3": "color: #000080;",
+            "4": "color: #800000;"
+        },
+        "COMMENTS": [
+            "color: #666666; style: italic;",
+            "color: #666666; style: italic;",
+            "color: #666666; style: italic;"
+        ],
+        "BRACKETS": [
+            "color: #66cc66;"
+        ],
+        "STRINGS": [
+            "color: #ff0000;"
+        ],
+        "NUMBERS": [
+            "color: #00F;"
+        ],
+        "METHODS": [
+            "color: #0F0;"
+        ],
+        "SYMBOLS": [
+            "color: #66cc66;"
+        ],
+        "ESCAPE_CHAR": [
+            "color: #00F;"
+        ],
+        "SCRIPT": [
+            "color: #00F;"
+        ],
+        "REGEXPS": []
+    },
+    "URLS": {
+        "1": "",
+        "2": "",
+        "3": "",
+        "4": ""
+    },
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "REGEXPS": [],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": [],
+    "PARSER_CONTROL": {
+        "KEYWORDS": {
+            "SPACE_AS_WHITESPACE": true
+        }
+    },
+    "TAB_WIDTH": 4
+}

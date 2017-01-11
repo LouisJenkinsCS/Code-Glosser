@@ -1,0 +1,133 @@
+{
+    "LANG_NAME": "ParaSail",
+    "COMMENT_SINGLE": {
+        "1": "\/\/"
+    },
+    "COMMENT_MULTI": {
+        "{": "}"
+    },
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [
+        "\""
+    ],
+    "ESCAPE_CHAR": "\\",
+    "KEYWORDS": {
+        "1": [
+            "all",
+            "block",
+            "case",
+            "continue",
+            "each",
+            "else",
+            "elsif",
+            "exit",
+            "for",
+            "forward",
+            "if",
+            "loop",
+            "return",
+            "reverse",
+            "some",
+            "then",
+            "until",
+            "while",
+            "with"
+        ],
+        "2": [
+            "abs",
+            "and",
+            "in",
+            "mod",
+            "not",
+            "null",
+            "or",
+            "rem",
+            "xor"
+        ],
+        "3": [
+            "abstract",
+            "class",
+            "concurrent",
+            "const",
+            "end",
+            "extends",
+            "exports",
+            "func",
+            "global",
+            "implements",
+            "import",
+            "interface",
+            "is",
+            "lambda",
+            "locked",
+            "new",
+            "of",
+            "op",
+            "optional",
+            "private",
+            "queued",
+            "ref",
+            "separate",
+            "type",
+            "var"
+        ]
+    },
+    "SYMBOLS": [
+        "(",
+        ")",
+        "[",
+        "]",
+        "<",
+        ">"
+    ],
+    "CASE_SENSITIVE": [
+        false,
+        false,
+        false,
+        false
+    ],
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #00007f;",
+            "2": "color: #0000ff;",
+            "3": "color: #46aa03; font-weight:bold;"
+        },
+        "BRACKETS": [
+            "color: #66cc66;"
+        ],
+        "COMMENTS": {
+            "1": "color: #adadad; font-style: italic;",
+            "MULTI": "color: #808080; font-style: italic;"
+        },
+        "ESCAPE_CHAR": [
+            "color: #000099; font-weight: bold;"
+        ],
+        "STRINGS": [
+            "color: #7f007f;"
+        ],
+        "NUMBERS": [
+            "color: #ff0000;"
+        ],
+        "METHODS": {
+            "1": "color: #202020;"
+        },
+        "SYMBOLS": [
+            "color: #66cc66;"
+        ],
+        "REGEXPS": [],
+        "SCRIPT": []
+    },
+    "URLS": {
+        "1": "",
+        "2": "",
+        "3": ""
+    },
+    "OOLANG": true,
+    "OBJECT_SPLITTERS": {
+        "1": "."
+    },
+    "REGEXPS": [],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": []
+}

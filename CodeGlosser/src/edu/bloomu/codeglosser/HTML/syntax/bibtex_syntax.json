@@ -1,0 +1,183 @@
+{
+    "LANG_NAME": "BibTeX",
+    "OOLANG": false,
+    "COMMENT_SINGLE": {
+        "1": "%%"
+    },
+    "COMMENT_MULTI": [],
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [],
+    "ESCAPE_CHAR": "",
+    "KEYWORDS": [
+        [
+            "@comment",
+            "@preamble",
+            "@string"
+        ],
+        [
+            "@article",
+            "@book",
+            "@booklet",
+            "@conference",
+            "@inbook",
+            "@incollection",
+            "@inproceedings",
+            "@manual",
+            "@mastersthesis",
+            "@misc",
+            "@phdthesis",
+            "@proceedings",
+            "@techreport",
+            "@unpublished"
+        ],
+        [
+            "@collection",
+            "@patent",
+            "@webpage"
+        ],
+        [
+            "address",
+            "annote",
+            "author",
+            "booktitle",
+            "chapter",
+            "crossref",
+            "edition",
+            "editor",
+            "howpublished",
+            "institution",
+            "journal",
+            "key",
+            "month",
+            "note",
+            "number",
+            "organization",
+            "pages",
+            "publisher",
+            "school",
+            "series",
+            "title",
+            "type",
+            "volume",
+            "year"
+        ],
+        [
+            "abstract",
+            "affiliation",
+            "chaptername",
+            "cited-by",
+            "cites",
+            "contents",
+            "copyright",
+            "date-added",
+            "date-modified",
+            "doi",
+            "eprint",
+            "isbn",
+            "issn",
+            "keywords",
+            "language",
+            "lccn",
+            "lib-congress",
+            "location",
+            "price",
+            "rating",
+            "read",
+            "size",
+            "source",
+            "url"
+        ]
+    ],
+    "URLS": [
+        "",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "SYMBOLS": [
+        "{",
+        "}",
+        "#",
+        "=",
+        ","
+    ],
+    "CASE_SENSITIVE": {
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "0": false
+    },
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #C02020;",
+            "2": "color: #C02020;",
+            "3": "color: #C08020;",
+            "4": "color: #C08020;"
+        },
+        "COMMENTS": {
+            "1": "color: #2C922C; font-style: italic;"
+        },
+        "STRINGS": [
+            "color: #2020C0;"
+        ],
+        "SYMBOLS": [
+            "color: #E02020;"
+        ],
+        "REGEXPS": {
+            "1": "color: #2020C0;",
+            "2": "color: #C08020;",
+            "3": "color: #800000;"
+        },
+        "ESCAPE_CHAR": [
+            "color: #000000; font-weight: bold;"
+        ],
+        "BRACKETS": [
+            "color: #E02020;"
+        ],
+        "NUMBERS": [],
+        "METHODS": [],
+        "SCRIPT": []
+    },
+    "REGEXPS": {
+        "1": [
+            "(?<=\\{)(?:\\{(?R)\\}|[^\\{\\}])*(?=\\})",
+            "\\0",
+            "s",
+            "",
+            ""
+        ],
+        "2": [
+            "\\bBdsk-(File|Url)-\\d+",
+            "\\0",
+            "Us",
+            "",
+            ""
+        ],
+        "3": [
+            "\\\\[A-Za-z0-9]*+",
+            "\\0",
+            "Us",
+            "",
+            ""
+        ]
+    },
+    "HIGHLIGHT_STRICT_BLOCK": [],
+    "OBJECT_SPLITTERS": [],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "PARSER_CONTROL": {
+        "ENABLE_FLAGS": {
+            "NUMBERS": 0
+        },
+        "KEYWORDS": {
+            "3": {
+                "DISALLOWED_AFTER": "(?=\\s*=)"
+            },
+            "4": {
+                "DISALLOWED_AFTER": "(?=\\s*=)"
+            }
+        }
+    }
+}

@@ -1,0 +1,108 @@
+{
+    "LANG_NAME": "RPM Specification File",
+    "COMMENT_SINGLE": {
+        "1": "#"
+    },
+    "COMMENT_MULTI": [],
+    "QUOTEMARKS": [
+        "\"",
+        "`"
+    ],
+    "ESCAPE_CHAR": "\\",
+    "CASE_KEYWORDS": 0,
+    "CASE_SENSITIVE": [
+        false
+    ],
+    "KEYWORDS": [],
+    "SYMBOLS": [
+        "<",
+        ">",
+        "=",
+        "!",
+        "@",
+        "~",
+        "&",
+        "|",
+        "^",
+        "+",
+        "-",
+        "*",
+        "\/",
+        "%",
+        ",",
+        ";",
+        "?",
+        ".",
+        ":"
+    ],
+    "STYLES": {
+        "KEYWORDS": [],
+        "COMMENTS": {
+            "1": "color: #666666; font-style: italic;",
+            "MULTI": "color: #666666; font-style: italic;"
+        },
+        "ESCAPE_CHAR": {
+            "0": "color: #000099; font-weight: bold;",
+            "HARD": "color: #000099; font-weight: bold;"
+        },
+        "BRACKETS": [
+            "color: #009900;"
+        ],
+        "STRINGS": [
+            "color: #ff0000;"
+        ],
+        "NUMBERS": [
+            "color: #cc66cc;"
+        ],
+        "METHODS": {
+            "1": "color: #006600;",
+            "2": "color: #006600;"
+        },
+        "SYMBOLS": [
+            "color: #339933;"
+        ],
+        "REGEXPS": {
+            "1": "color: #0000ff;",
+            "2": "color: #009999;",
+            "3": "color: #000000; font-weight: bold;",
+            "4": "color: #ff6600; font-style: italic;"
+        },
+        "SCRIPT": []
+    },
+    "REGEXPS": {
+        "1": [
+            "(%{?[a-zA-Z0-9_]+}?)",
+            "\\1",
+            "",
+            "",
+            ""
+        ],
+        "2": [
+            "(%(?:define|patch\\d*|mklibname|mkrel|configure\\S+|makeinstall\\S+|make_session|make|defattr|config|doc|setup))",
+            "\\1",
+            "i",
+            "",
+            ""
+        ],
+        "3": [
+            "((?:summary|license|buildroot|buildrequires|provides|version|release|source\\d*|group|buildarch|autoreqprov|provides|obsoletes|vendor|distribution|suggests|autoreq|autoprov|conflicts|name|url|requires|patch\\d*):)",
+            "\\1",
+            "i",
+            "",
+            ""
+        ],
+        "4": [
+            "(%(?:description|package|prep|build|install|clean|postun|preun|post|pre|files|changelog))",
+            "\\1",
+            "i",
+            "",
+            ""
+        ]
+    },
+    "URLS": [],
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": [],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": []
+}

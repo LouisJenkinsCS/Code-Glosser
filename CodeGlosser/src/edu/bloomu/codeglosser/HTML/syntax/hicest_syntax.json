@@ -1,0 +1,163 @@
+{
+    "LANG_NAME": "HicEst",
+    "COMMENT_SINGLE": {
+        "1": "!"
+    },
+    "COMMENT_MULTI": [],
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [
+        "\"",
+        "'"
+    ],
+    "ESCAPE_CHAR": "",
+    "KEYWORDS": {
+        "1": [
+            "$cmd_line",
+            "abs",
+            "acos",
+            "alarm",
+            "alias",
+            "allocate",
+            "appendix",
+            "asin",
+            "atan",
+            "axis",
+            "beep",
+            "call",
+            "ceiling",
+            "char",
+            "character",
+            "com",
+            "continue",
+            "cos",
+            "cosh",
+            "data",
+            "diffeq",
+            "dimension",
+            "dlg",
+            "dll",
+            "do",
+            "edit",
+            "else",
+            "elseif",
+            "end",
+            "enddo",
+            "endif",
+            "exp",
+            "floor",
+            "function",
+            "fuz",
+            "goto",
+            "iand",
+            "ichar",
+            "ieor",
+            "if",
+            "index",
+            "init",
+            "int",
+            "intpol",
+            "ior",
+            "key",
+            "len",
+            "len_trim",
+            "line",
+            "lock",
+            "log",
+            "max",
+            "maxloc",
+            "min",
+            "minloc",
+            "mod",
+            "nint",
+            "not",
+            "open",
+            "pop",
+            "ran",
+            "read",
+            "real",
+            "return",
+            "rgb",
+            "roots",
+            "sign",
+            "sin",
+            "sinh",
+            "solve",
+            "sort",
+            "subroutine",
+            "sum",
+            "system",
+            "tan",
+            "tanh",
+            "then",
+            "time",
+            "use",
+            "window",
+            "write",
+            "xeq"
+        ]
+    },
+    "SYMBOLS": {
+        "1": [
+            "(",
+            ")",
+            "+",
+            "-",
+            "*",
+            "\/",
+            "=",
+            "<",
+            ">",
+            "!",
+            "^",
+            ":",
+            ","
+        ],
+        "2": [
+            "$",
+            "$$"
+        ]
+    },
+    "CASE_SENSITIVE": [
+        false,
+        false
+    ],
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #ff0000;"
+        },
+        "COMMENTS": {
+            "1": "color: #666666; font-style: italic;",
+            "MULTI": "color: #666666; font-style: italic;"
+        },
+        "ESCAPE_CHAR": [
+            "color: #000099; font-weight: bold;"
+        ],
+        "BRACKETS": [
+            "color: #009900;"
+        ],
+        "STRINGS": [
+            "color: #0000ff;"
+        ],
+        "NUMBERS": [
+            "color: #cc66cc;"
+        ],
+        "METHODS": [
+            "color: #004000;"
+        ],
+        "SYMBOLS": {
+            "1": "color: #339933;",
+            "2": "color: #ff0000;"
+        },
+        "REGEXPS": [],
+        "SCRIPT": []
+    },
+    "URLS": {
+        "1": ""
+    },
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "REGEXPS": [],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": []
+}

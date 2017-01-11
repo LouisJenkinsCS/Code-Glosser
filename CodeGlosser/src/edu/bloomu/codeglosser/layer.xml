@@ -5,9 +5,6 @@
         <folder name="text">
             <folder name="x-java">
                 <folder name="Popup"/>
-                <file name="edu-bloomu-codeglosser-NoteMarkup.shadow">
-                    <attr name="originalFile" stringvalue="Actions/Window/edu-bloomu-codeglosser-NoteMarkup.instance"/>
-                </file>
             </folder>
         </folder>
     </folder>

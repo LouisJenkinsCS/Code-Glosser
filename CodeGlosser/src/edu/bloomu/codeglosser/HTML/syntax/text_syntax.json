@@ -1,0 +1,37 @@
+{
+    "LANG_NAME": "Text",
+    "COMMENT_SINGLE": [],
+    "COMMENT_MULTI": [],
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [],
+    "ESCAPE_CHAR": "",
+    "KEYWORDS": [],
+    "SYMBOLS": [],
+    "CASE_SENSITIVE": [
+        false
+    ],
+    "STYLES": {
+        "KEYWORDS": [],
+        "COMMENTS": [],
+        "ESCAPE_CHAR": [],
+        "BRACKETS": [],
+        "STRINGS": [],
+        "NUMBERS": [],
+        "METHODS": [],
+        "SYMBOLS": [],
+        "SCRIPT": [],
+        "REGEXPS": []
+    },
+    "URLS": [],
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "REGEXPS": [],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": [],
+    "PARSER_CONTROL": {
+        "ENABLE_FLAGS": {
+            "ALL": 0
+        }
+    }
+}

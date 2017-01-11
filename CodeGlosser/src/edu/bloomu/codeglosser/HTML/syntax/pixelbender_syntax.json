@@ -1,0 +1,236 @@
+{
+    "LANG_NAME": "Pixel Bender 1.0",
+    "COMMENT_SINGLE": {
+        "1": "\/\/"
+    },
+    "COMMENT_MULTI": {
+        "\/*": "*\/"
+    },
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [
+        "\""
+    ],
+    "ESCAPE_CHAR": "\\",
+    "KEYWORDS": {
+        "1": [
+            "languageVersion",
+            "kernel"
+        ],
+        "2": [
+            "import",
+            "parameter",
+            "dependent",
+            "const",
+            "input",
+            "output",
+            "evaluatePixel",
+            "evaluateDependents",
+            "needed",
+            "changed",
+            "generated"
+        ],
+        "3": [
+            "bool",
+            "bool2",
+            "bool3",
+            "bool4",
+            "int",
+            "int2",
+            "int3",
+            "int4",
+            "float",
+            "float2",
+            "float3",
+            "float4",
+            "float2x2",
+            "float3x3",
+            "float4x4",
+            "pixel2",
+            "pixel3",
+            "pixel4",
+            "region",
+            "image1",
+            "image2",
+            "image3",
+            "image4",
+            "imageRef",
+            "void"
+        ],
+        "4": [
+            "in",
+            "out",
+            "inout",
+            "if",
+            "else",
+            "for",
+            "while",
+            "do",
+            "break",
+            "continue",
+            "return"
+        ],
+        "5": [
+            "radians",
+            "degrees",
+            "sin",
+            "cos",
+            "tan",
+            "asin",
+            "acos",
+            "atan",
+            "pow",
+            "exp",
+            "exp2",
+            "log",
+            "log2",
+            "sqrt",
+            "inverseSqrt",
+            "abs",
+            "sign",
+            "floor",
+            "ceil",
+            "fract",
+            "mod",
+            "min",
+            "max",
+            "step",
+            "clamp",
+            "mix",
+            "smoothStep",
+            "length",
+            "distance",
+            "dot",
+            "cross",
+            "normalize",
+            "matrixCompMult",
+            "lessThan",
+            "lessThanEqual",
+            "greaterThan",
+            "greaterThanEqual",
+            "equal",
+            "notEqual",
+            "any",
+            "all",
+            "not",
+            "nowhere",
+            "everywhere",
+            "transform",
+            "union",
+            "intersect",
+            "outset",
+            "inset",
+            "bounds",
+            "isEmpty",
+            "sample",
+            "sampleLinear",
+            "sampleNearest",
+            "outCoord",
+            "dod",
+            "pixelSize",
+            "pixelAspectRatio"
+        ],
+        "6": [
+            "namespace",
+            "vendor",
+            "version",
+            "minValue",
+            "maxValue",
+            "defaultValue",
+            "description"
+        ],
+        "7": [
+            "#if",
+            "#endif",
+            "#ifdef",
+            "#elif",
+            "defined",
+            "#define",
+            "AIF_ATI",
+            "AIF_NVIDIA",
+            "AIF_FLASH_TARGET"
+        ]
+    },
+    "SYMBOLS": [
+        "(",
+        ")",
+        "[",
+        "]",
+        "{",
+        "}",
+        "!",
+        "%",
+        "&",
+        "|",
+        "+",
+        "-",
+        "*",
+        "\/",
+        "=",
+        "<",
+        ">",
+        "?",
+        ":"
+    ],
+    "CASE_SENSITIVE": [
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+    ],
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #0033ff;",
+            "2": "color: #0033ff; font-weight: bold;",
+            "3": "color: #0033ff;",
+            "4": "color: #9900cc; font-weight: bold;",
+            "5": "color: #333333;",
+            "6": "color: #666666;",
+            "7": "color: #990000;"
+        },
+        "COMMENTS": {
+            "1": "color: #009900;",
+            "MULTI": "color: #3f5fbf;"
+        },
+        "ESCAPE_CHAR": [
+            ""
+        ],
+        "BRACKETS": [
+            "color: #000000;"
+        ],
+        "STRINGS": [
+            "color: #990000;"
+        ],
+        "NUMBERS": [
+            "color: #000000; font-weight:bold;"
+        ],
+        "METHODS": [
+            "color: #000000;"
+        ],
+        "SYMBOLS": [
+            "color: #000000; font-weight: bold;"
+        ],
+        "REGEXPS": [],
+        "SCRIPT": []
+    },
+    "URLS": {
+        "1": "",
+        "2": "",
+        "3": "",
+        "4": "",
+        "5": "",
+        "6": "",
+        "7": ""
+    },
+    "OOLANG": true,
+    "OBJECT_SPLITTERS": [
+        "."
+    ],
+    "REGEXPS": [],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": []
+}

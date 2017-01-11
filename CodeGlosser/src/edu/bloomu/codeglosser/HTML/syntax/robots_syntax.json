@@ -1,0 +1,67 @@
+{
+    "LANG_NAME": "robots.txt",
+    "COMMENT_SINGLE": {
+        "1": "#"
+    },
+    "COMMENT_MULTI": [],
+    "COMMENT_REGEXP": {
+        "1": "\/^Comment:.*?\/m"
+    },
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [],
+    "ESCAPE_CHAR": "",
+    "KEYWORDS": {
+        "1": [
+            "Allow",
+            "Crawl-delay",
+            "Disallow",
+            "Request-rate",
+            "Robot-version",
+            "Sitemap",
+            "User-agent",
+            "Visit-time"
+        ]
+    },
+    "SYMBOLS": [
+        ":"
+    ],
+    "CASE_SENSITIVE": [
+        false,
+        true
+    ],
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #b1b100;"
+        },
+        "COMMENTS": {
+            "1": "color: #808080; font-style: italic;"
+        },
+        "ESCAPE_CHAR": [
+            "color: #000099; font-weight: bold;"
+        ],
+        "BRACKETS": [
+            "color: #66cc66;"
+        ],
+        "STRINGS": [
+            "color: #ff0000;"
+        ],
+        "NUMBERS": [
+            "color: #cc66cc;"
+        ],
+        "METHODS": [],
+        "SYMBOLS": [
+            "color: #66cc66;"
+        ],
+        "REGEXPS": [],
+        "SCRIPT": []
+    },
+    "URLS": {
+        "1": "http:\/\/www.robotstxt.org\/wc\/norobots.html"
+    },
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "REGEXPS": [],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": []
+}

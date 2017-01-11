@@ -1,0 +1,141 @@
+{
+    "LANG_NAME": "J",
+    "COMMENT_SINGLE": [],
+    "COMMENT_MULTI": [],
+    "COMMENT_REGEXP": {
+        "1": "\/(?<!\\w)NB\\..*?$\/m",
+        "2": "\/(?<=\\bNote\\b).*?$\\s+\\)(?:(?!\\n)\\s)*$\/sm",
+        "3": "\/'[^']*?$\/m"
+    },
+    "CASE_KEYWORDS": 0,
+    "QUOTEMARKS": [],
+    "ESCAPE_CHAR": "",
+    "HARDQUOTE": [
+        "'",
+        "'"
+    ],
+    "HARDESCAPE": [
+        "'"
+    ],
+    "HARDCHAR": "'",
+    "NUMBERS": [
+        "\\b(?:_?\\d+(?:\\.\\d+)?(?:x|[bejprx]_?[\\da-z]+(?:\\.[\\da-z]+)?)?|__?)(?![\\w\\.\\:])"
+    ],
+    "KEYWORDS": {
+        "1": [
+            "assert.",
+            "break.",
+            "case.",
+            "catch.",
+            "catcht.",
+            "continue.",
+            "do.",
+            "else.",
+            "elseif.",
+            "end.",
+            "fcase.",
+            "for.",
+            "goto.",
+            "if.",
+            "label.",
+            "return.",
+            "select.",
+            "throw.",
+            "trap.",
+            "try.",
+            "while.",
+            "whilst."
+        ],
+        "2": [
+            "m",
+            "n",
+            "u",
+            "v",
+            "x",
+            "y"
+        ]
+    },
+    "SYMBOLS": [
+        [
+            "(",
+            ")"
+        ]
+    ],
+    "CASE_SENSITIVE": [
+        false,
+        true,
+        true
+    ],
+    "STYLES": {
+        "KEYWORDS": {
+            "1": "color: #0000ff; font-weight: bold;",
+            "2": "color: #0000cc; font-weight: bold;"
+        },
+        "COMMENTS": {
+            "1": "color: #666666; font-style: italic;",
+            "2": "color: #666666; font-style: italic; font-weight: bold;",
+            "3": "color: #ff00ff; ",
+            "MULTI": "color: #666666; font-style: italic;"
+        },
+        "ESCAPE_CHAR": {
+            "HARD": "font-weight: bold;",
+            "0": ""
+        },
+        "BRACKETS": [
+            "color: #009900;"
+        ],
+        "STRINGS": {
+            "HARD": "color: #ff0000;",
+            "0": "color: #ff0000;"
+        },
+        "NUMBERS": [
+            "color: #009999; font-weight: bold;"
+        ],
+        "METHODS": [],
+        "SYMBOLS": [
+            "color: #009900; font-weight: bold;"
+        ],
+        "REGEXPS": [
+            "color: #0000ff; font-weight: bold;"
+        ],
+        "SCRIPT": []
+    },
+    "URLS": {
+        "1": "",
+        "2": ""
+    },
+    "OOLANG": false,
+    "OBJECT_SPLITTERS": [],
+    "REGEXPS": [
+        "\\b(for|goto|label)_[a-zA-Z]\\w*\\."
+    ],
+    "STRICT_MODE_APPLIES": 0,
+    "SCRIPT_DELIMITERS": [],
+    "HIGHLIGHT_STRICT_BLOCK": [],
+    "PARSER_CONTROL": {
+        "ENABLE_FLAGS": {
+            "BRACKETS": 0
+        },
+        "NUMBERS": {
+            "PRECHECK_RX": "#[\\d_]#"
+        },
+        "KEYWORDS": {
+            "2": {
+                "DISALLOWED_BEFORE": "(?<!\\w)",
+                "DISALLOWED_AFTER": "(?![\\w\\.\\:])"
+            },
+            "6": {
+                "DISALLOWED_BEFORE": "(?!K)",
+                "DISALLOWED_AFTER": "(?=.*)"
+            },
+            "7": {
+                "DISALLOWED_BEFORE": "(?<!\\w)",
+                "DISALLOWED_AFTER": "(?=.*)"
+            },
+            "8": {
+                "DISALLOWED_BEFORE": "(?<=\\s)",
+                "DISALLOWED_AFTER": "(?=.*)"
+            }
+        }
+    }
+}
