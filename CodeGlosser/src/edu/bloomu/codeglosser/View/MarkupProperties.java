@@ -218,8 +218,8 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
 
         jInternalFrame1.setVisible(true);
 
-        tabbedTreeView.addTab(org.openide.util.NbBundle.getMessage(MarkupProperties.class, "MarkupProperties.propertyFiles.TabConstraints.tabTitle"), propertyFiles); // NOI18N
-        tabbedTreeView.addTab(org.openide.util.NbBundle.getMessage(MarkupProperties.class, "MarkupProperties.propertyTemplates.TabConstraints.tabTitle"), propertyTemplates); // NOI18N
+        tabbedTreeView.addTab("Files", propertyFiles); // NOI18N
+        tabbedTreeView.addTab("Templates", propertyTemplates); // NOI18N
 
         javax.swing.GroupLayout jInternalFrame1Layout = new javax.swing.GroupLayout(jInternalFrame1.getContentPane());
         jInternalFrame1.getContentPane().setLayout(jInternalFrame1Layout);

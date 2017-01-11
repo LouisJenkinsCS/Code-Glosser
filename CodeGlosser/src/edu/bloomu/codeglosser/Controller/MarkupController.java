@@ -58,7 +58,6 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.openide.util.Exceptions;
 
 /**
  *
@@ -242,7 +241,6 @@ public class MarkupController implements EventHandler {
             stream.close();
             Desktop.getDesktop().browse(f.toURI());
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
         }
         
         return Observable.empty();

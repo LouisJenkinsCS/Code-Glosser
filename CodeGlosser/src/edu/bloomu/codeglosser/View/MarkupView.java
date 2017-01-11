@@ -46,7 +46,6 @@ import edu.bloomu.codeglosser.Utils.ColorUtils;
 import edu.bloomu.codeglosser.Utils.SwingScheduler;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.PublishSubject;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.logging.Level;
@@ -58,8 +57,6 @@ import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
 import javax.swing.text.Highlighter.HighlightPainter;
-import org.javatuples.Pair;
-import org.openide.util.Exceptions;
 
 /**
  *

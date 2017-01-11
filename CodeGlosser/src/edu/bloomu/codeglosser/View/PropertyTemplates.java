@@ -53,7 +53,6 @@ import javax.swing.tree.TreePath;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.openide.util.Exceptions;
 
 /**
  *
@@ -116,7 +115,6 @@ public class PropertyTemplates extends javax.swing.JPanel implements EventHandle
         try {
             populateTree(root, rootNode);
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
         }
         DefaultTreeModel model = (DefaultTreeModel) templateTree.getModel();
         model.setRoot(rootNode);

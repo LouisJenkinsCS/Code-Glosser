@@ -60,15 +60,15 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="edu.bloomu.codeglosser.View.PropertySelector" name="propertySelector">
+        <Component class="org.netbeans.modules.form.InvalidComponent" name="propertySelector">
         </Component>
-        <Component class="edu.bloomu.codeglosser.View.PropertyAttributes" name="propertyAttributes">
+        <Component class="org.netbeans.modules.form.InvalidComponent" name="propertyAttributes">
         </Component>
         <Container class="javax.swing.JTabbedPane" name="tabbedTreeView">
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
           <SubComponents>
-            <Component class="edu.bloomu.codeglosser.View.PropertyFiles" name="propertyFiles">
+            <Component class="org.netbeans.modules.form.InvalidComponent" name="propertyFiles">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                   <JTabbedPaneConstraints tabName="Files">
@@ -79,7 +79,7 @@
                 </Constraint>
               </Constraints>
             </Component>
-            <Component class="edu.bloomu.codeglosser.View.PropertyTemplates" name="propertyTemplates">
+            <Component class="org.netbeans.modules.form.InvalidComponent" name="propertyTemplates">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                   <JTabbedPaneConstraints tabName="Templates">
