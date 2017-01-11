@@ -30,7 +30,9 @@
  */
 package edu.bloomu.codeglosser.Model.Templates;
 
+import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Model.TreeViewNode;
+import java.awt.Color;
 import org.json.simple.JSONObject;
 
 /**
@@ -41,14 +43,22 @@ public class TemplateNodeFactory {
     public static TreeViewNode getTemplateNode(JSONObject obj) {
         TreeViewNode node = null;
         
-//        // Bootstrap the recursive process: Categories get recursively resolved
-//        if (obj.containsKey(TemplateBranch.KEY_CATEGORY)) {
-//            node = new TemplateBranch(obj);
-//        } else {
-//            MarkupTemplate template = new MarkupTemplate();
-//            template.deserialize(obj);
-//            node = new TemplateLeaf(template);
-//        }
+       // Bootstrap the recursive process: Categories get recursively resolved
+        if (obj.containsKey(TemplateBranch.KEY_CATEGORY)) {
+            node = new TemplateBranch(obj);
+        } else {
+            // While color and msg can be null, the title cannot be 
+            Color color = Color.decode((String) obj.get("color"));
+            String msg = (String) obj.get("message");
+            String title = (String) obj.get("title");
+            if (title == null) {
+                title = "UNDEFINED";
+            }
+            
+            Markup template = Markup.template(msg, color);
+            template.setId(title);
+            node = new TemplateLeaf(template);
+        }
         
         return node;
     }

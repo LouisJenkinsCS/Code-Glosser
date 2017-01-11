@@ -157,7 +157,7 @@ public class MarkupController implements EventHandler {
         String msg = template.getMsg();
         if (c != null) {
             currentMarkup.setHighlightColor(c);
-            events.add(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, CHANGE_HIGHLIGHT_COLOR, c));
+            events.add(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, CHANGE_HIGHLIGHT_COLOR, currentMarkup));
         }
         
         if (msg != null) {

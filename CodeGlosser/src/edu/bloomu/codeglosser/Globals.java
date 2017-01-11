@@ -32,6 +32,7 @@ package edu.bloomu.codeglosser;
 
 import java.net.URI;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  *
@@ -49,6 +50,9 @@ public final class Globals {
     // The URI used for obtaining the relative path to the file. This URI is used
     // for generating the file tree as well as saving session data.
     public static URI URI_PREFIX = null;
+    
+    // The location of the templates file
+    public static Path TEMPLATE_FILE = Paths.get("templates.json");
     
     /**
      * Initializes all globals to a default state. Used so that in the case of a

@@ -108,6 +108,11 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
                     default:
                         throw new RuntimeException("Bad Custom Tag from PropertySelector!");
                 }
+            case Event.PROPERTIES_TEMPLATES:
+                switch (e.getCustom()) {
+                    case PropertyTemplates.APPLY_TEMPLATE:
+                        return applyTemplate((Markup) e.data);
+                }
             default:
                 throw new RuntimeException("Bad Sender!");
         }
@@ -122,6 +127,7 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
         engine.register(propertyFiles.getEventEngine());
         engine.register(propertyAttributes.getEventEngine());
         engine.register(propertySelector.getEventEngine());
+        engine.register(propertyTemplates.getEventEngine());
     }
     
     private Observable<Event> displayMarkup(Markup markup) {
@@ -149,7 +155,10 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
         LOG.info("Propagating event for applying template: " + template);
         
         // Make the change as a template
-        return Observable.just(Event.of(Event.MARKUP_PROPERTIES, Event.MARKUP_CONTROLLER, APPLY_TEMPLATE, template));
+        return Observable.just(
+                Event.of(Event.MARKUP_PROPERTIES, Event.MARKUP_CONTROLLER, APPLY_TEMPLATE, template),
+                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_ATTRIBUTES, SET_ATTRIBUTES, template)
+        );
     }
     
     private Observable<Event> textChange(String text) {
@@ -205,7 +214,7 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
         propertyAttributes = new edu.bloomu.codeglosser.View.PropertyAttributes();
         tabbedTreeView = new javax.swing.JTabbedPane();
         propertyFiles = new edu.bloomu.codeglosser.View.PropertyFiles();
-        propertyTemplates = new edu.bloomu.codeglosser.View.PropertyTreeView();
+        propertyTemplates = new edu.bloomu.codeglosser.View.PropertyTemplates();
 
         jInternalFrame1.setVisible(true);
 
@@ -254,7 +263,7 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
     private edu.bloomu.codeglosser.View.PropertyAttributes propertyAttributes;
     private edu.bloomu.codeglosser.View.PropertyFiles propertyFiles;
     private edu.bloomu.codeglosser.View.PropertySelector propertySelector;
-    private edu.bloomu.codeglosser.View.PropertyTreeView propertyTemplates;
+    private edu.bloomu.codeglosser.View.PropertyTemplates propertyTemplates;
     private javax.swing.JTabbedPane tabbedTreeView;
     // End of variables declaration//GEN-END:variables
 }

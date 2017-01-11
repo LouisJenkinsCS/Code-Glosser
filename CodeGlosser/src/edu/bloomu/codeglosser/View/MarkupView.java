@@ -117,6 +117,8 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
                 switch (e.getCustom()) {
                     case MarkupController.REMOVE_HIGHLIGHTS:
                         return removeHighlight((Markup) e.data);
+                    case MarkupController.CHANGE_HIGHLIGHT_COLOR:
+                        return changeHighlightColor((Markup) e.data);
                     case MarkupController.SET_CURSOR:
                         return setCursorPosition((Bounds) e.data);
                     case MarkupController.FILE_SELECTED:
@@ -339,6 +341,12 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
         highlightMap.values().stream()
                 .forEach(highlighter::removeHighlight);
         highlightMap.clear();
+    }
+    
+    private Observable<Event> changeHighlightColor(Markup markup) {
+        setMarkupColor(markup.getRange(), markup.getHighlightColor());
+        
+        return Observable.empty();
     }
 
     public void setMarkupColor(Bounds bounds, Color color) {

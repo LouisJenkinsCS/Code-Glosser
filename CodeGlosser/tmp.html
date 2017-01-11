@@ -31,54 +31,69 @@
   position: absolute;
   display:block;
   z-index: 99;
-}</style>        <title></title>        <meta charset="UTF-8">    </head>    <body>        <pre><code id="code_segment">package edu.bloomu.codeglosser;
-
-import com.google.common.eventbus.EventBus;
-import edu.bloomu.codeglosser.Session.MarkupManager;
-import edu.bloomu.codeglosser.Controller.GlosserController;
-import edu.bloomu.codeglosser.Events.FileChangeEvent;
-import edu.bloomu.codeglosser.Utils.DocumentHelper;
-import edu.bloomu.codeglosser.View.MarkupView;
-import edu.bloomu.codeglosser.View.MarkupPropertiesView;
-import edu.bloomu.codeglosser.View.GlosserView;
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.io.File;
-import java.net.URL;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
-import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.Document;
-import org.openide.windows.TopComponent;
-
-/**
+}</style>        <title></title>        <meta charset="UTF-8">    </head>    <body>        <pre><code id="code_segment">/* BSD 3-Clause License
  *
- * @author Drue Coles
+ * Copyright (c) 2017, Louis Jenkins <LouisJenkinsCS@hotmail.com>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     - Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *
+ *     - Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *
+ *     - Neither the name of Louis Jenkins, Bloomsburg University nor the names of its 
+ *       contributors may be used to endorse or promote products derived
+ *       from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-@TopComponent.Description(
-        preferredID = "GlossTopComponent",
-        //iconBase="SET/PATH/TO/ICON/HERE", 
-        persistenceType = TopComponent.PERSISTENCE_ALWAYS
-)
-@TopComponent.Registration(mode = "glossEditor", openAtStartup = false)
-public class GlossableTopComponent extends TopComponent {
-    
-    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(GlossableTopComponent.class.getName());
+package edu.bloomu.codeglosser;
 
-    private static final char SYM = '\u2691'; // flag
-    private final EventBus bus = new EventBus();
-    
+import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-    public GlossableTopComponent(File file) {
-//        setDisplayName(DocumentHelper.getDocumentName(doc) + ".html");
-//        setLayout(new BorderLayout());      
-//        MarkupView v = new MarkupView(null, bus);
-//        add(v, BorderLayout.CENTER);
-//        MarkupManager.getInstance(DocumentHelper.getDocumentName(doc));
-//        v.setDocument(doc);
-//        bus.post(FileChangeEvent.of(DocumentHelper.getDocumentName(doc)));
+<span class="note" msg="If a method is self-explanatory, at-clauses may be omitted from the doc comment.">/**
+</span> <span class="note" msg="If a method is self-explanatory, at-clauses may be omitted from the doc comment.">*
+</span> <span class="note" msg="If a method is self-explanatory, at-clauses may be omitted from the doc comment.">* @author Louis Jenkins
+</span> <span class="note" msg="If a method is self-explanatory, at-clauses may be omitted from the doc comment.">*/
+</span><span class="note" msg="Leave a space before and after every binary operator.">public final class Globals {
+</span>    
+    <span class="note" msg="Leave a space before and after every binary operator.">// Flag used to indicate that an event currently is in progress and that other
+</span>    <span class="note" msg="Leave a space before and after every binary operator.">// events should either be discarded or queued for later.
+</span>    <span class="note" msg="Leave a space before and after every binary operator.">public static boolean IS_BUSY = false; </span>
+    
+    /<span class="note" msg="If a method is self-explanatory, at-clauses may be omitted from the doc comment.">/ The project folder selected by the user.
+</span>    <span class="note" msg="If a method is self-explanatory, at-clauses may be omitted from the doc comment.">public static Path PROJECT_FOLDER = null;
+</span>    
+    <span class="note" msg="If a method is self-explanatory, at-clauses may be omitted from the doc comment.">// The URI used for obtaining the relative path to the file. This URI is used
+</span>    <span class="note" msg="If a method is self-explanatory, at-clauses may be omitted from the doc comment.">// for generating the file tree as well as saving session data.
+</span>    <span class="note" msg="If a method is self-explanatory, at-clauses may be omitted from the doc comment.">public static URI URI_PREFIX = null;
+</span>    
+    <span class="note" msg="Use CONSTANT_CASE for variables declared final if they are primitive-type variables or references to immutable types (like Color or String).">// The location of the templates file
+</span>    <span class="note" msg="Use CONSTANT_CASE for variables declared final if they are primitive-type variables or references to immutable types (like Color or String).">public static Path TEMPLATE_FILE = Paths.get("templates.json");
+</span>    
+    /**
+     * Initializes all globals to a default state. Used so that in the case of a
+     * memory leak, the previous values are not accidentally used.
+     */
+    public static void initGlobals() {
+        IS_BUSY = false;
+        PROJECT_FOLDER = null;
+        URI_PREFIX = null;
     }
-}
-</code></pre>    </body></html>
+}</code></pre>    </body></html>

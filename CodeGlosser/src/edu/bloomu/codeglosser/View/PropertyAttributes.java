@@ -243,15 +243,19 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
     }
     
     public void setColor(Color c) {
-       color = c;
-       labelColor.setBackground(c);
-       labelColor.setForeground(c);
-       labelRGB.setText("(" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + ")");
+        if (c != null) {
+            color = c;
+            labelColor.setBackground(c);
+            labelColor.setForeground(c);
+            labelRGB.setText("(" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + ")");
+        }
     }
     
     public void setMessage(String msg) {
-        message = msg;
-        noteMsg.setText(msg);
+        if (msg != null && !msg.equals(message)) {
+            message = msg;
+            noteMsg.setText(msg);
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

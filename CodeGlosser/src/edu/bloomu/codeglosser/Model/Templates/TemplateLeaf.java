@@ -30,6 +30,7 @@
  */
 package edu.bloomu.codeglosser.Model.Templates;
 
+import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Model.TreeViewLeaf;
 import java.awt.Color;
 import java.util.logging.Logger;
@@ -44,18 +45,18 @@ public class TemplateLeaf implements TreeViewLeaf {
     
     private static final Logger LOG = Logger.getLogger(TemplateLeaf.class.getName());
     
-//    private final MarkupTemplate template;
+    private final Markup template;
 
-    public TemplateLeaf(Object data) {
-
+    public TemplateLeaf(Markup template) {
+        this.template = template;
     }
 
-    public Object getTemplate() {
-        return null;
+    public Markup getTemplate() {
+        return template;
     }
-
+    
     @Override
     public String toString() {
-        return super.toString();
+        return template.getId();
     }
 }

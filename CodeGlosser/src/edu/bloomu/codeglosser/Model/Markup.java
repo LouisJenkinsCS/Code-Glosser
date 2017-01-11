@@ -45,7 +45,7 @@ public class Markup {
     
     public static Markup template(String msg, Color c) {
         Markup m = new Markup(msg, null, new Bounds[] {});
-        m.setHighlightColor(null);
+        m.setHighlightColor(c);
         return m;
         
     }
