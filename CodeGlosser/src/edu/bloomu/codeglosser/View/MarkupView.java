@@ -57,6 +57,9 @@ import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
 import javax.swing.text.Highlighter.HighlightPainter;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 
 /**
  *
@@ -104,7 +107,96 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
         highlighter = textCode.getHighlighter();
         textCode.setEditable(false);
         initializePopup();
+        initializeView();
         initializeListeners();
+    }
+    
+    private void initializeView() {
+        StyleSheet stylesheet = new StyleSheet();
+        stylesheet.addRule(".hljs {\n" +
+                "  display: block;\n" +
+                "  overflow-x: auto;\n" +
+                "  padding: 0.5em;\n" +
+                "  color: #383a42;\n" +
+                "  background: #fafafa;\n" +
+                "}\n" +
+                "\n" +
+                ".hljs-comment,\n" +
+                ".hljs-quote {\n" +
+                "  color: #a0a1a7;\n" +
+                "  font-style: italic;\n" +
+                "}\n" +
+                "\n" +
+                ".hljs-doctag,\n" +
+                ".hljs-keyword,\n" +
+                ".hljs-formula {\n" +
+                "  color: #a626a4;\n" +
+                "}\n" +
+                "\n" +
+                ".hljs-section,\n" +
+                ".hljs-name,\n" +
+                ".hljs-selector-tag,\n" +
+                ".hljs-deletion,\n" +
+                ".hljs-subst {\n" +
+                "  color: #e45649;\n" +
+                "}\n" +
+                "\n" +
+                ".hljs-literal {\n" +
+                "  color: #0184bb;\n" +
+                "}\n" +
+                "\n" +
+                ".hljs-string,\n" +
+                ".hljs-regexp,\n" +
+                ".hljs-addition,\n" +
+                ".hljs-attribute,\n" +
+                ".hljs-meta-string {\n" +
+                "  color: #50a14f;\n" +
+                "}\n" +
+                "\n" +
+                ".hljs-built_in,\n" +
+                ".hljs-class .hljs-title {\n" +
+                "  color: #c18401;\n" +
+                "}\n" +
+                "\n" +
+                ".hljs-attr,\n" +
+                ".hljs-variable,\n" +
+                ".hljs-template-variable,\n" +
+                ".hljs-type,\n" +
+                ".hljs-selector-class,\n" +
+                ".hljs-selector-attr,\n" +
+                ".hljs-selector-pseudo,\n" +
+                ".hljs-number {\n" +
+                "  color: #986801;\n" +
+                "}\n" +
+                "\n" +
+                ".hljs-symbol,\n" +
+                ".hljs-bullet,\n" +
+                ".hljs-link,\n" +
+                ".hljs-meta,\n" +
+                ".hljs-selector-id,\n" +
+                ".hljs-title {\n" +
+                "  color: #4078f2;\n" +
+                "}\n" +
+                "\n" +
+                ".hljs-emphasis {\n" +
+                "  font-style: italic;\n" +
+                "}\n" +
+                "\n" +
+                ".hljs-strong {\n" +
+                "  font-weight: bold;\n" +
+                "}\n" +
+                "\n" +
+                ".hljs-link {\n" +
+                "  text-decoration: underline;\n" +
+                "}\n" +
+                "</style>"
+        );
+        
+        HTMLEditorKit htmlEditorKit = new HTMLEditorKit();
+        htmlEditorKit.setStyleSheet(stylesheet);
+        HTMLDocument htmlDocument = (HTMLDocument) htmlEditorKit.createDefaultDocument();
+        textCode.setEditorKit(htmlEditorKit);
+        textCode.setDocument(htmlDocument);
     }
 
     @Override
@@ -261,7 +353,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
 
     public void setText(String str) {
         LOG.info("Text changed...");
-        textCode.setText("<html><head></head><body style=\"font-size: 1.15em\">" + str.trim() + "</body></html>");
+        textCode.setText("<html><head></head><body style=\"font-size: 1.15em\"><pre><code>" + str.trim() + "</code></pre></body></html>");
     }
 
     /**
@@ -445,7 +537,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
                 // Handle syntax highlighting in background
                 .observeOn(Schedulers.computation())
                 .doOnNext(model::setText)
-                .map(contents -> new Java2HTML().translate(contents))
+                .flatMap(contents -> new Java2HTML().translate(contents))
                 // Display text on UI Thread
                 .observeOn(SwingScheduler.getInstance())
                 .doOnNext(this::setText)

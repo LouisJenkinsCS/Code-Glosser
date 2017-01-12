@@ -31,12 +31,31 @@
 package edu.bloomu.codeglosser.HTML;
 
 import edu.bloomu.codeglosser.Utils.HTMLGenerator;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 import java.awt.Color;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.HashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javafx.application.Platform;
+import javafx.concurrent.Worker;
+import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.StackPane;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JTextPane;
 
 /**
  *
@@ -261,72 +280,302 @@ public abstract class Lang2HTML {
         throw new RuntimeException("Did not handle character: " + ch);
     }
     
-    public String translate(String code) {
-        syntax = new Syntax();
-        boolean start = false;
-        StringBuffer buf = new StringBuffer();
-        StringBuffer tmp = new StringBuffer();
-        StringCharacterIterator it = new StringCharacterIterator(code.trim());
-        for(char c = it.current(); c != CharacterIterator.DONE; c = it.next()) {
-            String token = parseToken(it);
-            
-            
-            // Handle comments by buffering them.
-            switch (state) {
-                case NORMAL:
-                    buf.append(token);
-                    break;
-                case SINGLE_LINE_COMMENT:
-                    tmp.append(token);
-                    if (token.equals(getNewLineStandin())) {
-                        state = ParseState.NORMAL;
-                        buf.append(syntax.commentToHTMLTag(tmp.toString()));
-                        tmp.delete(0, tmp.length());
-                        tmp.trimToSize();
-                    }
-                    
-                    break;
-                case MULTI_LINE_COMMENT:
-                    tmp.append(token);
-                    if (token.equals("*/")) {
-                        state = ParseState.NORMAL;
-                        buf.append(syntax.commentToHTMLTag(tmp.toString()));
-                        tmp.delete(0, tmp.length());
-                        tmp.trimToSize();
-                    }
-                    
-                    break;
-                case STRING:
-                    tmp.append(token);
-                    if (token.equals("\"") && start) {
-                        state = ParseState.NORMAL;
-                        buf.append(syntax.stringToHTMLTag(tmp.toString()));
-                        tmp.delete(0, tmp.length());
-                        tmp.trimToSize();
-                        start = false;
-                    } else {
-                        start = true;
-                    }
-                    
-                    break;
-                case CHAR:
-                    tmp.append(token);
-                    if (token.equals("\'") && start) {
-                        state = ParseState.NORMAL;
-                        buf.append(syntax.stringToHTMLTag(tmp.toString()));
-                        tmp.delete(0, tmp.length());
-                        tmp.trimToSize();
-                        start = false;
-                    } else {
-                        start = true;
-                    }
-                    
-                    break;
-            }
-        }
+    WebView wv;
+    
+    public Observable<String> translate(final String code) {
+        PublishSubject<String> pageLoaded = PublishSubject.create();
+        Platform.runLater(() -> {
+            String html = "<title>Test</title>"
+                    + "<meta charset=\"UTF-8\">"
+                    + "</head>"
+                    + "<body>"
+                    + "<pre><code>" + code.replace(">", "&gt").replace("<", "&lt") + "</code>" + "</pre>" 
+                    + "</body>" + "</html>";
+            wv = new WebView();
+            WebEngine eng = wv.getEngine();
+
+    //        btn.setText("Say 'Hello World'");
+    //        btn.setOnAction(new EventHandler<ActionEvent>() {
+    //            
+    //            @Override
+    //            public void handle(ActionEvent event) {
+    //                System.out.println("Hello World!");
+    //            }
+    //        });
+
+            StackPane root = new StackPane();
+            root.getChildren().add(wv);
+
+            Scene scene = new Scene(root, 300, 250);
+
+            ContextMenu menu = new ContextMenu();
+            MenuItem item = new MenuItem("Create");
+            item.setOnAction(e -> {
+                String newCode = generateHTML2((String) eng.executeScript("document.getElementById('code_segment').innerHTML"));
+                System.out.println(newCode);
+                final JDialog dialog = new JDialog();
+                dialog.setModal(true);
+                JTextPane pane = new JTextPane();
+                pane.setText(newCode);
+                dialog.add(pane);
+                dialog.setVisible(true);
+            });
+            menu.getItems().add(item);
+
+            wv.setContextMenuEnabled(false);
+            wv.setOnMouseClicked(e -> {
+                if (e.getButton() == MouseButton.SECONDARY) {
+                    menu.show(wv, e.getSceneX(), e.getScreenY());
+                }
+            });
+
+
+            eng.getLoadWorker().stateProperty().addListener((ov,oldState,newState) -> {
+
+                switch (newState) {
+                    case SCHEDULED:
+                        System.out.println("state: scheduled");
+                        break;
+                    case RUNNING:
+                        System.out.println("state: running");
+                        break;
+                    case SUCCEEDED:
+                        System.out.println("state: succeeded");
+                        break;
+                    default:
+                        System.out.println("state: " + newState);
+                        break;
+                }
+                if (newState == Worker.State.SUCCEEDED) {
+                    String newCode = (String) eng.executeScript("document.getElementById('code_segment').innerHTML");
+                    pageLoaded.onNext(newCode);
+                }
+            });
+
+            eng.loadContent(generateHTML(code, true));
+        });
+//        syntax = new Syntax();
+//        boolean start = false;
+//        StringBuffer buf = new StringBuffer();
+//        StringBuffer tmp = new StringBuffer();
+//        StringCharacterIterator it = new StringCharacterIterator(code.trim());
+//        for(char c = it.current(); c != CharacterIterator.DONE; c = it.next()) {
+//            String token = parseToken(it);
+//            
+//            
+//            // Handle comments by buffering them.
+//            switch (state) {
+//                case NORMAL:
+//                    buf.append(token);
+//                    break;
+//                case SINGLE_LINE_COMMENT:
+//                    tmp.append(token);
+//                    if (token.equals(getNewLineStandin())) {
+//                        state = ParseState.NORMAL;
+//                        buf.append(syntax.commentToHTMLTag(tmp.toString()));
+//                        tmp.delete(0, tmp.length());
+//                        tmp.trimToSize();
+//                    }
+//                    
+//                    break;
+//                case MULTI_LINE_COMMENT:
+//                    tmp.append(token);
+//                    if (token.equals("*/")) {
+//                        state = ParseState.NORMAL;
+//                        buf.append(syntax.commentToHTMLTag(tmp.toString()));
+//                        tmp.delete(0, tmp.length());
+//                        tmp.trimToSize();
+//                    }
+//                    
+//                    break;
+//                case STRING:
+//                    tmp.append(token);
+//                    if (token.equals("\"") && start) {
+//                        state = ParseState.NORMAL;
+//                        buf.append(syntax.stringToHTMLTag(tmp.toString()));
+//                        tmp.delete(0, tmp.length());
+//                        tmp.trimToSize();
+//                        start = false;
+//                    } else {
+//                        start = true;
+//                    }
+//                    
+//                    break;
+//                case CHAR:
+//                    tmp.append(token);
+//                    if (token.equals("\'") && start) {
+//                        state = ParseState.NORMAL;
+//                        buf.append(syntax.stringToHTMLTag(tmp.toString()));
+//                        tmp.delete(0, tmp.length());
+//                        tmp.trimToSize();
+//                        start = false;
+//                    } else {
+//                        start = true;
+//                    }
+//                    
+//                    break;
+//            }
+//        }
+//        
+//        LOG.info(HTMLGenerator.generate(code));
+        return pageLoaded;
+    }
+    
+    public static String generateHTML2(String code) {
+        StringBuilder builder;
+        builder = new StringBuilder()
+                .append("<html><head><style>.hljs {\n" +
+"  display: block;\n" +
+"  overflow-x: auto;\n" +
+"  padding: 0.5em;\n" +
+"  color: #383a42;\n" +
+"  background: #fafafa;\n" +
+"}\n" +
+"\n" +
+".hljs-comment,\n" +
+".hljs-quote {\n" +
+"  color: #a0a1a7;\n" +
+"  font-style: italic;\n" +
+"}\n" +
+"\n" +
+".hljs-doctag,\n" +
+".hljs-keyword,\n" +
+".hljs-formula {\n" +
+"  color: #a626a4;\n" +
+"}\n" +
+"\n" +
+".hljs-section,\n" +
+".hljs-name,\n" +
+".hljs-selector-tag,\n" +
+".hljs-deletion,\n" +
+".hljs-subst {\n" +
+"  color: #e45649;\n" +
+"}\n" +
+"\n" +
+".hljs-literal {\n" +
+"  color: #0184bb;\n" +
+"}\n" +
+"\n" +
+".hljs-string,\n" +
+".hljs-regexp,\n" +
+".hljs-addition,\n" +
+".hljs-attribute,\n" +
+".hljs-meta-string {\n" +
+"  color: #50a14f;\n" +
+"}\n" +
+"\n" +
+".hljs-built_in,\n" +
+".hljs-class .hljs-title {\n" +
+"  color: #c18401;\n" +
+"}\n" +
+"\n" +
+".hljs-attr,\n" +
+".hljs-variable,\n" +
+".hljs-template-variable,\n" +
+".hljs-type,\n" +
+".hljs-selector-class,\n" +
+".hljs-selector-attr,\n" +
+".hljs-selector-pseudo,\n" +
+".hljs-number {\n" +
+"  color: #986801;\n" +
+"}\n" +
+"\n" +
+".hljs-symbol,\n" +
+".hljs-bullet,\n" +
+".hljs-link,\n" +
+".hljs-meta,\n" +
+".hljs-selector-id,\n" +
+".hljs-title {\n" +
+"  color: #4078f2;\n" +
+"}\n" +
+"\n" +
+".hljs-emphasis {\n" +
+"  font-style: italic;\n" +
+"}\n" +
+"\n" +
+".hljs-strong {\n" +
+"  font-weight: bold;\n" +
+"}\n" +
+"\n" +
+".hljs-link {\n" +
+"  text-decoration: underline;\n" +
+"}\n" +
+"</style>")
+                
+                .append("        <title>")
+                .append("Test")
+                .append("</title>")
+                .append("        <meta charset=\"UTF-8\">")
+                .append("    </head>")
+                .append("    <body>")
+                .append("        <pre>")
+                .append("<code>")
+                .append(code)
+                .append("</code>")
+                .append("</pre>")
+                .append("    </body>")
+                .append("</html>");
         
-        LOG.info(HTMLGenerator.generate(code));
-        return buf.toString();
+        return builder.toString();
+    }
+    
+    public static String generateHTML(String code, boolean script) {
+        StringBuilder builder;
+        builder = new StringBuilder()
+                .append("<html>")
+                .append("    <head>")
+                .append("        <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/styles/atom-one-light.min.css\"></script>")
+                .append(!script ? "" : "        <script src=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/highlight.min.js\"></script>")
+                .append(!script ? "" : "        <script>hljs.initHighlightingOnLoad();</script>")
+                .append("<style>.note {\n")
+                .append("  display: inline;\n" )
+                .append("  position: relative;\n" )
+                .append("  background-color: yellow;\n" )
+                .append("}\n" )
+                .append("\n" )
+                .append(".note:hover:after {\n" )
+                .append("  background: #333;\n" )
+                .append("  background: rgba(0,0,0,.8);\n" )
+                .append("  border-radius: 5px;\n" )
+                .append("  bottom: 26px;\n" )
+                .append("  white-space: pre-wrap;\n" )
+                .append("  color: #fff;\n" )
+                .append("  content: attr(msg);\n" )
+                .append("  left: 20%;\n" )
+                .append("  padding: 5px 15px;\n" )
+                .append("  position: absolute;\n" )
+                .append("  z-index: 98;\n" )
+                .append("  width:500px;\n" )
+                .append("  display:block;\n" )
+                .append("  word-wrap: normal;\n" )
+                .append("}\n" )
+                .append("\n" )
+                .append(".note:hover:before{\n" )
+                .append("  border:solid;\n" )
+                .append("  border-color: #333 transparent;\n" )
+                .append("  border-width: 6px 6px 0 6px;\n" )
+                .append("  bottom: 20px;\n" )
+                .append("  content: \"\";\n" )
+                .append("  left: 50%;\n" )
+                .append("  position: absolute;\n" )
+                .append("  display:block;\n" )
+                .append("  z-index: 99;\n" )
+                .append("}</style>")
+                .append("        <title>")
+                .append("Test")
+                .append("</title>")
+                .append("        <meta charset=\"UTF-8\">")
+                .append("    </head>")
+                .append("    <body contenteditable=\"false\">")
+                .append("        <pre>")
+                .append("<code id=\"code_segment\">")
+                .append(code.replace(">", "&gt").replace("<", "&lt"))
+                .append("</code>")
+                .append("</pre>")
+                .append("    </body>")
+                .append("</html>");
+        
+        return builder.toString();
     }
     private static final Logger LOG = Logger.getLogger(Lang2HTML.class.getName());
     

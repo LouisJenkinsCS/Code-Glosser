@@ -55,7 +55,6 @@ public class MarkupFrame extends javax.swing.JFrame {
         
         File project = null;
         JFileChooser jfc = new JFileChooser();
-        jfc.setFileFilter(new FileNameExtensionFilter("Java source files...", "java"));
         jfc.setCurrentDirectory(new File("."));
         jfc.setDialogTitle("Project");
         jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);

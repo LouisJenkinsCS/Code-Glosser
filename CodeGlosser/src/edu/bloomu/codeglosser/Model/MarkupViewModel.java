@@ -33,6 +33,7 @@ package edu.bloomu.codeglosser.Model;
 import edu.bloomu.codeglosser.Exceptions.InvalidTextSelectionException;
 import edu.bloomu.codeglosser.HTML.Java2HTML;
 import edu.bloomu.codeglosser.Utils.Bounds;
+import io.reactivex.Observable;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;
@@ -181,7 +182,7 @@ public class MarkupViewModel {
         this.title = title;
     }
     
-    public String toHTML() {
+    public Observable<String> toHTML() {
         return new Java2HTML().translate(text);
     }
     
