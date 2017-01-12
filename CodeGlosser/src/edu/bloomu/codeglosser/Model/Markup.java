@@ -31,23 +31,43 @@
 package edu.bloomu.codeglosser.Model;
 
 import edu.bloomu.codeglosser.Utils.Bounds;
+import edu.bloomu.codeglosser.Utils.ColorUtils;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.json.simple.JSONObject;
 
 /**
  *
  * @author Louis
  */
 public class Markup {
+    
     public static Markup DEFAULT = new Markup("", "<None Selected>");
+    
+    public static final String COLOR = "color";
+    public static final String ID = "id";
+    public static final String MESSAGE = "message";
+    public static final String BOUNDS = "bounds";
     
     public static Markup template(String msg, Color c) {
         Markup m = new Markup(msg, null, new Bounds[] {});
         m.setHighlightColor(c);
         return m;
         
+    }
+    
+    public static Markup deserialize(JSONObject obj) {
+        Color color = (Color) obj.get(COLOR);
+        String id = (String) obj.get(ID);
+        String msg = (String) obj.get(MESSAGE);
+        Bounds bounds[] = (Bounds[]) obj.get(BOUNDS);
+        
+        Markup markup = new Markup(msg, id, bounds);
+        markup.highlightColor = color;
+        
+        return markup;
     }
     
     public static Markup template(String msg) {
@@ -116,6 +136,15 @@ public class Markup {
 
     public void setTextColor(Color textColor) {
         this.textColor = textColor;
+    }
+    
+    public JSONObject serialize() {
+        JSONObject obj = new JSONObject();
+        obj.put(COLOR, ColorUtils.asString(highlightColor));
+        obj.put(ID, id);
+        obj.put(MESSAGE, msg);
+        
+        return obj;
     }
 
     @Override

@@ -54,6 +54,9 @@ public final class Globals {
     // The location of the templates file
     public static Path TEMPLATE_FILE = Paths.get("templates.json");
     
+    // The path to current file
+    public static Path CURRENT_FILE = null;
+    
     /**
      * Initializes all globals to a default state. Used so that in the case of a
      * memory leak, the previous values are not accidentally used.
@@ -62,5 +65,6 @@ public final class Globals {
         IS_BUSY = false;
         PROJECT_FOLDER = null;
         URI_PREFIX = null;
+        CURRENT_FILE = null;
     }
 }

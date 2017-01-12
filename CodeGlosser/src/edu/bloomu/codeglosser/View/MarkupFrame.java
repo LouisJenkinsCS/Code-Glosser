@@ -32,6 +32,7 @@ package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Controller.MarkupController;
 import edu.bloomu.codeglosser.Globals;
+import edu.bloomu.codeglosser.Utils.SessionManager;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.util.logging.Level;
@@ -69,6 +70,9 @@ public class MarkupFrame extends javax.swing.JFrame {
         Globals.initGlobals();
         Globals.PROJECT_FOLDER = project.toPath();
         Globals.URI_PREFIX = project.toURI();
+        
+        // Initialize needed components
+        SessionManager.init();
         
         // Create the main components
         MarkupController controller = new MarkupController();

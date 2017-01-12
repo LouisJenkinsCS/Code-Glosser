@@ -33,6 +33,7 @@ package edu.bloomu.codeglosser.Controller;
 import edu.bloomu.codeglosser.Events.Event;
 import edu.bloomu.codeglosser.Events.EventEngine;
 import edu.bloomu.codeglosser.Events.EventHandler;
+import edu.bloomu.codeglosser.Globals;
 import edu.bloomu.codeglosser.Model.MarkupViewModel;
 import edu.bloomu.codeglosser.Utils.HTMLGenerator;
 import edu.bloomu.codeglosser.View.MarkupView;
@@ -42,6 +43,7 @@ import java.io.BufferedOutputStream;
 import edu.bloomu.codeglosser.Utils.Bounds;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Utils.IdentifierGenerator;
+import edu.bloomu.codeglosser.Utils.SessionManager;
 import edu.bloomu.codeglosser.Utils.SwingScheduler;
 import edu.bloomu.codeglosser.View.MarkupProperties;
 import io.reactivex.schedulers.Schedulers;
@@ -54,6 +56,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -253,6 +256,10 @@ public class MarkupController implements EventHandler {
         return Observable
                 .just(filePath)
                 // Handle reading on IO thread
+                .observeOn(Schedulers.io())
+                .doOnNext(ignored -> SessionManager.saveSession(markupMap.values().stream().collect(Collectors.toList())))
+                .observeOn(SwingScheduler.getInstance())
+                .doOnNext(path -> Globals.CURRENT_FILE = path)
                 .observeOn(Schedulers.io())
                 .map(Files::readAllLines)
                 // Handle computation on computation thread
