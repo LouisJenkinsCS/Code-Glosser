@@ -33,6 +33,11 @@ package edu.bloomu.codeglosser.Utils;
 import edu.bloomu.codeglosser.Globals;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Logger;
@@ -65,5 +70,23 @@ public class FileUtils {
                 .map(Files::readAllLines)
                 .observeOn(Schedulers.computation())
                 .map(list -> list.stream().collect(Collectors.joining("\n")));         
+    }
+    
+    public static String getExtension(Path path) {
+        String fileName = path.toString();
+        int offset = fileName.indexOf('.');
+        LOG.info("Extension: " + fileName.substring(offset + 1));
+        return fileName.substring(offset + 1);
+    }
+
+    public static File temporaryFile(String html) throws IOException  {
+        File f = new File("tmp.html");
+        f.createNewFile();
+        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(f));
+        stream.write(html.getBytes());
+        stream.flush();
+        stream.close();
+        
+        return f;
     }
 }

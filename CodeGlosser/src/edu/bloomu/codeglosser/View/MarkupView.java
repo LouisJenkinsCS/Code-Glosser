@@ -39,7 +39,7 @@ import edu.bloomu.codeglosser.Events.Event;
 import edu.bloomu.codeglosser.Events.EventEngine;
 import edu.bloomu.codeglosser.Events.EventHandler;
 import edu.bloomu.codeglosser.Exceptions.InvalidTextSelectionException;
-import edu.bloomu.codeglosser.HTML.Java2HTML;
+import edu.bloomu.codeglosser.HTML.Lang2HTML;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Model.MarkupViewModel;
 import edu.bloomu.codeglosser.Utils.ColorUtils;
@@ -48,6 +48,9 @@ import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Stream;
@@ -114,85 +117,14 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
     }
     
     private void initializeView() {
+        String styles;
+        try {
+            styles = new String(Files.readAllBytes(Paths.get("src/edu/bloomu/codeglosser/HTML/styles.css")));
+        } catch (IOException ex) {
+            throw new RuntimeException("Unable to locate syles.css: " + ex.getMessage());
+        }
         StyleSheet stylesheet = new StyleSheet();
-        stylesheet.addRule(".hljs {\n" +
-                "  display: block;\n" +
-                "  overflow-x: auto;\n" +
-                "  padding: 0.5em;\n" +
-                "  color: #383a42;\n" +
-                "  background: #fafafa;\n" +
-                "}\n" +
-                "\n" +
-                ".hljs-comment,\n" +
-                ".hljs-quote {\n" +
-                "  color: #a0a1a7;\n" +
-                "  font-style: italic;\n" +
-                "}\n" +
-                "\n" +
-                ".hljs-doctag,\n" +
-                ".hljs-keyword,\n" +
-                ".hljs-formula {\n" +
-                "  color: #a626a4;\n" +
-                "}\n" +
-                "\n" +
-                ".hljs-section,\n" +
-                ".hljs-name,\n" +
-                ".hljs-selector-tag,\n" +
-                ".hljs-deletion,\n" +
-                ".hljs-subst {\n" +
-                "  color: #e45649;\n" +
-                "}\n" +
-                "\n" +
-                ".hljs-literal {\n" +
-                "  color: #0184bb;\n" +
-                "}\n" +
-                "\n" +
-                ".hljs-string,\n" +
-                ".hljs-regexp,\n" +
-                ".hljs-addition,\n" +
-                ".hljs-attribute,\n" +
-                ".hljs-meta-string {\n" +
-                "  color: #50a14f;\n" +
-                "}\n" +
-                "\n" +
-                ".hljs-built_in,\n" +
-                ".hljs-class .hljs-title {\n" +
-                "  color: #c18401;\n" +
-                "}\n" +
-                "\n" +
-                ".hljs-attr,\n" +
-                ".hljs-variable,\n" +
-                ".hljs-template-variable,\n" +
-                ".hljs-type,\n" +
-                ".hljs-selector-class,\n" +
-                ".hljs-selector-attr,\n" +
-                ".hljs-selector-pseudo,\n" +
-                ".hljs-number {\n" +
-                "  color: #986801;\n" +
-                "}\n" +
-                "\n" +
-                ".hljs-symbol,\n" +
-                ".hljs-bullet,\n" +
-                ".hljs-link,\n" +
-                ".hljs-meta,\n" +
-                ".hljs-selector-id,\n" +
-                ".hljs-title {\n" +
-                "  color: #4078f2;\n" +
-                "}\n" +
-                "\n" +
-                ".hljs-emphasis {\n" +
-                "  font-style: italic;\n" +
-                "}\n" +
-                "\n" +
-                ".hljs-strong {\n" +
-                "  font-weight: bold;\n" +
-                "}\n" +
-                "\n" +
-                ".hljs-link {\n" +
-                "  text-decoration: underline;\n" +
-                "}\n" +
-                "</style>"
-        );
+        stylesheet.addRule(styles);
         
         HTMLEditorKit htmlEditorKit = new HTMLEditorKit();
         htmlEditorKit.setStyleSheet(stylesheet);
@@ -539,7 +471,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
                 // Handle syntax highlighting in background
                 .observeOn(Schedulers.computation())
                 .doOnNext(p -> model.setText(p.getValue0()))
-                .flatMap(p -> new Java2HTML()
+                .flatMap(p -> new Lang2HTML()
                         .translate(p.getValue0())
                         .map(p::setAt0)
                 )

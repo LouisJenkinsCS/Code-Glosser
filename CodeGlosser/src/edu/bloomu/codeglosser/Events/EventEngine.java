@@ -56,7 +56,6 @@ public class EventEngine {
         ingoingEvent
                 // Only accept events if they are addressed to use
                 .filter(e -> e.getRecipient() == id)
-                .doOnNext(e -> LOG.info("Received event: " + e))
                 // Convert it to the implementor's Observable
                 .flatMap(handler::handleEvent)
                 // If it emits any events, send them as outgoing.
