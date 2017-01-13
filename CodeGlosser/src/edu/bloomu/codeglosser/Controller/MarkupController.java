@@ -320,7 +320,10 @@ public class MarkupController implements EventHandler {
     }
     
     private Observable<Event> exportProject() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        LOG.info("Exporting project...");
+        
+        HTMLGenerator.generateAll();
+        return Observable.empty();
     }
     
     private Observable<Event> saveSession() {

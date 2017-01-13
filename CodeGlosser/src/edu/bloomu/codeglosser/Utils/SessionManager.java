@@ -106,23 +106,33 @@ public class SessionManager {
                 .observeOn(Schedulers.io())
                 // Write to file
                 .subscribe(SessionManager::writeData);
-                
-                
+    }
+    
+    public static boolean sessionExists(Path path) {
+        LOG.info("Determining if session exists: " + path);
+        
+        String key = Globals.PROJECT_FOLDER.relativize(path).toString();
+        return getJSONContents()
+                .any(json -> json.containsKey(key))
+                .blockingGet();
+    }
+    
+    public static Observable<JSONObject> getJSONContents() {
+        Path dataPath = Paths.get(Globals.PROJECT_FOLDER + "\\" + FILE_NAME);
+        
+        return Observable
+                .just(dataPath)
+                .flatMap(FileUtils::getContents)
+                .map(json -> (JSONObject) new JSONParser().parse(json));
     }
     
     public static List<Markup> loadSession(Path path) {
         LOG.info("Loading session data...");
         
         String key = Globals.PROJECT_FOLDER.relativize(path).toString();
-        List<Markup> markups = (List<Markup>) Observable
-                .just(Paths.get(Globals.PROJECT_FOLDER + "\\" + FILE_NAME))
-                .observeOn(Schedulers.io())
-                .map(Files::readAllLines)
-                .observeOn(Schedulers.computation())
-                .map(list -> list.stream().collect(Collectors.joining("\n")))
-                .map(json -> (JSONObject) new JSONParser().parse(json))
-                .filter(obj -> obj.containsKey(key))
-                .map(obj -> (JSONArray) obj.get(key))
+        List<Markup> markups = (List<Markup>) getJSONContents()
+                .filter(json -> json.containsKey(key))
+                .map(json -> (JSONArray) json.get(key))
                 .flatMap(Observable::fromIterable)
                 .map(data -> Markup.deserialize((JSONObject) data))
                 .toList()
