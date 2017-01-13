@@ -48,6 +48,7 @@ import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 import javax.swing.JMenuItem;
@@ -60,6 +61,7 @@ import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
+import org.javatuples.Pair;
 
 /**
  *
@@ -211,7 +213,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
                     case MarkupController.SET_CURSOR:
                         return setCursorPosition((Bounds) e.data);
                     case MarkupController.FILE_SELECTED:
-                        return fileSelected((String) e.data);
+                        return fileSelected((Pair<String, List<Markup>>) e.data);
                     default:
                         throw new RuntimeException("Bad Custom Tag!");
                 }
@@ -249,7 +251,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
             try {
                 // Segment boundary
                 Bounds[] bounds = model.segmentRange(b);
-                addMarkup(bounds);
+                addMarkup(Color.YELLOW, bounds);
                 engine.broadcast(Event.MARKUP_CONTROLLER, CREATE_MARKUP, bounds);
             } catch (InvalidTextSelectionException ex) {
                 LOG.severe("Bad Bounds!!!");
@@ -382,7 +384,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
         setSelection(model.getLineBounds(textCode.getSelectionStart()));
     }
 
-    public void addMarkup(Bounds... bounds) {
+    public void addMarkup(Color color, Bounds... bounds) {
         LOG.info(Stream
                 .of(bounds)
                 .map(Bounds::toString)
@@ -394,7 +396,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
                 .forEach((b) -> {
                     Highlight highlight = null;
                     try {
-                        highlight = (Highlight) highlighter.addHighlight(b.getStart(), b.getEnd(), new DefaultHighlightPainter(ColorUtils.makeTransparent(Color.YELLOW)));
+                        highlight = (Highlight) highlighter.addHighlight(b.getStart(), b.getEnd(), new DefaultHighlightPainter(ColorUtils.makeTransparent(color)));
                     } catch (BadLocationException ex) {
                         LOG.throwing(this.getClass().getName(), "addMarkup", ex);
                     }
@@ -531,16 +533,23 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
                 
     }
     
-    private Observable<Event> fileSelected(String fileContents) {
+    private Observable<Event> fileSelected(Pair<String, List<Markup>> pair) {
         return Observable
-                .just(fileContents)
+                .just(pair)
                 // Handle syntax highlighting in background
                 .observeOn(Schedulers.computation())
-                .doOnNext(model::setText)
-                .flatMap(contents -> new Java2HTML().translate(contents))
+                .doOnNext(p -> model.setText(p.getValue0()))
+                .flatMap(p -> new Java2HTML()
+                        .translate(p.getValue0())
+                        .map(p::setAt0)
+                )
                 // Display text on UI Thread
                 .observeOn(SwingScheduler.getInstance())
-                .doOnNext(this::setText)
+                .doOnNext(p -> setText(p.getValue0()))
+                // Set highlights
+                .map(Pair::getValue1)
+                .flatMap(Observable::fromIterable)
+                .doOnNext(markup -> addMarkup(markup.getHighlightColor(), markup.getOffsets()))
                 // We have handled the event, so no need for anything else.
                 .flatMap(Event::empty);
     }

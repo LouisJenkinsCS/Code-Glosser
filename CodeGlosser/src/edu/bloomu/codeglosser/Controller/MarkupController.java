@@ -58,9 +58,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.javatuples.Pair;
+import org.javatuples.Unit;
 
 /**
  *
@@ -72,6 +75,7 @@ public class MarkupController implements EventHandler {
     public static final int NEW_MARKUP = 0x1;
     public static final int REMOVE_MARKUP = 0x2;
     public static final int DISPLAY_MARKUP = 0x3;
+    public static final int RESTORE_MARKUPS = 0x4;
     
     // MarkupView events
     public static final int REMOVE_HIGHLIGHTS = 0x1;
@@ -178,10 +182,18 @@ public class MarkupController implements EventHandler {
     private Observable<Event> createMarkup(Bounds[] bounds) {
         LOG.info("Creating markup with offsets... " + Arrays.toString(bounds));
         
-        // Create a new markup
-        String id = idGen.getNextId();
-        currentMarkup = new Markup("", id, bounds);
-        markupMap.put(id, currentMarkup);
+        // Create a new markup. We must ensure each id is unique however.
+        while (true) {
+            String id = idGen.getNextId();
+            if (markupMap.containsKey(id)) {
+                continue;
+            }
+            
+            currentMarkup = new Markup("", id, bounds);
+            markupMap.put(id, currentMarkup);
+            break;
+        }
+        
         
         // Notify the MarkupProperties to display new Markup.
         return Observable.just(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, NEW_MARKUP, currentMarkup));
@@ -249,24 +261,61 @@ public class MarkupController implements EventHandler {
         return Observable.empty();
     }
 
+    /**
+     * Save the current and restore a previous session (if present) and display
+     * the requested file contents. If a previous session of the current file exists,
+     * it will overwrite it. If a previous session of the new file exists, it will be
+     * loaded and the preserved markups are restored.
+     * @param filePath Path to file
+     * @return Observable
+     */
     private Observable<Event> fileSelected(Path filePath) {
         LOG.info("Handling file change event for " + filePath);
         
-        // Notify MarkupView of file
         return Observable
                 .just(filePath)
-                // Handle reading on IO thread
+                // First, save the user's session. As this involves IO, we switch to an
+                // IO Bound thread to perform this work.
                 .observeOn(Schedulers.io())
                 .doOnNext(ignored -> SessionManager.saveSession(markupMap.values().stream().collect(Collectors.toList())))
+                // Second, if there exists any, restore any preserved markups. 
+                // To maintain this pipeline, we tuple the list of
+                // restored markups with the current path, becoming of type 
+                // Pair<Path, List<Markup>>.
+                .map(path -> Pair.with(path, SessionManager.loadSession(path)))
+                // Third, to ensure that the current file is not updated simulataneously from multiple threads, we always
+                // switch to the UI Thread prior to doing so.
                 .observeOn(SwingScheduler.getInstance())
-                .doOnNext(path -> Globals.CURRENT_FILE = path)
+                .doOnNext(path -> Globals.CURRENT_FILE = path.getValue0())
+                // Fourth, as the rest of work can be done in the background, 
+                // we switch back to an IO Bound thread. This thread will be in 
+                // charge of reading in the requested file. We drop the path 
+                // for it's files respective contents (as lines) as it is no longer needed,
+                // becoming of type Pair<List<String>, List<Markup>>
                 .observeOn(Schedulers.io())
-                .map(Files::readAllLines)
-                // Handle computation on computation thread
+                .map(pair -> pair.setAt0(Files.readAllLines(pair.getValue0())))
+                // Fifth, as we have both the file contents and (potentially) the Markups,
+                // we need to send the markups to MarkupProperties (for it to update itself)
+                // and both contents and Markups to the MarkupView, as well as update our own. 
+                // However, first we must reduce all lines into a single stream, becoming of type Pair<String, List<Markup>>
                 .observeOn(Schedulers.computation())
-                .map(list -> list.stream().collect(Collectors.joining("\n")))
-                .map(fileContents -> Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, FILE_SELECTED, fileContents))
-                // Switch back to Swing UI thread
+                .map(pair -> pair.setAt0(pair.getValue0().stream().collect(Collectors.joining("\n"))))
+                .observeOn(SwingScheduler.getInstance())
+                .doOnNext(pair -> restoreMarkups(pair.getValue1()))
+                .observeOn(Schedulers.computation())
+                .flatMap(pair -> {
+                    List<Event> events = new ArrayList<>();
+                    
+                    // We always inform the MarkupView
+                    events.add(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, FILE_SELECTED, pair));
+                    
+                    // We only inform the MarkupProperties if and only if there are previous Markups to restore.
+                    if (!pair.getValue1().isEmpty()) {
+                        events.add(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, RESTORE_MARKUPS, pair.getValue1()));
+                    }
+                    
+                    return Observable.fromIterable(events);
+                })
                 .observeOn(SwingScheduler.getInstance());
     }
     
@@ -304,5 +353,17 @@ public class MarkupController implements EventHandler {
                         Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, SET_CURSOR, markup.getRange()),
                         Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, DISPLAY_MARKUP, markup)
                 ));
+    }
+
+    private void restoreMarkups(List<Markup> markups) {
+        LOG.info("Restoring previous Markups...");
+        
+        if (markups.isEmpty()) {
+            LOG.info("No Markups to restore...");
+            return;
+        }
+        
+        markupMap.clear();
+        markups.forEach(markup -> markupMap.put(markup.getId(), markup));
     }
 }

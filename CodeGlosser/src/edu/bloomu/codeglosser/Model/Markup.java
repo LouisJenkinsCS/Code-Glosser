@@ -34,8 +34,13 @@ import edu.bloomu.codeglosser.Utils.Bounds;
 import edu.bloomu.codeglosser.Utils.ColorUtils;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
@@ -43,7 +48,8 @@ import org.json.simple.JSONObject;
  * @author Louis
  */
 public class Markup {
-    
+
+    private static final Logger LOG = Logger.getLogger(Markup.class.getName());
     public static Markup DEFAULT = new Markup("", "<None Selected>");
     
     public static final String COLOR = "color";
@@ -59,12 +65,16 @@ public class Markup {
     }
     
     public static Markup deserialize(JSONObject obj) {
-        Color color = (Color) obj.get(COLOR);
+        LOG.info("Deserializing: " + obj);
+        Color color = Color.decode((String) obj.get(COLOR));
         String id = (String) obj.get(ID);
         String msg = (String) obj.get(MESSAGE);
-        Bounds bounds[] = (Bounds[]) obj.get(BOUNDS);
+        List<Bounds> bounds = (List<Bounds>) ((JSONArray) obj.get(BOUNDS))
+                .stream()
+                .map(object -> Bounds.deserialize((JSONObject) object))
+                .collect(Collectors.toList());
         
-        Markup markup = new Markup(msg, id, bounds);
+        Markup markup = new Markup(msg, id, bounds.toArray(new Bounds[bounds.size()]));
         markup.highlightColor = color;
         
         return markup;
@@ -143,6 +153,13 @@ public class Markup {
         obj.put(COLOR, ColorUtils.asString(highlightColor));
         obj.put(ID, id);
         obj.put(MESSAGE, msg);
+        
+        JSONArray serializedBounds = new JSONArray();
+        offsets
+                .stream()
+                .map(Bounds::serialize)
+                .forEach(serializedBounds::add);
+        obj.put(BOUNDS, serializedBounds);
         
         return obj;
     }

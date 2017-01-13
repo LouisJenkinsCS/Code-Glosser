@@ -1,0 +1,341 @@
+<html>    <head>        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/styles/atom-one-light.min.css"></script>        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/highlight.min.js"></script>        <script>hljs.initHighlightingOnLoad();</script><style>.note {
+  display: inline;
+  position: relative;
+  background-color: yellow;
+}
+
+.note:hover:after {
+  background: #333;
+  background: rgba(0,0,0,.8);
+  border-radius: 5px;
+  bottom: 26px;
+  white-space: pre-wrap;
+  color: #fff;
+  content: attr(msg);
+  left: 20%;
+  padding: 5px 15px;
+  position: absolute;
+  z-index: 98;
+  width:500px;
+  display:block;
+  word-wrap: normal;
+}
+
+.note:hover:before{
+  border:solid;
+  border-color: #333 transparent;
+  border-width: 6px 6px 0 6px;
+  bottom: 20px;
+  content: "";
+  left: 50%;
+  position: absolute;
+  display:block;
+  z-index: 99;
+}</style>        <title></title>        <meta charset="UTF-8">    </head>    <body>        <pre><code id="code_segment">/* BSD 3-Clause License
+ *
+ * Copyright (c) 2017, Louis Jenkins <LouisJenkinsCS@hotmail.<span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">com>
+ * All rights r</span>es<span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">erved.
+ *
+ * Redis</span>tr<span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">ibution and use in source an</span>d <span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">binary forms, with o</span>r <span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">without
+ * mod</span>if<span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">ication, are permitted </span>pr<span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">ovided that t</span>he<span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters)."> following condition</span>s <span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">are met:
+ *</span>
+ <span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">*     - Redistribut</span>io<span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">ns of source code mu</span>st<span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters)."> retain the a</span>bo<span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">ve copyright
+</span> *<span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">       notice, </span>th<span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">is list of conditio</span><span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">ns</span> and the following disclaimer.
+ *
+ *     - Redistributions i<span class="note" msg="">n binary form must reproduce the above copyright
+ *       notice, this list of con</span>diti<span class="note" msg="">ons and the following disclaimer in the
+ *       documentation and/or other materials provid</span>ed w<span class="note" msg="">ith the distribution.
+ *
+ *     - Neither the name of Louis Jenkins, Bloomsburg Un</span>iver<span class="note" msg="">sity nor the names of its 
+ *       contributors may be used to endorse or promote products d</span>eriv<span class="note" msg="">ed
+ *       from this software without specific prior written permission.
+ *
+ * THIS</span> SOF<span class="note" msg="">TWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRE</span>SS O<span class="note" msg="">R IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTA</span>BILI<span class="note" msg="">TY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYR</span>IGHT<span class="note" msg=""> HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, E</span>XEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package edu.bloomu.codeglosser.Controller;
+
+import edu.bloomu.codeglosser.Events.Event;
+import edu.bloomu.codeglosser.Events.EventEngine;
+import edu.bloomu.codeglosser.Events.EventHandler;
+import edu.bloomu.codeglosser.Globals;
+import edu.bloomu.codeglosser.Model.MarkupViewModel;
+import edu.bloomu.codeglosser.Utils.HTMLGenerator;
+import edu.bloomu.codeglosser.View.MarkupView;
+import io.reactivex.Observable;
+import java.awt.Desktop;
+import java.io.BufferedOutputStream;
+import edu.bloomu.codeglosser.Utils.Bounds;
+import edu.bloomu.codeglosser.Model.Markup;
+import edu.bloomu.codeglosser.Utils.Identifie<span class="note" msg="">rGenerator;
+import edu.bloomu.codeglosser.Utils.SessionManager;
+import edu.bloomu.codeglosser.Utils.SwingScheduler;
+im</span>port edu<span class="note" msg="">.bloomu.codeglosser.View.MarkupProperties;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjec</span>ts.Publi<span class="note" msg="">shSubject;
+import java.awt.Color;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+im</span>port jav<span class="note" msg="">a.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util</span>.Collect<span class="note" msg="">ions;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.u</span>til.stre<span class="note" msg="">am.Collectors;
+
+/**
+ *
+ * @author Louis
+ */
+public class MarkupController implements EventHandler {
+    
+    // Mar</span>kupPrope<span class="note" msg="">rties events
+    public static final int NEW_MARKUP = 0x1;
+    public static final int REMOVE_MARKUP = 0x2;
+    publ</span>ic stati<span class="note" msg="">c final int DISPLAY_MARKUP = 0x3;
+    
+    // MarkupView events
+    public static final int REMOVE_HIGHLIGHTS </span>= 0x1;
+ <span class="note" msg="">   public static final int CHANGE_HIGHLIGHT_COLOR = 0x2;
+    public static final int SET_CURSOR = 0x3;
+    public sta</span>tic fina<span class="note" msg="">l int FILE_SELECTED = 0x4;
+    
+    private static final Logger LOG = Logger.getLogger(MarkupController.class.getName());
+   </span> 
+    pr<span class="note" msg="">ivate final HashMap<String, Markup> markupMap = new HashMap<>();
+    private Markup currentMarkup = null;
+    
+    // Hand</span>les gene<span class="note" msg="">ration of the identifiers for markups. All markups must have a unique
+    // identifier for it to map correctly, so</span> the cur<span class="note" msg="">rent tag must be unique.
+    private final IdentifierGenerator idGen = new IdentifierGenerator("Markup");
+    
+    private final EventEn</span>gine eng<span class="note" msg="">ine = new EventEngine(this, Event.MARKUP_CONTROLLER);
+    
+    public MarkupController() {
+
+    }
+    
+    @Override
+    public Obs</span>ervable<<span class="note" msg="">Event> handleEvent(Event e) {
+        switch (e.getSender()) {
+            case Event.MARKUP_VIEW:
+                switch (e.getCustom()) {
+            </span>        case MarkupView.CREATE_MARKUP:
+                        return createMarkup((Bounds []) e.data);
+                    case MarkupView.DELETE_MARKUP:
+                        return deleteMarkup();
+                    case MarkupView.GET_MARKUP_SELECTION:
+                         return getMarkupSelection((Bounds) e.data);
+                    case MarkupView.EXPORT_PROJECT:
+                        return exportProject();
+                    case MarkupView.PREVIEW_HTML:
+                        return previewHTML((MarkupViewModel) e.data);
+                    case MarkupView.SAVE_SESSION:
+                        return saveSession();
+                    default:
+                        throw new RuntimeException("Bad Custom Tag for MarkupView!");
+                }
+            case Event.MARKUP_PROPERTIES:
+                switch (e.getCustom()) {
+                    case MarkupProperties.FILE_SELECTED:
+                        return fileSelected((Path) e.data);
+                    case MarkupProperties.APPLY_TEMPLATE:
+                        return applyTemplate((Markup) e.data);
+                    case MarkupProperties.SELECTED_ID:
+                        return selectedId((String) e.data);
+                    default:
+                        throw new RuntimeException("Bad Custom Tag for MarkupProperties!");
+                }
+            default:
+                throw new RuntimeException("Bad Sender!");
+        }
+    }
+
+    @Override
+    public EventEngine getEventEngine() {
+        return engine;
+    }
+    
+    private Observable<Event> selectedId(String id) {
+        LOG.info("Handling event for id selection: " + id);
+        
+        // MarkupView must update its cursor and MarkupProperties needs to be notified
+        return Observable
+                .just(id)
+                // Check if it is currently selected
+                .filter(id_ -> currentMarkup == null || !currentMarkup.getId().equals(id_))
+                // Find the markup's range
+                .map(markupMap::get)
+                // Set as currently selected
+                .doOnNext(markup -> currentMarkup = markup)
+                .flatMap(markup -> Observable.just(
+                        Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, SET_CURSOR, markup.getRange()),
+                        Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, DISPLAY_MARKUP, markup)
+                ));
+    }
+    
+    private Observable<Event> applyTemplate(Markup template) {
+        ArrayList<Event> events = new ArrayList<>();
+        Color c = template.getHighlightColor();
+        String msg = template.getMsg();
+        if (c != null) {
+            currentMarkup.setHighlightColor(c);
+            events.add(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, CHANGE_HIGHLIGHT_COLOR, currentMarkup));
+        }
+        
+        if (msg != null) {
+            currentMarkup.setMsg(msg);
+        }
+        
+        return Observable.fromIterable(events);
+    }
+    
+    /**
+     * Handle events to create a new markup. The new markup is given a unique identifier
+     * and as well becomes the current selected Markup. This event is also forwarded to
+     * the MarkupProperties component.
+     * @param bounds Boundary of the created markup.
+     */
+    private Observable<Event> createMarkup(Bounds[] bounds) {
+        LOG.info("Creating markup with offsets... " + Arrays.toString(bounds));
+        
+        // Create a new markup
+        String id = idGen.getNextId();
+        currentMarkup = new Markup("", id, bounds);
+        markupMap.put(id, currentMarkup);
+        
+        // Notify the MarkupProperties to display new Markup.
+        return Observable.just(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, NEW_MARKUP, currentMarkup));
+    }
+    
+    /**
+     * Delete the current markup, if one is selected. If one is selected, we inform
+     * the MarkupView that it should delete it's highlights, and then tell MarkupProperties
+     * to remove it's own attributes.
+     */
+    private Observable<Event> deleteMarkup() {
+        LOG.info("Deleting current markup...");
+        
+        Observable<Event> obs;
+        
+        // We can only delete the markup if one is currently selected
+        if (currentMarkup != null) {
+            // Remove markup and propagate event
+            obs = Observable
+                    .just(currentMarkup)
+                    .doOnNext(markup -> LOG.log(Level.INFO, "Current Markup: {0}", markup))
+                    .doOnNext(markup -> markupMap.remove(markup.getId()))
+                    // Inform MarkupView and MarkupProperties
+                    .flatMap(markup -> Observable.just(
+                            Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, REMOVE_HIGHLIGHTS, markup),
+                            Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, REMOVE_MARKUP, markup)
+                    ));
+                    
+            currentMarkup = null;
+        } else {
+            LOG.info("No current markup selected...");
+            obs = Observable.empty();
+        }
+        
+        return obs;
+    }
+    
+    /**
+     * Handler for generating the HTML exportation of a single file. The current
+     * file open is the only one marked up; if marking up an entire project is desired,
+     * see "exportProject" instead. This method will launch the default browser
+     * for the user and display a preview.
+     * @param model The model used for generating HTML.
+     */
+    private Observable<Event> previewHTML(MarkupViewModel model) {
+        LOG.log(Level.INFO, "Generating HTML preview for {0}", model.getTitle());
+        String html = HTMLGenerator.generate(
+                model.getTitle(), model.getText(), 
+                markupMap.values().stream().collect(Collectors.toList())
+        );
+        
+        // Show in browser.
+        LOG.info("Displaying preview in browser...");
+        try {
+            File f = new File("tmp.html");
+            f.createNewFile();
+            BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(f));
+            stream.write(html.getBytes());
+            stream.flush();
+            stream.close();
+            Desktop.getDesktop().browse(f.toURI());
+        } catch (IOException ex) {
+        }
+        
+        return Observable.empty();
+    }
+
+    private Observable<Event> fileSelected(Path filePath) {
+        LOG.info("Handling file change event for " + filePath);
+        
+        // Notify MarkupView of file
+        return Observable
+                .just(filePath)
+                // Handle reading on IO thread
+                .observeOn(Schedulers.io())
+                .doOnNext(ignored -> SessionManager.saveSession(markupMap.values().stream().collect(Collectors.toList())))
+                .observeOn(SwingScheduler.getInstance())
+                .doOnNext(path -> Globals.CURRENT_FILE = path)
+                .observeOn(Schedulers.io())
+                .map(Files::readAllLines)
+                // Handle computation on computation thread
+                .observeOn(Schedulers.computation())
+                .map(list -> list.stream().collect(Collectors.joining("\n")))
+                .map(fileContents -> Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, FILE_SELECTED, fileContents))
+                // Switch back to Swing UI thread
+                .observeOn(SwingScheduler.getInstance());
+    }
+    
+    private Observable<Event> exportProject() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    private Observable<Event> saveSession() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    /**
+     * Notify the MarkupView of the boundary of a markup that is in range of the
+     * selection.
+     * @param b Bounds to check.
+     */
+    private Observable<Event> getMarkupSelection(Bounds bounds) {
+        LOG.log(Level.INFO, "Obtaining Markup Selection for boundary: {0}", bounds);
+        
+        <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">// Return markup selections (if present) and notify MarkupProperties that selection changed
+</span>        <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">return Observable
+</span>                <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">.fromIterable(markupMap.values())
+</span>                <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">// Handle in background
+</span>                <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">.observeOn(Schedulers.computation())
+</span>                <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">// Obtain the range from start to end of markup and check for collision
+</span>                <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">.filter(markup -> markup.getRange().collidesWith(bounds))
+</span>                <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">// Note: There should only ever be one, but just in case.
+</span>                <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">.take(1)
+</span>                <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">// Switch back to Swing UI thread
+</span>                <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">.observeOn(SwingScheduler.getInstance())
+</span>                <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">// Set as current markup
+</span>                <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">.doOnNext(markup -> currentMarkup = markup)
+</span>                <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">// Broadcast events
+</span>                <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">.flatMap(markup -> Observable.just(
+</span>                        <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, SET_CURSOR, markup.getRange()),
+</span>                        <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, DISPLAY_MARKUP, markup)
+</span>                <span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">));
+</span>    }
+}</code></pre>    </body></html>

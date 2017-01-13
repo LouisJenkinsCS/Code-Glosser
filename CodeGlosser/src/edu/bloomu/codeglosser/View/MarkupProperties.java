@@ -39,7 +39,9 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import java.awt.Color;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -60,6 +62,7 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
     public static final int CLEAR_SELECTION = 0x1;
     public static final int NEW_SELECTION = 0x2;
     public static final int SET_SELECTION = 0x3;
+    public static final int RESTORE_SELECTIONS = 0x4;
     
     // PropertyAttributes
     public static final int CLEAR_ATTRIBUTES = 0x1;
@@ -84,6 +87,8 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
                         return newMarkup((Markup) e.data);
                     case MarkupController.DISPLAY_MARKUP:
                         return displayMarkup((Markup) e.data);
+                    case MarkupController.RESTORE_MARKUPS:
+                        return restoreMarkups((List<Markup>) e.data);
                     default:
                         throw new RuntimeException("Bad Custom Tag from MarkupController!");
                 }
@@ -197,6 +202,17 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
         return Observable.just(
                 Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_ATTRIBUTES, SET_ATTRIBUTES, markup),
                 Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_SELECTOR, NEW_SELECTION, markup)
+        );
+    }
+    
+    private Observable<Event> restoreMarkups(List<Markup> markups) {
+        LOG.info("Restoring Markups for :" + markups);
+        
+        return Observable.just(Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_SELECTOR, RESTORE_SELECTIONS, 
+                markups
+                    .stream()
+                    .map(Markup::getId)
+                    .collect(Collectors.toList()))
         );
     }
 

@@ -37,7 +37,9 @@ import io.reactivex.schedulers.Schedulers;
 import java.io.File;
 import java.io.FileWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -108,25 +110,31 @@ public class SessionManager {
                 
     }
     
-    private static List<Markup> loadSession() {
+    public static List<Markup> loadSession(Path path) {
         LOG.info("Loading session data...");
         
-        String key = Globals.PROJECT_FOLDER.relativize(Globals.CURRENT_FILE).toString();
-        return (List<Markup>) Observable
+        String key = Globals.PROJECT_FOLDER.relativize(path).toString();
+        List<Markup> markups = (List<Markup>) Observable
                 .just(Paths.get(Globals.PROJECT_FOLDER + "\\" + FILE_NAME))
                 .observeOn(Schedulers.io())
                 .map(Files::readAllLines)
                 .observeOn(Schedulers.computation())
                 .map(list -> list.stream().collect(Collectors.joining("\n")))
                 .map(json -> (JSONObject) new JSONParser().parse(json))
+                .filter(obj -> obj.containsKey(key))
                 .map(obj -> (JSONArray) obj.get(key))
                 .flatMap(Observable::fromIterable)
                 .map(data -> Markup.deserialize((JSONObject) data))
                 .toList()
-                .to(list -> (List<Markup>) list);
-                
-                
-                
+                .blockingGet();
+        
+        if (markups == null) {
+            markups = Collections.EMPTY_LIST;
+        }
+        
+        LOG.info("Received Markups: " + markups);
+        
+        return markups;
     }
     
     private static void writeData(JSONArray data) {
