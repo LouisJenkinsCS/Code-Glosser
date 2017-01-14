@@ -32,33 +32,17 @@ package edu.bloomu.codeglosser.HTML;
 
 import edu.bloomu.codeglosser.Globals;
 import edu.bloomu.codeglosser.Utils.FileUtils;
-import edu.bloomu.codeglosser.Utils.HTMLGenerator;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
-import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.CharacterIterator;
-import java.text.StringCharacterIterator;
-import java.util.HashMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.scene.Scene;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JTextPane;
 
 /**
  *
@@ -112,7 +96,11 @@ public class Lang2HTML {
             
             String html = generateHTML(code);
             try {
-                File file = FileUtils.temporaryFile(html);
+                File file = FileUtils.temporaryFile("html.html", html);
+                String css = FileUtils.readAll("HTML/styles.css");
+                FileUtils.temporaryFile("styles.css", css);
+                String js = FileUtils.readAll("HTML/highlight.pack.js");
+                FileUtils.temporaryFile("script.js", js);
                 eng.load(file.toURI().toURL().toString());
             } catch (IOException ex) {
                 throw new RuntimeException("Error while attempting to create temporary file!");
@@ -126,8 +114,8 @@ public class Lang2HTML {
     public static String generateHTML(String code) {
         StringBuilder builder;
         builder = new StringBuilder()
-                .append("<html><head><link rel=\"stylesheet\" href=\"src/edu/bloomu/codeglosser/HTML/styles.css\"></style>")
-                .append("<script src=\"src/edu/bloomu/codeglosser/HTML/highlight.pack.js\"></script>")
+                .append("<html><head><link rel=\"stylesheet\" href=\"styles.css\"></style>")
+                .append("<script src=\"script.js\"></script>")
                 .append("<script>")
                 .append("hljs.initHighlightingOnLoad();")
                 .append("</script>")

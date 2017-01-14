@@ -43,12 +43,14 @@ import edu.bloomu.codeglosser.HTML.Lang2HTML;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Model.MarkupViewModel;
 import edu.bloomu.codeglosser.Utils.ColorUtils;
+import edu.bloomu.codeglosser.Utils.FileUtils;
 import edu.bloomu.codeglosser.Utils.SwingScheduler;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -117,12 +119,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
     }
     
     private void initializeView() {
-        String styles;
-        try {
-            styles = new String(Files.readAllBytes(Paths.get("src/edu/bloomu/codeglosser/HTML/styles.css")));
-        } catch (IOException ex) {
-            throw new RuntimeException("Unable to locate syles.css: " + ex.getMessage());
-        }
+        String styles = FileUtils.readAll("HTML/styles.css");
         StyleSheet stylesheet = new StyleSheet();
         stylesheet.addRule(styles);
         

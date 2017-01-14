@@ -31,15 +31,21 @@
 package edu.bloomu.codeglosser.Utils;
 
 import edu.bloomu.codeglosser.Globals;
+import edu.bloomu.codeglosser.main;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -78,12 +84,23 @@ public class FileUtils {
         LOG.info("Extension: " + fileName.substring(offset + 1));
         return fileName.substring(offset + 1);
     }
+    
+    public static String readAll(String fileName) {
+        InputStream is = main.class.getResourceAsStream(fileName);
+        if (is == null) {
+            throw new RuntimeException("Filename: " + fileName + " was not found...");
+        }
+        InputStreamReader isr = new InputStreamReader(is);
+        BufferedReader br = new BufferedReader(isr);
+        StringBuilder contents = new StringBuilder();
+        return br.lines().collect(Collectors.joining("\n"));
+    }
 
-    public static File temporaryFile(String html) throws IOException  {
-        File f = new File("tmp.html");
+    public static File temporaryFile(String fileName, String contents) throws IOException  {
+        File f = new File(fileName);
         f.createNewFile();
         BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(f));
-        stream.write(html.getBytes());
+        stream.write(contents.getBytes());
         stream.flush();
         stream.close();
         
