@@ -69,6 +69,10 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
     public PropertyAttributes() {
         // Initialize GUI components
         initComponents();
+        noteMsg.setLineWrap(true);
+        noteMsg.setWrapStyleWord(true);
+        labelName.setText("Color");
+        textLabel.setText("Message");
         initListeners();
         setColor(Color.YELLOW);     
     }
@@ -143,12 +147,11 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
         labelColor = new javax.swing.JLabel();
         labelName = new javax.swing.JLabel();
         labelRGB = new javax.swing.JLabel();
-        textLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         noteMsg = new javax.swing.JTextArea();
+        textLabel = new javax.swing.JLabel();
 
         labelColor.setBackground(new java.awt.Color(255, 255, 102));
-        org.openide.awt.Mnemonics.setLocalizedText(labelColor, org.openide.util.NbBundle.getMessage(PropertyAttributes.class, "PropertyAttributes.labelColor.text")); // NOI18N
         labelColor.setOpaque(true);
         labelColor.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
@@ -157,22 +160,16 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
         });
 
         labelName.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(labelName, org.openide.util.NbBundle.getMessage(PropertyAttributes.class, "PropertyAttributes.labelName.text")); // NOI18N
-        labelName.setToolTipText(org.openide.util.NbBundle.getMessage(PropertyAttributes.class, "PropertyAttributes.labelName.toolTipText")); // NOI18N
 
         labelRGB.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(labelRGB, org.openide.util.NbBundle.getMessage(PropertyAttributes.class, "PropertyAttributes.labelRGB.text")); // NOI18N
-
-        textLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(textLabel, org.openide.util.NbBundle.getMessage(PropertyAttributes.class, "PropertyAttributes.textLabel.text")); // NOI18N
 
         noteMsg.setColumns(20);
-        noteMsg.setLineWrap(true);
         noteMsg.setRows(5);
-        noteMsg.setText(org.openide.util.NbBundle.getMessage(PropertyAttributes.class, "PropertyAttributes.noteMsg.text")); // NOI18N
-        noteMsg.setToolTipText(org.openide.util.NbBundle.getMessage(PropertyAttributes.class, "PropertyAttributes.noteMsg.toolTipText")); // NOI18N
-        noteMsg.setWrapStyleWord(true);
         jScrollPane1.setViewportView(noteMsg);
+
+        textLabel.setFont(new java.awt.Font("sansserif", 1, 12)); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("edu/bloomu/codeglosser/View/Bundle"); // NOI18N
+        textLabel.setToolTipText(bundle.getString("PropertyAttributes.textLabel.toolTipText")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -188,9 +185,9 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(labelColor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(textLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(textLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1)))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -204,12 +201,13 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
                             .addComponent(labelRGB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(19, 19, 19)
-                        .addComponent(labelColor, javax.swing.GroupLayout.DEFAULT_SIZE, 19, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(textLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1))
-                .addContainerGap())
+                        .addComponent(labelColor, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)))
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(textLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
     }// </editor-fold>//GEN-END:initComponents
 

@@ -30,6 +30,7 @@
  */
 package edu.bloomu.codeglosser.Utils;
 
+import edu.bloomu.codeglosser.Globals;
 import edu.bloomu.codeglosser.Model.Markup;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,7 +41,7 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.script.ScriptEngineManager;
-import org.openide.util.Exceptions;
+import org.json.simple.JSONObject;
 
 
 
@@ -56,72 +57,84 @@ public class HTMLGenerator {
         return "";
     }
     
-//    public static String relativeFileName(File f) {
-//        LOG.info("Relativized Filename: " + f.getName() + " to " + MarkupManager.getURIPrefix().relativize(f.toURI()).getPath());
-//        return MarkupManager.getURIPrefix().relativize(f.toURI()).getPath();
-//    }
-//    
-//    public static boolean isValidDirectory(File dir) {
-//        for (File f : dir.listFiles()) {
-//            if (f.isDirectory() && isValidDirectory(f)) {
-//                return true;
-//            } else if (MarkupManager.instanceExists(relativeFileName(f))) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//    
-//    public static void generateDirectory(File dir, ZipOutputStream stream) throws IOException {
-//        // Only generate if directory contains a file that is marked up.
-//        if (!isValidDirectory(dir)) {
-//            return;
-//        }
-//        
-//        // Directories must end with a slash.
-//        String name = relativeFileName(dir);
-//        name = name.endsWith("/") ? name : name + "/";
-//        stream.putNextEntry(new ZipEntry(name));
-//        
-//        for (final File f : dir.listFiles()) {
-//            if (f.isDirectory()) {
-//                generateDirectory(f, stream);
-//            } else if (MarkupManager.instanceExists(relativeFileName(f))){
-//                generateFile(f, stream);
-//            }
-//        }
-//    }
-//    
-//    public static void generateFile(File file, ZipOutputStream ostream) {
-//        try {
-//            // Copy contents into zip file (We replace carriage returns for standard newlines)
-//            String title = relativeFileName(file);
-//            
-//            String code = new String(Files.readAllBytes(file.toPath())).replace("\r\n", "\n");
-//            String result = generate(title, code, MarkupManager.getInstance(title).getAllNotes());
-//            ostream.putNextEntry(new ZipEntry(title + ".html"));
-//            ostream.write(result.getBytes());
-//            ostream.closeEntry();
-//        } catch (IOException ex) {
-//            Exceptions.printStackTrace(ex);
-//        }
-//    }
-//    
-//    public static void generateAll() {
-//        try(ZipOutputStream stream = new ZipOutputStream(new FileOutputStream(new File(MarkupManager.getURIPrefix().getPath() + "/exported.zip")))) {
-//            File dir = new File(MarkupManager.getURIPrefix());
-//            for (final File f : dir.listFiles()) {
-//                if (f.isDirectory()) {
-//                    generateDirectory(f, stream);
-//                } else if (f.getName().toLowerCase().endsWith(".java")){
-//                    generateFile(f, stream);
-//                }
-//        }
-//        } catch (IOException ex) {
-//            Exceptions.printStackTrace(ex);
-//        }
-//    }
+    private static String fileToString(File file) {
+        return Globals.PROJECT_FOLDER.relativize(file.toPath()).toString();
+    }
     
+    public static boolean isValidDirectory(File dir, JSONObject data) {
+        for (File f : dir.listFiles()) {
+            if (f.isDirectory() && isValidDirectory(f, data)) {
+                return true;
+            } else if (data.containsKey(fileToString(f))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static void generateDirectory(File dir, JSONObject data, ZipOutputStream stream) throws IOException {
+        LOG.info("Archiving Directory: " + dir);
+        
+        // Only generate if directory contains a file that is marked up.
+        if (!isValidDirectory(dir, data)) {
+            LOG.info("Not a valid directory...");
+            return;
+        }
+        
+        // Directories must end with a slash.
+        String name = fileToString(dir);
+        name = name.endsWith("/") ? name : name + "/";
+        stream.putNextEntry(new ZipEntry(name));
+        
+        for (final File f : dir.listFiles()) {
+            if (f.isDirectory()) {
+                generateDirectory(f, data,  stream);
+            } else if (data.containsKey(fileToString(f))){
+                generateFile(f, data, stream);
+            }
+        }
+    }
+    
+    public static void generateFile(File file, JSONObject data, ZipOutputStream ostream) {
+        try {
+            LOG.info("Archiving file: " + file);
+            // Copy contents into zip file (We replace carriage returns for standard newlines)
+            String title = fileToString(file);
+            
+            String code = new String(Files.readAllBytes(file.toPath())).replace("\r\n", "\n");
+            String result = generate(title, code, SessionManager.loadSession(file.toPath()));
+            ostream.putNextEntry(new ZipEntry(title + ".html"));
+            ostream.write(result.getBytes());
+            ostream.closeEntry();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    private static void generateAll(JSONObject data) {
+        String zipFileName = Globals.PROJECT_FOLDER + "\\" + "exported.zip";
+        LOG.info(zipFileName);
+        try(ZipOutputStream stream = new ZipOutputStream(new FileOutputStream(new File(zipFileName)))) {
+            LOG.info("Created zip archive...");
+            File dir = Globals.PROJECT_FOLDER.toFile();
+            for (final File f : dir.listFiles()) {
+                if (f.isDirectory()) {
+                    generateDirectory(f, data, stream);
+                } else if (data.containsKey(fileToString(f))){
+                    generateFile(f, data, stream);
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    public static void generateAll() {
+        SessionManager
+                .getJSONContents()
+                .subscribe(HTMLGenerator::generateAll);
+    }
+            
     public static String generate(String title, String code, List<Markup> notes) {
         StringBuilder builder = new StringBuilder();
 //        code = code.replaceAll("&", "&amp;");

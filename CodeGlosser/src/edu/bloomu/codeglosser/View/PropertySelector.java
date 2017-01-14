@@ -40,6 +40,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import javax.swing.JComboBox;
@@ -59,9 +60,7 @@ public class PropertySelector extends javax.swing.JPanel implements EventHandler
     
     public PropertySelector() {
         initComponents();
-        initListeners();
-//        clear();
-        
+        initListeners();        
     }
     
     private void initListeners() {
@@ -75,20 +74,31 @@ public class PropertySelector extends javax.swing.JPanel implements EventHandler
         });
     }
     
-//    public void update(Markup... notes) {
-//        Markup n = currentNote;
-//        clear();
-//        Stream.of(notes).forEach(noteSelector::addItem);
-//        if (!Stream.of(notes).anyMatch(n::equals)) {
-//            noteSelector.setSelectedItem(Markup.DEFAULT);
-//        }
-//    }
-//    
-//    public void clear() {
-//        noteSelector.removeAllItems();
-//        currentNote = Markup.DEFAULT;
-//        noteSelector.addItem(currentNote);
-//    }
+    @Override
+    public Observable<Event> handleEvent(Event e) {
+        switch (e.getSender()) {
+            case Event.MARKUP_PROPERTIES:
+                switch (e.getCustom()) {
+                    case MarkupProperties.NEW_SELECTION:
+                        return newSelection((Markup) e.data);
+                    case MarkupProperties.CLEAR_SELECTION:
+                        return clearSelection();
+                    case MarkupProperties.SET_SELECTION:
+                        return setSelection((String) e.data);
+                    case MarkupProperties.RESTORE_SELECTIONS:
+                        return restoreSelections((List<String>) e.data);
+                    default:
+                        throw new RuntimeException("Bad Custom Tag from MarkupProperties!");
+                }
+            default:
+                throw new RuntimeException("Bad Sender!");
+        }
+    }
+
+    @Override
+    public EventEngine getEventEngine() {
+        return engine;
+    }
     
     private Observable<Event> setSelection(String id) {
         LOG.info("Handling event for setting selection: " + id);
@@ -145,6 +155,17 @@ public class PropertySelector extends javax.swing.JPanel implements EventHandler
                 .flatMap(Event::empty);
     }
     
+    private Observable<Event> restoreSelections(List<String> selections) {
+        LOG.info("Restoring Selections: " + selections);
+        
+        selections
+                .stream()
+                .sorted()
+                .forEach(noteSelector::addItem);
+        
+        return Observable.empty();
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -173,28 +194,4 @@ public class PropertySelector extends javax.swing.JPanel implements EventHandler
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<java.lang.String> noteSelector;
     // End of variables declaration//GEN-END:variables
-
-    @Override
-    public Observable<Event> handleEvent(Event e) {
-        switch (e.getSender()) {
-            case Event.MARKUP_PROPERTIES:
-                switch (e.getCustom()) {
-                    case MarkupProperties.NEW_SELECTION:
-                        return newSelection((Markup) e.data);
-                    case MarkupProperties.CLEAR_SELECTION:
-                        return clearSelection();
-                    case MarkupProperties.SET_SELECTION:
-                        return setSelection((String) e.data);
-                    default:
-                        throw new RuntimeException("Bad Custom Tag from MarkupProperties!");
-                }
-            default:
-                throw new RuntimeException("Bad Sender!");
-        }
-    }
-
-    @Override
-    public EventEngine getEventEngine() {
-        return engine;
-    }
 }

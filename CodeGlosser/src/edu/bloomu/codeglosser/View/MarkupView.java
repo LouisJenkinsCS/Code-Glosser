@@ -39,16 +39,21 @@ import edu.bloomu.codeglosser.Events.Event;
 import edu.bloomu.codeglosser.Events.EventEngine;
 import edu.bloomu.codeglosser.Events.EventHandler;
 import edu.bloomu.codeglosser.Exceptions.InvalidTextSelectionException;
-import edu.bloomu.codeglosser.HTML.Java2HTML;
+import edu.bloomu.codeglosser.HTML.Lang2HTML;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Model.MarkupViewModel;
 import edu.bloomu.codeglosser.Utils.ColorUtils;
+import edu.bloomu.codeglosser.Utils.FileUtils;
 import edu.bloomu.codeglosser.Utils.SwingScheduler;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.PublishSubject;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 import javax.swing.JMenuItem;
@@ -58,8 +63,10 @@ import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
 import javax.swing.text.Highlighter.HighlightPainter;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 import org.javatuples.Pair;
-import org.openide.util.Exceptions;
 
 /**
  *
@@ -107,7 +114,20 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
         highlighter = textCode.getHighlighter();
         textCode.setEditable(false);
         initializePopup();
+        initializeView();
         initializeListeners();
+    }
+    
+    private void initializeView() {
+        String styles = FileUtils.readAll("HTML/styles.css");
+        StyleSheet stylesheet = new StyleSheet();
+        stylesheet.addRule(styles);
+        
+        HTMLEditorKit htmlEditorKit = new HTMLEditorKit();
+        htmlEditorKit.setStyleSheet(stylesheet);
+        HTMLDocument htmlDocument = (HTMLDocument) htmlEditorKit.createDefaultDocument();
+        textCode.setEditorKit(htmlEditorKit);
+        textCode.setDocument(htmlDocument);
     }
 
     @Override
@@ -122,7 +142,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
                     case MarkupController.SET_CURSOR:
                         return setCursorPosition((Bounds) e.data);
                     case MarkupController.FILE_SELECTED:
-                        return fileSelected((String) e.data);
+                        return fileSelected((Pair<String, List<Markup>>) e.data);
                     default:
                         throw new RuntimeException("Bad Custom Tag!");
                 }
@@ -160,7 +180,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
             try {
                 // Segment boundary
                 Bounds[] bounds = model.segmentRange(b);
-                addMarkup(bounds);
+                addMarkup(Color.YELLOW, bounds);
                 engine.broadcast(Event.MARKUP_CONTROLLER, CREATE_MARKUP, bounds);
             } catch (InvalidTextSelectionException ex) {
                 LOG.severe("Bad Bounds!!!");
@@ -264,7 +284,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
 
     public void setText(String str) {
         LOG.info("Text changed...");
-        textCode.setText("<html><head></head><body style=\"font-size: 1.15em\">" + str.trim() + "</body></html>");
+        textCode.setText("<html><head></head><body style=\"font-size: 1.15em\"><pre><code>" + str.trim() + "</code></pre></body></html>");
     }
 
     /**
@@ -293,7 +313,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
         setSelection(model.getLineBounds(textCode.getSelectionStart()));
     }
 
-    public void addMarkup(Bounds... bounds) {
+    public void addMarkup(Color color, Bounds... bounds) {
         LOG.info(Stream
                 .of(bounds)
                 .map(Bounds::toString)
@@ -305,7 +325,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
                 .forEach((b) -> {
                     Highlight highlight = null;
                     try {
-                        highlight = (Highlight) highlighter.addHighlight(b.getStart(), b.getEnd(), new DefaultHighlightPainter(ColorUtils.makeTransparent(Color.YELLOW)));
+                        highlight = (Highlight) highlighter.addHighlight(b.getStart(), b.getEnd(), new DefaultHighlightPainter(ColorUtils.makeTransparent(color)));
                     } catch (BadLocationException ex) {
                         LOG.throwing(this.getClass().getName(), "addMarkup", ex);
                     }
@@ -442,16 +462,23 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
                 
     }
     
-    private Observable<Event> fileSelected(String fileContents) {
+    private Observable<Event> fileSelected(Pair<String, List<Markup>> pair) {
         return Observable
-                .just(fileContents)
+                .just(pair)
                 // Handle syntax highlighting in background
                 .observeOn(Schedulers.computation())
-                .doOnNext(model::setText)
-                .map(contents -> new Java2HTML().translate(contents))
+                .doOnNext(p -> model.setText(p.getValue0()))
+                .flatMap(p -> new Lang2HTML()
+                        .translate(p.getValue0())
+                        .map(p::setAt0)
+                )
                 // Display text on UI Thread
                 .observeOn(SwingScheduler.getInstance())
-                .doOnNext(this::setText)
+                .doOnNext(p -> setText(p.getValue0()))
+                // Set highlights
+                .map(Pair::getValue1)
+                .flatMap(Observable::fromIterable)
+                .doOnNext(markup -> addMarkup(markup.getHighlightColor(), markup.getOffsets()))
                 // We have handled the event, so no need for anything else.
                 .flatMap(Event::empty);
     }

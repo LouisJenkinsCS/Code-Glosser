@@ -48,7 +48,6 @@ import java.io.IOException;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import org.openide.util.Exceptions;
 
 /**
  *
@@ -109,7 +108,7 @@ public class PropertyFiles extends javax.swing.JPanel implements EventHandler {
         try {
             populateTree(root, rootNode);
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            
         }
         DefaultTreeModel model = (DefaultTreeModel) projectFileTree.getModel();
         model.setRoot(rootNode);
