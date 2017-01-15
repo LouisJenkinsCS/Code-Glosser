@@ -30,9 +30,12 @@
  */
 package edu.bloomu.codeglosser;
 
+import io.reactivex.Scheduler;
+import io.reactivex.schedulers.Schedulers;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.Executors;
 
 /**
  *
@@ -40,9 +43,9 @@ import java.nio.file.Paths;
  */
 public final class Globals {
     
-    // Flag used to indicate that an event currently is in progress and that other
-    // events should either be discarded or queued for later.
-    public static boolean IS_BUSY = false; 
+    // Scheduler for our background worker thread. The worker thread handles all
+    // IO and CPU Bound processing.
+    public static final Scheduler WORKER_THREAD = Schedulers.from(Executors.newSingleThreadScheduledExecutor());
     
     // The project folder selected by the user.
     public static Path PROJECT_FOLDER = null;
@@ -62,7 +65,6 @@ public final class Globals {
      * memory leak, the previous values are not accidentally used.
      */
     public static void initGlobals() {
-        IS_BUSY = false;
         PROJECT_FOLDER = null;
         URI_PREFIX = null;
         CURRENT_FILE = null;

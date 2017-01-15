@@ -57,7 +57,7 @@ public class PropertyFiles extends javax.swing.JPanel implements EventHandler {
     
     public static final int FILE_SELECTED = 0x1;
     
-    private final EventEngine engine = new EventEngine(this, Event.PROPERTIES_FILES);
+    private final EventEngine engine = new EventEngine(this, Event.PROPERTY_FILES);
     
     /**
      * Creates new form PropertyFiles

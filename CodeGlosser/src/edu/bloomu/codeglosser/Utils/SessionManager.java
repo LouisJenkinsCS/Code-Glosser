@@ -63,12 +63,9 @@ public class SessionManager {
     /**
      * Initialize by creating the session data object ahead of time.
      */
-    public static void init() {
-       LOG.info("Initializing session data...");
-       
+    public static void init() {       
        Observable
                .just(Globals.PROJECT_FOLDER + "\\" + FILE_NAME)
-               .observeOn(Schedulers.io())
                .map(Paths::get)
                // Only initialize if file does not exist
                .filter(path -> !Files.exists(path))
@@ -84,9 +81,7 @@ public class SessionManager {
      * Saves all markups.
      * @param markups Markups.
      */
-    public static void saveSession(List<Markup> markups) {
-        LOG.info("Saving session data...");
-        
+    public static void saveSession(List<Markup> markups) {        
         // Fist time loading file
         if (Globals.CURRENT_FILE == null) {
             return;
@@ -95,7 +90,6 @@ public class SessionManager {
         String key = Globals.PROJECT_FOLDER.relativize(Globals.CURRENT_FILE).toString();
         Observable
                 .fromIterable(markups)
-                .observeOn(Schedulers.computation())
                 .map(Markup::serialize)
                 .buffer(Integer.MAX_VALUE)
                 .map(serializedMarkup -> {
@@ -103,14 +97,11 @@ public class SessionManager {
                     arr.addAll(serializedMarkup);
                     return arr;
                 })
-                .observeOn(Schedulers.io())
                 // Write to file
                 .subscribe(SessionManager::writeData);
     }
     
-    public static boolean sessionExists(Path path) {
-        LOG.info("Determining if session exists: " + path);
-        
+    public static boolean sessionExists(Path path) {        
         String key = Globals.PROJECT_FOLDER.relativize(path).toString();
         return getJSONContents()
                 .any(json -> json.containsKey(key))
@@ -126,9 +117,7 @@ public class SessionManager {
                 .map(json -> (JSONObject) new JSONParser().parse(json));
     }
     
-    public static List<Markup> loadSession(Path path) {
-        LOG.info("Loading session data...");
-        
+    public static List<Markup> loadSession(Path path) {        
         String key = Globals.PROJECT_FOLDER.relativize(path).toString();
         List<Markup> markups = (List<Markup>) getJSONContents()
                 .filter(json -> json.containsKey(key))
@@ -141,28 +130,19 @@ public class SessionManager {
         if (markups == null) {
             markups = Collections.EMPTY_LIST;
         }
-        
-        LOG.info("Received Markups: " + markups);
-        
+                
         return markups;
     }
     
-    private static void writeData(JSONArray data) {
-        LOG.info("Writing session data to: " + Globals.PROJECT_FOLDER + "\\" + FILE_NAME);
-        
+    private static void writeData(JSONArray data) {        
         String key = Globals.PROJECT_FOLDER.relativize(Globals.CURRENT_FILE).toString();
         Observable
                 .just(Globals.PROJECT_FOLDER + "\\" + FILE_NAME)
-                .observeOn(Schedulers.io())
                 .map(Paths::get)
                 .map(Files::readAllLines)
-                .observeOn(Schedulers.computation())
                 .map(list -> list.stream().collect(Collectors.joining("\n")))
-                .doOnNext(json -> LOG.info("Contents: " + json))
                 .map(json -> (JSONObject) new JSONParser().parse(json))
                 .doOnNext(obj -> ((JSONObject) obj).put(key, data))
-                .observeOn(Schedulers.io())
-                .doOnNext(json -> LOG.info("Writing data: " + json.toJSONString()))
                 .subscribe(allData -> {
                     FileWriter writer = new FileWriter(new File(Globals.PROJECT_FOLDER + "\\" + FILE_NAME));
                     writer.write(allData.toJSONString());

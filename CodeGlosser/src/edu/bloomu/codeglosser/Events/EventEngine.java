@@ -30,7 +30,9 @@
  */
 package edu.bloomu.codeglosser.Events;
 
+import edu.bloomu.codeglosser.Globals;
 import io.reactivex.subjects.PublishSubject;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 /**
@@ -40,26 +42,35 @@ import java.util.logging.Logger;
 public class EventEngine {
     
     private final int id;
-    private final EventHandler handler;
     
     private static final Logger LOG = Logger.getLogger(EventEngine.class.getName());
+    
+    private Function<Event, String> stringifyEvent;
     
     
     PublishSubject<Event> outgoingEvent = PublishSubject.create();
     PublishSubject<Event> ingoingEvent = PublishSubject.create();
     
     public EventEngine(EventHandler handler, int id) {
-        this.handler = handler;
         this.id = id;
         
         // Handle receiving events
         ingoingEvent
                 // Only accept events if they are addressed to use
                 .filter(e -> e.getRecipient() == id)
+                // Log any and all events
+                .doOnNext(e -> LOG.info(stringifyEvent != null ? e.toString(stringifyEvent) : e.toString()))
                 // Convert it to the implementor's Observable
                 .flatMap(handler::handleEvent)
+                // All events received are processed by the background worker thread.
+                // This includes any and all events above.
+                .subscribeOn(Globals.WORKER_THREAD)
                 // If it emits any events, send them as outgoing.
                 .subscribe(outgoingEvent::onNext);
+    }
+    
+    public void setStringification(Function<Event, String> toString) {
+        this.stringifyEvent = toString;
     }
     
     /**

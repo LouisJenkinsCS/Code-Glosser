@@ -166,6 +166,6 @@ public class Markup {
 
     @Override
     public String toString() {
-        return id;
+        return "Markup{" + "msg=" + msg + ", id=" + id + ", offsets=" + offsets + ", highlightColor=" + highlightColor + ", textColor=" + textColor + '}';
     }
 }
