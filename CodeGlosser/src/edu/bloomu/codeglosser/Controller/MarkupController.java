@@ -31,8 +31,7 @@
 package edu.bloomu.codeglosser.Controller;
 
 import edu.bloomu.codeglosser.Events.Event;
-import edu.bloomu.codeglosser.Events.EventEngine;
-import edu.bloomu.codeglosser.Events.EventHandler;
+import edu.bloomu.codeglosser.Events.EventBus;
 import edu.bloomu.codeglosser.Globals;
 import edu.bloomu.codeglosser.Model.MarkupViewModel;
 import edu.bloomu.codeglosser.Utils.HTMLGenerator;
@@ -64,12 +63,13 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.javatuples.Pair;
 import org.javatuples.Unit;
+import edu.bloomu.codeglosser.Events.EventProcessor;
 
 /**
  *
  * @author Louis
  */
-public class MarkupController implements EventHandler {
+public class MarkupController implements EventProcessor {
     
     // MarkupProperties events
     public static final int NEW_MARKUP = 0x1;
@@ -93,14 +93,14 @@ public class MarkupController implements EventHandler {
     // identifier for it to map correctly, so the current tag must be unique.
     private final IdentifierGenerator idGen = new IdentifierGenerator("Markup");
     
-    private final EventEngine engine = new EventEngine(this, Event.MARKUP_CONTROLLER);
+    private final EventBus engine = new EventBus(this, Event.MARKUP_CONTROLLER);
     
     public MarkupController() {
         
     }
     
     @Override
-    public Observable<Event> handleEvent(Event e) {
+    public Observable<Event> process(Event e) {
         switch (e.getSender()) {
             case Event.MARKUP_VIEW:
                 switch (e.getCustom()) {
@@ -136,7 +136,7 @@ public class MarkupController implements EventHandler {
     }
 
     @Override
-    public EventEngine getEventEngine() {
+    public EventBus getEventEngine() {
         return engine;
     }
     
@@ -246,10 +246,10 @@ public class MarkupController implements EventHandler {
      */
     private Observable<Event> previewHTML(MarkupViewModel model) {
         LOG.log(Level.INFO, "Generating HTML preview for {0}", model.getTitle());
-        String html = HTMLGenerator.generate(
-                model.getTitle(), model.getText(), 
+        String html = HTMLGenerator.syntaxHighlight(
+                model.getText(), model.getTitle(), 
                 markupMap.values().stream().collect(Collectors.toList())
-        );
+        ).blockingFirst();
         
         // Show in browser.
         LOG.info("Displaying preview in browser...");
@@ -320,7 +320,9 @@ public class MarkupController implements EventHandler {
     }
     
     private Observable<Event> saveSession() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        SessionManager.saveSession(markupMap.values().stream().collect(Collectors.toList()));
+        
+        return Observable.empty();
     }
 
     /**

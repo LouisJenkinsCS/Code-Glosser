@@ -1,214 +1,572 @@
-<html><head><link rel="stylesheet" href="styles.css"></style><script src="script.js"></script><script>hljs.initHighlightingOnLoad();</script>        <title>Test</title>        <meta charset="UTF-8">    </head>    <body contenteditable="false"><pre><code id="code_segment" class="hs">module VirtualMachine.ByteCode where
-  import Data.IORef
-  import Data.Bits
-  import Data.Word
-  import Control.Monad
-  import VirtualMachine.Types
-  import ClassFile.Types
-  import VirtualMachine.Debug
-  import VirtualMachine.Stack_Frame
-  import Data.Binary.IEEE754
-
-  loadConstantPool :: Runtime_Environment -&gt Int -&gt IO Value
-  loadConstantPool env idx = (!! idx) . constant_pool &lt$&gt readIORef (current_class env) &gt&gt= toValue
-    where
-      toValue :: CP_Info -&gt IO Value
-      toValue info = case tag info of
-        3 -&gt return . VInt . fromIntegral . bytes $ info
-        4 -&gt return . VFloat . wordToFloat . bytes $ info
-        5 -&gt return . VLong $ (fromIntegral . high_bytes $ info) `shift` 32  .|. (fromIntegral . low_bytes $ info)
-        6 -&gt return . VDouble . wordToDouble $ (fromIntegral . high_bytes $ info) `shift` 32  .|. (fromIntegral . low_bytes $ info)
-        8 -&gt readIORef (current_class env) &gt&gt= \c -&gt (return . VString . show . utf8_bytes) (constant_pool c !! (fromIntegral . string_index $ info))
-        _ -&gt error $ "Bad Tag: " ++ show (tag info)
-
-  {- | Starting point of execution of ByteCode isntructions -}
-  execute :: Runtime_Environment -&gt IO ()
-  execute env = head &lt$&gt readIORef (stack env)  -- Take the head of the stack (current stack frame)
-    &gt&gt= \frame -&gt when (debug_mode env) (debugFrame frame &gt&gt= putStrLn) -- Optional Debug
-    &gt&gt getPC' frame &gt&gt= \pc -&gt maxPC frame &gt&gt= \max_pc -&gt -- Program Counters for comparison
-    -- While valid program_counter, execute instruction
-    unless (pc &gt= max_pc) (getNextBC frame &gt&gt= execute' frame &gt&gt execute env)
-      where
-        -- The main dispatcher logic
-        execute' :: StackFrame -&gt ByteCode -&gt IO ()
-        execute' frame bc
-          -- NOP
-          | bc == 0 = return ()
-          -- Constants
-          | bc &gt= 1 && bc &lt= 15 = constOp frame bc
-          -- Push raw byte(s)
-          | bc == 16 || bc == 17 =
-            -- Special Case: 0x10 pushes a single byte, but 0x11 pushes a short
-            (if bc == 16 then fromIntegral &lt$&gt getNextBC frame else getNextShort frame)
-              &gt&gt= pushOp frame . fromIntegral
-          -- Load from runtime constant pool
-          | bc &gt= 18 && bc &lt= 20 =
-            -- Special Case: 0x12 uses only one byte for index, while 0x13 and 0x14 use two
-            (if bc == 18 then fromIntegral &lt$&gt getNextBC frame else getNextShort frame)
-              &gt&gt= loadConstantPool env . fromIntegral &gt&gt= pushOp frame
-          -- Loads
-          | bc &gt= 21 && bc &lt= 53 = loadOp frame bc
-          -- Stores
-          | bc &gt= 54 && bc &lt= 86 = storeOp frame bc
-          -- Special Case: 'dup' is used commonly but ignored, so we have to stub it
-          | bc == 89 = return ()
-          -- Math
-          | bc &gt= 96 && bc &lt= 132 = mathOp frame bc
-          -- Conditionals
-          | bc &gt= 148 && bc &lt= 166 = cmpOp frame bc
-          -- Goto: The address is the offset from the current, with the offset being
-          -- the next two instructions. Since we advance the PC 2 (+1 from reading this
-          -- instruction), we must decrement the count by 3 to correctly obtain the target.
-          | bc == 167 = getNextShort frame &gt&gt= \jmp -&gt modifyPC frame (+ (jmp - 3))
-          -- Return
-          | bc == 177 = return ()
-          -- Runtime Stubs
-          | bc &gt= 178 || bc &lt= 195 = runtimeStub env frame bc
-          | otherwise = error $ "Bad ByteCode Instruction: " ++ show bc
-
-  runtimeStub :: Runtime_Environment -&gt StackFrame -&gt ByteCode -&gt IO ()
-  runtimeStub env frame bc
-    -- getstatic: 2 bytes wide
-    | bc == 178 = void $ getNextShort frame
-    -- invokevirtual: (append, println). NOTE: MUST HAVE ONLY ONE PARAMETER ELSE UNDEFINED
-    | bc == 182 = getNextShort frame &gt&gt= \method_idx -&gt (readIORef . current_class) env
-      &gt&gt= \c -&gt case methodName c method_idx of
-        "append" -&gt ((\x y -&gt VString $ show y ++ show x) &lt$&gt popOp frame &lt*&gt popOp frame) &gt&gt= pushOp frame
-        "println" -&gt popOp frame &gt&gt= print -- Defer I/O to Haskell
-        "toString" -&gt return () -- StringBuilder object is already a 'VString'
-        _ -&gt error "Bad Method Call!"
-    -- Invokespecial is used to call &ltinit&gt, but we don't deal with that... yet
-    -- Invokestatic is also used Scala compatibility, which we can safely ignore
-    | bc == 183 || bc == 184 = void $ getNextShort frame
-    -- Laziness: 'new' must refer to StringBuilder... otherwise it's undefined anyway
-    | bc == 187 = getNextShort frame &gt&gt pushOp frame (VString "")
-    | otherwise = error $ "Bad ByteCode Instruction: " ++ show bc
-        where
-          methodName :: Class -&gt Word16 -&gt String
-          methodName clazz method_idx = let
-            cpool = constant_pool clazz
-            method_ref = cpool !! fromIntegral method_idx
-            name_and_type = cpool !! fromIntegral (name_and_type_index method_ref)
-            utf8_name = cpool !! fromIntegral (name_index name_and_type)
-            in show . utf8_bytes $ utf8_name
-
-  {- | Loads from local_variables to operand_stack -}
-  loadOp :: StackFrame -&gt ByteCode -&gt IO ()
-  loadOp frame bc
-    -- Loads with the index as the next bytecode instruction
-    | bc &gt= 21 && bc &lt=25 = getNextBC frame &gt&gt= getLocal' frame &gt&gt= pushOp frame
-    -- Loads with a constant index (I.E: ILOAD_0 to ILOAD_3 have indice 0 to 3 respectively)
-    | bc &gt= 26 && bc &lt= 45 = getLocal' frame ((bc - 26) `mod` 4) &gt&gt= pushOp frame
-    | otherwise = error $ "Bad ByteCode Instruction: " ++ show bc
-
-  {- | Stores from operand_stack to local_variables -}
-  storeOp :: StackFrame -&gt ByteCode -&gt IO ()
-  storeOp frame bc
-    -- Stores with the index as the next bytecode instruction
-    | bc &gt= 54 && bc &lt= 58 = popOp frame &gt&gt= \op -&gt getNextBC frame &gt&gt= \idx -&gt putLocal frame idx op
-      &gt&gt when (bc == 55 || bc == 57) (putLocal frame (idx + 1) (VReference 0))
-    -- Stores with a constant index (I.E: ISTORE_0 to ISTORE_3 have indice 0 to 3 respectively)
-    | bc &gt= 59 && bc &lt= 78 = let idx = ((bc - 59) `mod` 4) in
-      popOp frame &gt&gt= putLocal frame idx
-      -- Special Case: Double word-sized variables, such as 'long' and 'double' must
-      -- take up two slots. We fit both types in a single slot, but the compiler generates
-      -- ByteCode that are sensitive to these invariants, so we insert a dummy null reference
-      -- in the second slot to restore that balance.
-      &gt&gt when ((bc &gt= 63 && bc &lt= 66) || (bc &gt= 71 && bc &lt= 74))
-      ((putLocal frame $ idx + 1) (VReference 0))
-    | otherwise = error $ "Bad ByteCode Instruction: " ++ show bc
+<html><head><link rel="stylesheet" href="styles.css"></style><script src="script.js"></script><script>hljs.initHighlightingOnLoad();</script>        <title>Test</title>        <meta charset="UTF-8">    </head>    <body contenteditable="false"><pre><code id="code_segment" class="java">package com.theif519.sakoverlay.Widgets;
 
 
-  {- | Stores constant values on the Operand Stack. -}
-  constOp :: StackFrame -&gt ByteCode -&gt IO ()
-  constOp frame bc
-    -- Null Reference
-    | bc == 1 = pushOp frame (VReference 0)
-    -- Integer Constants
-    | bc &gt= 2 && bc &lt= 8 = pushOp frame (VInt (fromIntegral $ bc - 3))
-    -- Long Constants
-    | bc == 9 || bc == 10 = pushOp frame (VLong (fromIntegral $ bc - 9))
-    -- Float Constants
-    | bc &gt= 11 && bc &lt= 13 = pushOp frame (VFloat (fromIntegral $ bc - 11))
-    -- Double Constants
-    | bc &gt= 14 && bc &lt= 15 = pushOp frame (VDouble (fromIntegral $ bc - 14))
-    -- ERROR
-    | otherwise = error $ "Bad ByteCode Instruction: " ++ show bc
+import android.app.Fragment;
+import android.content.res.Configuration;
+import android.graphics.Point;
+import android.os.Bundle;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
-  {- | Math operations which are abstracted by the Value type. -}
-  mathOp :: StackFrame -&gt ByteCode -&gt IO ()
-  mathOp frame bc
-    | bc &gt= 96 && bc &lt= 99 = applyBinaryOp (+)
-    | bc &gt= 100 && bc &lt= 103 = applyBinaryOp (-)
-    | bc &gt= 104 && bc &lt= 107 = applyBinaryOp (*)
-    | bc &gt= 108 && bc &lt= 111 = applyBinaryOp div
-    | bc &gt= 112 && bc &lt= 115 = applyBinaryOp rem
-    | bc &gt= 116 && bc &lt= 119 = applyUnaryOp negate
-    -- Need to implement as lambda due to shiftL and shiftR requiring type Int
-    | bc == 120 || bc == 121 = applyBinaryOp (\x y -&gt x `shiftL` fromIntegral y)
-    | bc &gt= 122 && bc &lt= 125 = applyBinaryOp (\x y -&gt x `shiftR` fromIntegral y)
-    | bc == 126 || bc == 127 = applyBinaryOp (.&.)
-    | bc == 128 || bc == 129 = applyBinaryOp (.|.)
-    | bc == 130 || bc == 131 = applyBinaryOp xor
-    | bc == 132 = increment
-    | otherwise = error $ "Bad ByteCode Instruction: " ++ show bc
-      where
-        applyUnaryOp :: (Operand -&gt Operand) -&gt IO ()
-        applyUnaryOp f = popOp frame &gt&gt= pushOp frame . f
-        applyBinaryOp :: (Operand -&gt Operand -&gt Operand) -&gt IO ()
-        applyBinaryOp f = replicateM 2 (popOp frame) &gt&gt= \(x:y:_) -&gt pushOp frame (f y x)
-        increment :: IO ()
-        increment = -- 'iinc' has local variable index as first, with value as second indice
-          join $ modifyLocal frame &lt$&gt getNextBC frame &lt*&gt ((+) . fromIntegral &lt$&gt getNextBC frame)
+import com.theif519.sakoverlay.Core.Animations.MoveAndResizeAnimation;
+import com.theif519.sakoverlay.Core.Builders.MenuBuilder;
+import com.theif519.sakoverlay.Core.Listeners.OnAnimationEndListener;
+import com.theif519.sakoverlay.Core.Misc.Globals;
+import com.theif519.sakoverlay.Widgets.POJO.ViewState;
+import com.theif519.sakoverlay.Widgets.Views.TouchInterceptorLayout;
+import com.theif519.utils.Misc.MeasureTools;
+import com.theif519.sakoverlay.Core.POJO.MenuOptions;
+import com.theif519.sakoverlay.R;
+import com.theif519.sakoverlay.Core.Rx.RxBus;
+import com.theif519.sakoverlay.Widgets.Misc.Sessions.WidgetSessionManager;
 
-  {- | Conditional jump instructions ('if', 'for', and 'while') -}
-  cmpOp :: StackFrame -&gt ByteCode -&gt IO ()
-  cmpOp frame bc
-    | bc &gt= 148 && bc &lt= 152 = pushCmp
-    | bc &gt= 153 && bc &lt= 166 = getPC' frame &gt&gt= \pc -&gt getNextShort frame &gt&gt= \jmp -&gt
-      -- Special Case: We combine instructions which directly compare two different
-      -- values for a jump by first pushing the result of the comparison on the operand
-      -- stack, and THEN comparing them to save time and code.
-      when (bc &gt= 159) pushCmp &gt&gt cmpJmp (pc + jmp - 1)
-    | otherwise = error $ "Bad ByteCode Instruction: " ++ show bc
-    where
-      pushCmp :: IO ()
-      pushCmp = (flip compare &lt$&gt popOp frame &lt*&gt popOp frame) &gt&gt= pushOrd
-      pushOrd :: Ordering -&gt IO ()
-      pushOrd ord = pushOp frame (VInt (ordToInt ord))
-      cmpJmp :: Word16 -&gt IO ()
-      cmpJmp
-        | bc == 153 || bc == 159 || bc == 165 = flip condJmp [EQ]
-        | bc == 154 || bc == 160 || bc == 166 = flip condJmp [LT, GT]
-        | bc == 155 || bc == 161 = flip condJmp [LT]
-        | bc == 156 || bc == 162 = flip condJmp [GT, EQ]
-        | bc == 157 || bc == 163 = flip condJmp [GT]
-        | bc == 158 || bc == 164 = flip condJmp [LT, EQ]
-        | otherwise = error $ "Bad ByteCode Instruction: " ++ show bc
-      condJmp :: Word16 -&gt [Ordering] -&gt IO ()
-      condJmp jmp ords = popOp frame &gt&gt= \cmp -&gt when (enumToOrd cmp `elem` ords)
-        (readIORef frame &gt&gt= flip (writeIORef . program_counter . code_segment) (fromIntegral jmp))
-      ordToInt :: Ordering -&gt Int
-      ordToInt ord = case ord of
-        GT -&gt 1
-        EQ -&gt 0
-        LT -&gt -1
-      enumToOrd :: Integral a =&gt a -&gt Ordering
-      enumToOrd x = case x of
-        1 -&gt GT
-        0 -&gt EQ
-        -1 -&gt LT
-        _ -&gt error "Bad Enumerable Value! "
+import org.json.JSONException;
+import org.json.JSONObject;
 
-  {- | Obtains the next ByteCode instruction and increments the PC -}
-  getNextBC :: StackFrame -&gt IO ByteCode
-  getNextBC frame = readIORef frame &gt&gt= \f -&gt -- Read StackFrame from passed reference
-    let segment = code_segment f in -- Retrieve current set of instructions
-    readIORef (program_counter segment) &gt&gt= \n -&gt -- Read current ByteCode instruction
-    modifyIORef (program_counter segment) (+1) &gt&gt -- Increment PC
-    return (byte_code segment !! fromIntegral n) -- Return ByteCode instruction
+/**
+ * Created by theif519 on 10/29/2015.
+ */
+public class BaseWidget extends Fragment {
 
-  {- | Obtains the next two ByteCode instructions as a short, and increments the PC by 2 -}
-  getNextShort :: StackFrame -&gt IO Word16
-  getNextShort frame = replicateM 2 (getNextBC frame) &gt&gt= \(i1:i2:_) -&gt
-    return $ fromIntegral i1 `shift` 8 .|. fromIntegral i2</code></pre>    </body></html>
+    public static final BaseWidget INVALID_WIDGET = new BaseWidget();
+
+    protected ViewState mViewState;
+    protected String LAYOUT_TAG;
+    protected int mLayoutId, mIconId, mMinWidth, mMinHeight;
+    protected long id = -1;
+    private TouchInterceptorLayout mContentView;
+    private ImageButton mTaskBarButton;
+    private MenuOptions mOptionsMenu;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mContentView = (TouchInterceptorLayout) inflater.inflate(mLayoutId, container, false);
+        mContentView.setVisibility(View.INVISIBLE);
+        mMinWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 250, getResources().getDisplayMetrics());
+        mMinHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 250, getResources().getDisplayMetrics());
+        setupTaskItem();
+        createOptions();
+        // Ensures that the following methods are called after the view is fully drawn and setup.
+        mContentView.post(() -&gt {
+            setupListeners();
+            setup();
+            RxBus.publish(mOptionsMenu);
+        });
+        return mContentView;
+    }
+
+    /**
+     * This is where we setup the bottom task bar's button for this BaseWidget. Very bare-bones right now.
+     */
+    private void setupTaskItem() {
+        mTaskBarButton = new ImageButton(getActivity());
+        mTaskBarButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        mTaskBarButton.setImageResource(mIconId);
+        mTaskBarButton.setOnClickListener(v -&gt toggleMinimize());
+        ((LinearLayout) getActivity().findViewById(R.id.main_task_bar)).addView(mTaskBarButton);
+    }
+
+    /**
+     * Where we initialize all of our listeners.
+     */
+    private void setupListeners() {
+        mContentView.findViewById(R.id.title_bar_close).setOnClickListener(v -&gt close());
+        mContentView.findViewById(R.id.title_bar_minimize).setOnClickListener(v -&gt minimize());
+        mContentView.findViewById(R.id.title_bar_maximize).setOnClickListener(v -&gt toggleMaximize());
+        RxBus
+                .observe(Integer.class)
+                .filter(count -&gt count != null && count % 5 == 0 && !mOptionsMenu.isShowing())
+                .subscribe(count -&gt toggleMinimize());
+        mContentView.setCallback(() -&gt RxBus.publish(mOptionsMenu));
+        mContentView.findViewById(R.id.title_bar_move)
+                .setOnTouchListener(new View.OnTouchListener() {
+                    int prevX, prevY, touchXOffset, touchYOffset;
+
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        switch (event.getAction()) {
+                            case MotionEvent.ACTION_DOWN:
+                                if (mViewState.isMaximized() || mViewState.isSnapped()) {
+                                    mViewState.resetState();
+                                    restoreState();
+                                    setCoordinates(
+                                            (int) event.getRawX() - MeasureTools.scaleDeltaWidth(mContentView),
+                                            (int) event.getRawY() - MeasureTools.scaleDeltaHeight(mContentView)
+                                    );
+                                    Point p = MeasureTools.getScaledCoordinates(mContentView);
+                                    prevX = touchXOffset = p.x - mViewState.getX();
+                                    prevY = touchYOffset = p.y - mViewState.getY();
+                                } else {
+                                    prevX = touchXOffset = (int) event.getRawX() - mViewState.getX();
+                                    prevY = touchYOffset = (int) event.getRawY() - mViewState.getY();
+                                }
+                                return false;
+                            case MotionEvent.ACTION_MOVE:
+                                int tmpX, tmpY;
+                                updateSnapMask(prevX, prevY, (tmpX = (int) event.getRawX()), (tmpY = (int) event.getRawY()));
+                                prevX = tmpX;
+                                prevY = tmpY;
+                                setCoordinates(tmpX - touchXOffset, tmpY - touchYOffset);
+                                return false;
+                            case MotionEvent.ACTION_UP:
+                                boundsCheck();
+                                snap();
+                                WidgetSessionManager
+                                        .getInstance()
+                                        .updateSession(BaseWidget.this);
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+        mContentView.findViewById(R.id.resize_button)
+                .setOnTouchListener(new View.OnTouchListener() {
+                    int tmpX, tmpY;
+
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        switch (event.getAction()) {
+                            case MotionEvent.ACTION_DOWN:
+                                Point p = MeasureTools.getScaledCoordinates(mContentView);
+                                tmpX = p.x;
+                                tmpY = p.y;
+                                return false;
+                            case MotionEvent.ACTION_MOVE:
+                                mViewState.resetState();
+                                setSize(
+                                        Math.abs(MeasureTools.scaleInverse((int) event.getRawX() - tmpX)),
+                                        Math.abs(MeasureTools.scaleInverse((int) event.getRawY() - tmpY))
+                                );
+                                return false;
+                            case MotionEvent.ACTION_UP:
+                                boundsCheck();
+                                WidgetSessionManager
+                                        .getInstance()
+                                        .updateSession(BaseWidget.this);
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+        RxBus
+                .observe(Configuration.class)
+                .subscribe(configuration -&gt {
+                    boundsCheck();
+                    snap();
+                    if (mViewState.isMaximized()) {
+                        maximize();
+                    }
+                });
+    }
+
+    /**
+     * Used to check the bounds of the view. Sometimes I don't do a good enough job of checking for
+     * whether or not my views remain in bounds, and other times it is impossible to maintain otherwise,
+     * like if the user changes orientation. I consider these my BaseWidget's training wheels,
+     * as this gets called whenever a view's state or visibility changes (Meaning on every move, unfortunately).
+     * &ltp&gt
+     * A lot of this code is honestly brute forced. I go with what I feel would be right, then modify it like
+     * 100x until it is working.
+     */
+    private void boundsCheck() {
+        // Checks if the scaled width is less than minimum width
+        if (MeasureTools.scaleWidth(mContentView) &lt mMinWidth) {
+            setWidth(mMinWidth);
+        }
+        // Checks if the scaled height is less than minimum height
+        if (MeasureTools.scaleHeight(mContentView) &lt mMinHeight) {
+            setHeight(mMinHeight);
+        }
+        // Checks if the overall width is greater than maximum available width
+        if (MeasureTools.scaleWidth(mContentView) &gt Globals.MAX_X.get()) {
+            setWidth(MeasureTools.scaleInverse(Globals.MAX_X.get()));
+        }
+        // Checks if the overall height is greater than the maximum available height
+        if (MeasureTools.scaleHeight(mContentView) &gt Globals.MAX_Y.get()) {
+            setHeight(MeasureTools.scaleInverse(Globals.MAX_Y.get()));
+        }
+        Point p = MeasureTools.getScaledCoordinates(mContentView);
+        // Checks right side of screen relative to X coordinate
+        if (p.x + MeasureTools.scaleWidth(mContentView) &gt Globals.MAX_X.get()) {
+            setX(Globals.MAX_X.get() - MeasureTools.scaleDeltaWidth(mContentView) - MeasureTools.scaleWidth(mContentView));
+        }
+        // Checks top side of screen relative to Y coordinate
+        if (p.y + MeasureTools.scaleHeight(mContentView) &gt Globals.MAX_Y.get()) {
+            setY(Globals.MAX_Y.get() - MeasureTools.scaleDeltaHeight(mContentView) - MeasureTools.scaleHeight(mContentView));
+        }
+        p = MeasureTools.getScaledCoordinates(mContentView);
+        // Checks left side of screen
+        if (p.x &lt 0) {
+            setX(-MeasureTools.scaleDeltaWidth(mContentView));
+        }
+        // Checks top side of screen
+        if (p.y &lt 0) {
+            setY(-MeasureTools.scaleDeltaHeight(mContentView));
+        }
+    }
+
+    private void restoreState() {
+        mContentView.setX(mViewState.getX());
+        mContentView.setY(mViewState.getY());
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mContentView.getLayoutParams();
+        params.width = mViewState.getWidth();
+        params.height = mViewState.getHeight();
+        mContentView.setLayoutParams(params);
+    }
+
+    /**
+     * Updates the bitmask used to maintain the current snap direction of the current view.
+     *
+     * @param oldX The old x-coordinate. This is used to determine the horizontal direction the user is going.
+     * @param oldY The old y-coordinate. This is used to determine the vertical direction the user is going.
+     * @param newX The new x-coordinate. By finding the difference between new and old we can determine which horizontal direction the user is going.
+     * @param newY The new y-coordinate. By finding the difference between new and old, we can determine which vertical direction the user is going.
+     */
+    private void updateSnapMask(int oldX, int oldY, int newX, int newY) {
+        mViewState.resetSnap();
+        int transitionX = newX - oldX;
+        int transitionY = newY - oldY;
+        int snapOffsetX = Globals.MAX_X.get() / 10;
+        int snapOffsetY = Globals.MAX_Y.get() / 10;
+        if (transitionX &gt 0 && newX + snapOffsetX &gt= Globals.MAX_X.get()) {
+            mViewState.addState(ViewState.RIGHT);
+        }
+        if (transitionX &lt 0 && newX &lt= snapOffsetX) {
+            mViewState.addState(ViewState.LEFT);
+        }
+        if (transitionY &lt 0 && newY &lt= snapOffsetY) {
+            mViewState.addState(ViewState.UPPER);
+        }
+        if (transitionY &gt 0 && newY + snapOffsetY &gt= Globals.MAX_Y.get()) {
+            mViewState.addState(ViewState.BOTTOM);
+        }
+    }
+
+    private int[] getSnapViewProperties() {
+        int maxWidth = Globals.MAX_X.get();
+        int maxHeight = Globals.MAX_Y.get();
+        int width = 0, height = 0, x = 0, y = 0;
+        if (mViewState.isStateSet(ViewState.RIGHT)) {
+            width = maxWidth / 2;
+            height = maxHeight;
+            x = maxWidth / 2;
+        }
+        if (mViewState.isStateSet(ViewState.LEFT)) {
+            width = maxWidth / 2;
+            height = maxHeight;
+        }
+        if (mViewState.isStateSet(ViewState.UPPER)) {
+            if (width == 0) {
+                width = maxWidth;
+            }
+            height = maxHeight / 2;
+        }
+        if (mViewState.isStateSet(ViewState.BOTTOM)) {
+            if (width == 0) {
+                width = maxWidth;
+            }
+            height = maxHeight / 2;
+            y = maxHeight / 2;
+        }
+        width = MeasureTools.scaleInverse(width);
+        height = MeasureTools.scaleInverse(height);
+        x -= MeasureTools.scaleDelta(width);
+        y -= MeasureTools.scaleDelta(height);
+        return new int[]{x, y, width, height};
+    }
+
+    /**
+     * Used to snap views to a side of the window if the bitmask is set.
+     * &ltp&gt
+     * By utilizing a bitmask, it allows me to dynamically snap to not just sides, but also corners as well. It uses bitwise AND'ing
+     * to retrieve set bits/attributes. Unlike other operations, such as move() and resize(), changes to the mContentView's
+     * size and coordinates are not saved, to easily allow the view to go back to it's original size easily.
+     */
+    private void snap() {
+        if (!mViewState.isSnapped()) return;
+        int[] p = getSnapViewProperties();
+        MoveAndResizeAnimation anim = new MoveAndResizeAnimation(mContentView, p[0], p[1], p[2], p[3]);
+        anim.setDuration(500);
+        mContentView.startAnimation(anim);
+    }
+
+    private int[] restoredViewProperties(){
+        return mViewState.isMaximized() ? getMaximizeViewProperties() :
+                mViewState.isSnapped() ? getSnapViewProperties() :
+                        mViewState.getViewProperties();
+    }
+
+    /**
+     * Maximizes the view. Note that it does not alter the view's X and Y coordinate through the ViewState
+     * instance, as we do not really want it to be saved. This allows for the view to go back to it's
+     * previous size and coordinates easily, as the previous are remembered. In fact,  what's really cool about
+     * it is that because it is not set, but the state of whether or not it is maximized is, it will allow the user
+     * to go back to their previous size EVEN if they already exited the program fully.
+     */
+    private void maximize() {
+        mContentView.bringToFront();
+        MoveAndResizeAnimation anim = new MoveAndResizeAnimation(mContentView, getMaximizeViewProperties());
+        anim.setDuration(500);
+        mContentView.startAnimation(anim);
+        mViewState.setMaximized(true);
+        WidgetSessionManager.getInstance().updateSession(this);
+    }
+
+    private int[] getMaximizeViewProperties() {
+        int width = MeasureTools.scaleInverse(Globals.MAX_X.get()), height = MeasureTools.scaleInverse(Globals.MAX_Y.get()),
+                x = -MeasureTools.scaleDelta(width), y = -MeasureTools.scaleDelta(height);
+        return new int[]{x, y, width, height};
+    }
+
+    private void restoreMaximize() {
+        mViewState.setMaximized(false);
+        MoveAndResizeAnimation anim = new MoveAndResizeAnimation(mContentView, restoredViewProperties());
+        anim.setDuration(500);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                mContentView.bringToFront();
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                WidgetSessionManager
+                        .getInstance()
+                        .updateSession(BaseWidget.this);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mContentView.startAnimation(anim);
+    }
+
+    private void toggleMaximize() {
+        if (mViewState.isMaximized()) {
+            restoreMaximize();
+        } else {
+            maximize();
+        }
+    }
+
+    /**
+     * Used to minimize the view. It doesn't do much right now, but it works.
+     */
+    private void toggleMinimize() {
+        if (mContentView.getVisibility() == View.INVISIBLE) {
+            restoreMinimize();
+        } else {
+            minimize();
+        }
+        WidgetSessionManager
+                .getInstance()
+                .updateSession(this);
+    }
+
+
+    private void minimize() {
+        MoveAndResizeAnimation anim = new MoveAndResizeAnimation(mContentView, mTaskBarButton.getX(), Globals.MAX_Y.get(), 0, 0);
+        anim.setDuration(500);
+        anim.setAnimationListener(new OnAnimationEndListener() {
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mContentView.setVisibility(View.INVISIBLE);
+                mViewState.setMinimized(true);
+                WidgetSessionManager
+                        .getInstance()
+                        .updateSession(BaseWidget.this);
+                Log.i(getClass().getName(), "(" + mContentView.getX() + ", " + mContentView.getY() + ")\n&lt" + mContentView.getWidth() + "x" + mContentView.getHeight() + "&gt");
+            }
+        });
+        mContentView.startAnimation(anim);
+    }
+
+    private void restoreMinimize() {
+        mViewState.setMinimized(false);
+        MoveAndResizeAnimation anim = new MoveAndResizeAnimation(mContentView, restoredViewProperties());
+        anim.setDuration(500);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                mContentView.setVisibility(View.VISIBLE);
+                mContentView.bringToFront();
+                RxBus.publish(mOptionsMenu);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                boundsCheck();
+                WidgetSessionManager
+                        .getInstance()
+                        .updateSession(BaseWidget.this);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mContentView.startAnimation(anim);
+    }
+
+    /**
+     * For subclasses to override to setup their own additional needed information. Not abstract as it is not
+     * necessary to setup.
+     */
+    protected void setup() {
+        if (mViewState == null) {
+            mViewState = new ViewState();
+        }
+        restoreState();
+        if (mViewState.getWidth() == 0 || mViewState.getHeight() == 0) {
+            setSize(mMinWidth, mMinHeight);
+        }
+        snap();
+        if (mViewState.isMaximized()) {
+            maximize();
+        }
+        if (mViewState.isMinimized()) {
+            minimize();
+        } else mContentView.setVisibility(View.VISIBLE);
+    }
+
+    protected JSONObject pack() {
+        try {
+            return mViewState.deserialize();
+        } catch (JSONException e) {
+            Log.w(getClass().getName(), e.getMessage());
+            return null;
+        }
+    }
+
+    protected void unpack(JSONObject obj) {
+        try {
+            mViewState = new ViewState(obj);
+        } catch (JSONException e) {
+            Log.w(getClass().getName(), e.getMessage());
+        }
+    }
+
+    public void deserialize(byte[] data) {
+        try {
+            unpack(new JSONObject(new String(data)));
+        } catch (JSONException e) {
+            Log.w(getClass().getName(), e.getMessage());
+        }
+    }
+
+    public byte[] serialize() {
+        return pack()
+                .toString()
+                .getBytes();
+    }
+
+    protected MenuBuilder buildOptions() {
+        return new MenuBuilder()
+                .addSeparator(LAYOUT_TAG)
+                .addOption("Check Bounds", null, this::boundsCheck);
+    }
+
+    private void createOptions() {
+        MenuBuilder builder = buildOptions();
+        mOptionsMenu = new MenuOptions(builder.create(getActivity()), mIconId, LAYOUT_TAG);
+    }
+
+    /**
+     * For any subclasses that need to clean up extra resources, they may do so here.
+     */
+    protected void cleanUp() {
+        ((LinearLayout) getActivity()
+                .findViewById(R.id.main_task_bar))
+                .removeView(mTaskBarButton);
+    }
+
+    private void close() {
+        cleanUp();
+        WidgetSessionManager
+                .getInstance()
+                .deleteSession(this);
+        getActivity()
+                .getFragmentManager()
+                .beginTransaction()
+                .remove(this)
+                .commit();
+        if (mOptionsMenu != null) {
+            mOptionsMenu.notifyObservers();
+        }
+    }
+
+    private void setSize(int width, int height) {
+        mViewState
+                .setWidth(width)
+                .setHeight(height);
+        mContentView.getLayoutParams().width = width;
+        mContentView.getLayoutParams().height = height;
+        mContentView.requestLayout();
+    }
+
+    private void setCoordinates(int x, int y) {
+        mViewState
+                .setX(x)
+                .setY(y);
+        mContentView.setX(x);
+        mContentView.setY(y);
+    }
+
+    private void setX(int x) {
+        mViewState.setX(x);
+        mContentView.setX(x);
+    }
+
+    private void setY(int y) {
+        mViewState.setY(y);
+        mContentView.setY(y);
+    }
+
+    private void setWidth(int width) {
+        mViewState.setWidth(width);
+        mContentView.getLayoutParams().width = width;
+        mContentView.requestLayout();
+    }
+
+    private void setHeight(int height) {
+        mViewState.setHeight(height);
+        mContentView.getLayoutParams().height = height;
+        mContentView.requestLayout();
+    }
+
+    /**
+     * A way for the subclasses to retrieve the Content View. In the future, I most likely will make the
+     * mContentView protected and remove this, or make this public for other classes to use, I.E MainActivity.
+     *
+     * @return The content view.
+     */
+    protected View getContentView() {
+        return mContentView;
+    }
+
+    public String getLayoutTag() {
+        return LAYOUT_TAG;
+    }
+
+    public long getUniqueId() {
+        return id;
+    }
+
+    public void setUniqueId(long id) {
+        this.id = id;
+    }
+
+}</code></pre>    </body></html>

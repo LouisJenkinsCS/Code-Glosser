@@ -31,8 +31,7 @@
 package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Events.Event;
-import edu.bloomu.codeglosser.Events.EventEngine;
-import edu.bloomu.codeglosser.Events.EventHandler;
+import edu.bloomu.codeglosser.Events.EventBus;
 import edu.bloomu.codeglosser.Globals;
 import edu.bloomu.codeglosser.Model.Templates.TemplateLeaf;
 import edu.bloomu.codeglosser.Model.Templates.TemplateNodeFactory;
@@ -53,16 +52,17 @@ import javax.swing.tree.TreePath;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import edu.bloomu.codeglosser.Events.EventProcessor;
 
 /**
  *
  * @author Louis Jenkins
  */
-public class PropertyTemplates extends javax.swing.JPanel implements EventHandler {
+public class PropertyTemplates extends javax.swing.JPanel implements EventProcessor {
     
     public static final int APPLY_TEMPLATE = 0x1;
     
-    private final EventEngine engine = new EventEngine(this, Event.PROPERTY_TEMPLATES);
+    private final EventBus engine = new EventBus(this, Event.PROPERTY_TEMPLATES);
 
     /**
      * Creates new form PropertyTemplates
@@ -74,12 +74,12 @@ public class PropertyTemplates extends javax.swing.JPanel implements EventHandle
     }
     
     @Override
-    public Observable<Event> handleEvent(Event e) {
+    public Observable<Event> process(Event e) {
         return Observable.empty();
     }
 
     @Override
-    public EventEngine getEventEngine() {
+    public EventBus getEventEngine() {
         return engine;
     }
     

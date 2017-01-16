@@ -39,11 +39,11 @@ import java.util.logging.Logger;
  *
  * @author Louis Jenkins
  */
-public class EventEngine {
+public class EventBus {
     
     private final int id;
     
-    private static final Logger LOG = Logger.getLogger(EventEngine.class.getName());
+    private static final Logger LOG = Logger.getLogger(EventBus.class.getName());
     
     private Function<Event, String> stringifyEvent;
     
@@ -51,7 +51,7 @@ public class EventEngine {
     PublishSubject<Event> outgoingEvent = PublishSubject.create();
     PublishSubject<Event> ingoingEvent = PublishSubject.create();
     
-    public EventEngine(EventHandler handler, int id) {
+    public EventBus(EventProcessor handler, int id) {
         this.id = id;
         
         // Handle receiving events
@@ -61,7 +61,7 @@ public class EventEngine {
                 // Log any and all events
                 .doOnNext(e -> LOG.info(stringifyEvent != null ? e.toString(stringifyEvent) : e.toString()))
                 // Convert it to the implementor's Observable
-                .flatMap(handler::handleEvent)
+                .flatMap(handler::process)
                 // All events received are processed by the background worker thread.
                 // This includes any and all events above.
                 .subscribeOn(Globals.WORKER_THREAD)
@@ -88,7 +88,7 @@ public class EventEngine {
      * Registers another engine with our own so that both receive and send to each other.
      * @param engine Engine to register.
      */
-    public void register(EventEngine engine) {
+    public void register(EventBus engine) {
         engine.outgoingEvent.subscribe(this.ingoingEvent::onNext);
         this.outgoingEvent.subscribe(engine.ingoingEvent::onNext);
     } 

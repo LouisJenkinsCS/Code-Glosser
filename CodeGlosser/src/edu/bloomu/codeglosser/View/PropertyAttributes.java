@@ -31,8 +31,7 @@
 package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Events.Event;
-import edu.bloomu.codeglosser.Events.EventEngine;
-import edu.bloomu.codeglosser.Events.EventHandler;
+import edu.bloomu.codeglosser.Events.EventBus;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Utils.SwingScheduler;
 import io.reactivex.Observable;
@@ -45,12 +44,13 @@ import javax.swing.JColorChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import edu.bloomu.codeglosser.Events.EventProcessor;
 
 /**
  *
  * @author Louis Jenkins
  */
-public class PropertyAttributes extends javax.swing.JPanel implements EventHandler {
+public class PropertyAttributes extends javax.swing.JPanel implements EventProcessor {
 
     private static final Logger LOG = Logger.getLogger(PropertyAttributes.class.getName());
     
@@ -65,7 +65,7 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
     private Color color = Color.YELLOW;
     private String message = "";
     
-    private final EventEngine engine = new EventEngine(this, Event.PROPERTY_ATTRIBUTES);
+    private final EventBus engine = new EventBus(this, Event.PROPERTY_ATTRIBUTES);
 
     public PropertyAttributes() {
         // Initialize GUI components
@@ -79,7 +79,7 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
     }
     
     @Override
-    public Observable<Event> handleEvent(Event e) {
+    public Observable<Event> process(Event e) {
         switch (e.getSender()) {
             case Event.MARKUP_PROPERTIES:
                 switch (e.getCustom()) {
@@ -96,7 +96,7 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
     }
 
     @Override
-    public EventEngine getEventEngine() {
+    public EventBus getEventEngine() {
         return engine;
     }
     

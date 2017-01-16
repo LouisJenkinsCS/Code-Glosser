@@ -35,11 +35,11 @@ import io.reactivex.Observable;
 /**
  *
  * @author Louis Jenkins
- * 
- * An EventHandler is a component in an EventEngine that acts as both an Observer
- * and an Observable.
+ 
+ An EventProcessor is a component in an EventBus that acts as both an Observer
+ and an Observable.
  */
-public interface EventHandler {
+public interface EventProcessor {
     
     /**
      * Handle the passed Event. By returning an Observable, it allows the handler
@@ -48,7 +48,7 @@ public interface EventHandler {
      * @param e Event
      * @return Zero or more events.
      */
-    Observable<Event> handleEvent(Event e);
+    Observable<Event> process(Event e);
     
-    EventEngine getEventEngine();
+    EventBus getEventEngine();
 }

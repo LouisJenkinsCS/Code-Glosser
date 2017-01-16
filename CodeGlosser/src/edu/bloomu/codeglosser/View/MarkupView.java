@@ -36,8 +36,7 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.logging.Logger;
 import edu.bloomu.codeglosser.Events.Event;
-import edu.bloomu.codeglosser.Events.EventEngine;
-import edu.bloomu.codeglosser.Events.EventHandler;
+import edu.bloomu.codeglosser.Events.EventBus;
 import edu.bloomu.codeglosser.Exceptions.InvalidTextSelectionException;
 import edu.bloomu.codeglosser.HTML.Lang2HTML;
 import edu.bloomu.codeglosser.Model.Markup;
@@ -63,6 +62,7 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 import org.javatuples.Pair;
+import edu.bloomu.codeglosser.Events.EventProcessor;
 
 /**
  *
@@ -76,7 +76,7 @@ import org.javatuples.Pair;
  * The MarkupView is, currently, only connected to the MarkupController.
  *
  */
-public class MarkupView extends javax.swing.JPanel implements EventHandler {
+public class MarkupView extends javax.swing.JPanel implements EventProcessor {
 
     // The events we send
     public static final int CREATE_MARKUP = 0x1;
@@ -91,7 +91,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
     // The model for this view; the model handles the computational work such as segmentation of highlighting
     private final MarkupViewModel model = new MarkupViewModel();
 
-    private final EventEngine engine = new EventEngine(this, Event.MARKUP_VIEW);
+    private final EventBus engine = new EventBus(this, Event.MARKUP_VIEW);
 
     // The highlighter and it's respective mapping of highlights
     private final Highlighter highlighter;
@@ -135,7 +135,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
     }
 
     @Override
-    public Observable<Event> handleEvent(Event e) {
+    public Observable<Event> process(Event e) {
         switch (e.getSender()) {
             case Event.MARKUP_CONTROLLER:
                 switch (e.getCustom()) {
@@ -156,7 +156,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
     }
 
     @Override
-    public EventEngine getEventEngine() {
+    public EventBus getEventEngine() {
         return engine;
     }
     

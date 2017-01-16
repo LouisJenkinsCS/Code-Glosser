@@ -31,8 +31,7 @@
 package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Events.Event;
-import edu.bloomu.codeglosser.Events.EventEngine;
-import edu.bloomu.codeglosser.Events.EventHandler;
+import edu.bloomu.codeglosser.Events.EventBus;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Utils.SwingScheduler;
 import io.reactivex.Observable;
@@ -43,19 +42,20 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
+import edu.bloomu.codeglosser.Events.EventProcessor;
 
 /**
  *
  * @author Louis
  */
-public class PropertySelector extends javax.swing.JPanel implements EventHandler {
+public class PropertySelector extends javax.swing.JPanel implements EventProcessor {
     
     // MarkupProperties
     public static final int SELECTED_ID = 0x1;
     
     private static final Logger LOG = Logger.getLogger(PropertySelector.class.getName());
     
-    private final EventEngine engine = new EventEngine(this, Event.PROPERTY_SELECTOR);
+    private final EventBus engine = new EventBus(this, Event.PROPERTY_SELECTOR);
     
     public PropertySelector() {
         initComponents();
@@ -74,7 +74,7 @@ public class PropertySelector extends javax.swing.JPanel implements EventHandler
     }
     
     @Override
-    public Observable<Event> handleEvent(Event e) {
+    public Observable<Event> process(Event e) {
         switch (e.getSender()) {
             case Event.MARKUP_PROPERTIES:
                 switch (e.getCustom()) {
@@ -97,7 +97,7 @@ public class PropertySelector extends javax.swing.JPanel implements EventHandler
     }
 
     @Override
-    public EventEngine getEventEngine() {
+    public EventBus getEventEngine() {
         return engine;
     }
     

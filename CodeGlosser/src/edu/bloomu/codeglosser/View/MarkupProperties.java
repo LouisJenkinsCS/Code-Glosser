@@ -32,8 +32,7 @@ package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Controller.MarkupController;
 import edu.bloomu.codeglosser.Events.Event;
-import edu.bloomu.codeglosser.Events.EventEngine;
-import edu.bloomu.codeglosser.Events.EventHandler;
+import edu.bloomu.codeglosser.Events.EventBus;
 import edu.bloomu.codeglosser.Model.Markup;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
@@ -42,6 +41,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import edu.bloomu.codeglosser.Events.EventProcessor;
 
 /**
  *
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
  * PropertiesAttributes, and PropertiesSelector. Due to technical difficulties
  * with NetBeans, we reserve space for all attributes and add them manually. 
  */
-public class MarkupProperties extends javax.swing.JPanel implements EventHandler {
+public class MarkupProperties extends javax.swing.JPanel implements EventProcessor {
     
     // MarkupController
     public static final int FILE_SELECTED = 0x1;
@@ -71,7 +71,7 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
     
     private static final Logger LOG = Logger.getLogger(MarkupProperties.class.getName());
     
-    private final EventEngine engine = new EventEngine(this, Event.MARKUP_PROPERTIES);
+    private final EventBus engine = new EventBus(this, Event.MARKUP_PROPERTIES);
 
     public MarkupProperties() {
         // Initialize components
@@ -80,7 +80,7 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
     }
     
     @Override
-    public Observable<Event> handleEvent(Event e) {
+    public Observable<Event> process(Event e) {
         switch (e.getSender()) {
             case Event.MARKUP_CONTROLLER:
                 switch (e.getCustom()) {
@@ -129,7 +129,7 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
     }
 
     @Override
-    public EventEngine getEventEngine() {
+    public EventBus getEventEngine() {
         return engine;
     }
     
