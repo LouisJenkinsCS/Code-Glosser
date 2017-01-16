@@ -31,8 +31,7 @@
 package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Events.Event;
-import edu.bloomu.codeglosser.Events.EventEngine;
-import edu.bloomu.codeglosser.Events.EventHandler;
+import edu.bloomu.codeglosser.Events.EventBus;
 import edu.bloomu.codeglosser.Globals;
 import edu.bloomu.codeglosser.Model.Templates.TemplateLeaf;
 import edu.bloomu.codeglosser.Model.Templates.TemplateNodeFactory;
@@ -53,16 +52,17 @@ import javax.swing.tree.TreePath;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import edu.bloomu.codeglosser.Events.EventProcessor;
 
 /**
  *
  * @author Louis Jenkins
  */
-public class PropertyTemplates extends javax.swing.JPanel implements EventHandler {
+public class PropertyTemplates extends javax.swing.JPanel implements EventProcessor {
     
     public static final int APPLY_TEMPLATE = 0x1;
     
-    private final EventEngine engine = new EventEngine(this, Event.PROPERTIES_TEMPLATES);
+    private final EventBus engine = new EventBus(this, Event.PROPERTY_TEMPLATES);
 
     /**
      * Creates new form PropertyTemplates
@@ -73,11 +73,21 @@ public class PropertyTemplates extends javax.swing.JPanel implements EventHandle
         initListeners();
     }
     
+    @Override
+    public Observable<Event> process(Event e) {
+        return Observable.empty();
+    }
+
+    @Override
+    public EventBus getEventEngine() {
+        return engine;
+    }
+    
     private void initTemplateTree() {
         // Construct template tree (in background)
         Observable
                 .just(Globals.TEMPLATE_FILE)
-                .observeOn(Schedulers.io())
+                .subscribeOn(Globals.WORKER_THREAD)
                 // Only do so if it exists
                 .filter(path -> path.toFile().exists())
                 // Convert from JSON to JSONObject
@@ -91,7 +101,6 @@ public class PropertyTemplates extends javax.swing.JPanel implements EventHandle
                 .map(obj -> TemplateNodeFactory.getTemplateNode((JSONObject) obj))
                 // Buffer all values into a single list.
                 .buffer(Integer.MAX_VALUE)
-                // Back to UI Thread to update tree
                 .observeOn(SwingScheduler.getInstance())
                 // Set the root to a dummy which returns the parsed information above.
                 .subscribe(list ->
@@ -182,14 +191,4 @@ public class PropertyTemplates extends javax.swing.JPanel implements EventHandle
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTree templateTree;
     // End of variables declaration//GEN-END:variables
-
-    @Override
-    public Observable<Event> handleEvent(Event e) {
-        return Observable.empty();
-    }
-
-    @Override
-    public EventEngine getEventEngine() {
-        return engine;
-    }
 }

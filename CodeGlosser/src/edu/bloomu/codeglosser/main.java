@@ -33,6 +33,7 @@ package edu.bloomu.codeglosser;
 import edu.bloomu.codeglosser.View.MarkupFrame;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.logging.LogManager;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
@@ -59,6 +60,7 @@ public class main extends JApplet {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        
         SwingUtilities.invokeLater(new Runnable() {
             
             @Override

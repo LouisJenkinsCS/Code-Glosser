@@ -36,28 +36,23 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.logging.Logger;
 import edu.bloomu.codeglosser.Events.Event;
-import edu.bloomu.codeglosser.Events.EventEngine;
-import edu.bloomu.codeglosser.Events.EventHandler;
+import edu.bloomu.codeglosser.Events.EventBus;
 import edu.bloomu.codeglosser.Exceptions.InvalidTextSelectionException;
 import edu.bloomu.codeglosser.HTML.Lang2HTML;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Model.MarkupViewModel;
 import edu.bloomu.codeglosser.Utils.ColorUtils;
 import edu.bloomu.codeglosser.Utils.FileUtils;
-import edu.bloomu.codeglosser.Utils.SwingScheduler;
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
 import javax.swing.text.Highlighter;
@@ -67,6 +62,7 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 import org.javatuples.Pair;
+import edu.bloomu.codeglosser.Events.EventProcessor;
 
 /**
  *
@@ -80,7 +76,7 @@ import org.javatuples.Pair;
  * The MarkupView is, currently, only connected to the MarkupController.
  *
  */
-public class MarkupView extends javax.swing.JPanel implements EventHandler {
+public class MarkupView extends javax.swing.JPanel implements EventProcessor {
 
     // The events we send
     public static final int CREATE_MARKUP = 0x1;
@@ -95,7 +91,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
     // The model for this view; the model handles the computational work such as segmentation of highlighting
     private final MarkupViewModel model = new MarkupViewModel();
 
-    private final EventEngine engine = new EventEngine(this, Event.MARKUP_VIEW);
+    private final EventBus engine = new EventBus(this, Event.MARKUP_VIEW);
 
     // The highlighter and it's respective mapping of highlights
     private final Highlighter highlighter;
@@ -105,8 +101,6 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
     private final JPopupMenu popup = new JPopupMenu();
 
     public MarkupView() {
-        LOG.info("Initializing MarkupView...");
-
         // Initialize NetBeans' generated GUI components
         initComponents();
 
@@ -116,6 +110,16 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
         initializePopup();
         initializeView();
         initializeListeners();
+        
+        // Setup stringification for logging events.
+        engine.setStringification(e -> {
+            switch (e.getCustom()) {
+                case MarkupController.FILE_SELECTED:
+                    return ((Pair<String, List<Markup>>) e.data).getValue1().toString();
+                default:
+                    return e.toString();
+            }
+        });
     }
     
     private void initializeView() {
@@ -131,7 +135,7 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
     }
 
     @Override
-    public Observable<Event> handleEvent(Event e) {
+    public Observable<Event> process(Event e) {
         switch (e.getSender()) {
             case Event.MARKUP_CONTROLLER:
                 switch (e.getCustom()) {
@@ -152,13 +156,11 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
     }
 
     @Override
-    public EventEngine getEventEngine() {
+    public EventBus getEventEngine() {
         return engine;
     }
     
     private void initializePopup() {
-        LOG.finer("Initializing PopupMenu...");
-
         // Create all menu items
         JMenuItem deleteMarkup = new JMenuItem("Delete Markup");
         JMenuItem createMarkup = new JMenuItem("Create Markup");
@@ -283,8 +285,9 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
     }
 
     public void setText(String str) {
-        LOG.info("Text changed...");
-        textCode.setText("<html><head></head><body style=\"font-size: 1.15em\"><pre><code>" + str.trim() + "</code></pre></body></html>");
+        SwingUtilities.invokeLater(() -> {
+            textCode.setText("<html><head></head><body style=\"font-size: 1.15em\"><pre><code>" + str.trim() + "</code></pre></body></html>");
+        });
     }
 
     /**
@@ -314,52 +317,43 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
     }
 
     public void addMarkup(Color color, Bounds... bounds) {
-        LOG.info(Stream
-                .of(bounds)
-                .map(Bounds::toString)
-                .reduce("Adding Markups: {", (s1, s2) -> s1 + "\n\t" + s2)
-                .concat("\n}")
-        );
         Stream.of(bounds)
                 .filter((b) -> b.getStart() != b.getEnd())
                 .forEach((b) -> {
-                    Highlight highlight = null;
-                    try {
-                        highlight = (Highlight) highlighter.addHighlight(b.getStart(), b.getEnd(), new DefaultHighlightPainter(ColorUtils.makeTransparent(color)));
-                    } catch (BadLocationException ex) {
-                        LOG.throwing(this.getClass().getName(), "addMarkup", ex);
-                    }
-                    highlightMap.put(b, highlight);
+                    SwingUtilities.invokeLater(() -> {
+                        Highlight highlight = null;
+                        try {
+                            highlight = (Highlight) highlighter.addHighlight(b.getStart(), b.getEnd(), new DefaultHighlightPainter(ColorUtils.makeTransparent(color)));
+                        } catch (BadLocationException ex) {
+                            LOG.throwing(this.getClass().getName(), "addMarkup", ex);
+                        }
+                        highlightMap.put(b, highlight);
+                    });
                 });
     }
 
     public Observable<Event> removeMarkup(Bounds... bounds) {
-        LOG.info(Stream
-                .of(bounds)
-                .map(Bounds::toString)
-                .reduce("Removing Markups: {", (s1, s2) -> s1 + "\n\t" + s2)
-                .concat("\n}")
-        );
-
         // Remove any highlights within requested bounds
         return Observable
                 .fromIterable(highlightMap.keySet())
-                // Perform the work on background thread
-                .observeOn(Schedulers.computation())
                 // Find any highlights that match the request and remove them
                 .filter(bound -> Stream.of(bounds).anyMatch(bound::collidesWith))
                 .map(highlightMap::remove)
                 // Remove the visual highlights on UI Thread
-                .observeOn(SwingScheduler.getInstance())
-                .doOnNext(highlighter::removeHighlight)
+                .doOnNext(highlight -> SwingUtilities.invokeLater(
+                        () -> highlighter.removeHighlight(highlight)
+                ))
                 // We have handled the event, so no need for anything else.
                 .flatMap(Event::empty);
     }
 
-    public void removeAllMarkups() {
-        LOG.info("Removing all markups!");
-        highlightMap.values().stream()
-                .forEach(highlighter::removeHighlight);
+    public void removeAllMarkups() {        
+        highlightMap
+                .values()
+                .stream()
+                .forEach(highlight -> SwingUtilities.invokeLater(
+                        () -> highlighter.removeHighlight(highlight)
+                ));
         highlightMap.clear();
     }
     
@@ -375,33 +369,45 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
         int end = textCode.getSelectionEnd();
 
         // Remove selection
-        textCode.setSelectionStart(start);
-        textCode.setSelectionEnd(start);
+        SwingUtilities.invokeLater(() -> {
+            textCode.setSelectionStart(start);
+            textCode.setSelectionEnd(start);
+        });
+        
 
         Stream.of(highlighter.getHighlights())
-                .filter((h) -> Bounds.of(h.getStartOffset(), h.getEndOffset()).collidesWith(bounds))
-                .forEach((h) -> {
+                // Obtain highlights which are within the requested bounds
+                .filter(h -> Bounds.of(h.getStartOffset(), h.getEndOffset()).collidesWith(bounds))
+                // For each highlight, we need to remove it and add it again as another color. There is no
+                // way to directly change the color of a highlight once set.
+                .forEach(h -> {
                     Bounds b = Bounds.of(h.getStartOffset(), h.getEndOffset());
-                    highlighter.removeHighlight(h);
-                    HighlightPainter hp = new DefaultHighlightPainter(ColorUtils.makeTransparent(color));
-                    try {
-                        Highlight h1 = (Highlight) highlighter.addHighlight(b.getStart(), b.getEnd(), hp);
-                        highlightMap.put(b, h1);
-                    } catch (BadLocationException ex) {
-                        ex.printStackTrace();
-                    }
+                    
+                    // TODO: Race Condition!!! highlightMap is added to from UI Thread
+                    SwingUtilities.invokeLater(() -> {
+                        highlighter.removeHighlight(h);
+                        HighlightPainter hp = new DefaultHighlightPainter(ColorUtils.makeTransparent(color));
+                        try {
+                            Highlight h1 = (Highlight) highlighter.addHighlight(b.getStart(), b.getEnd(), hp);
+                            highlightMap.put(b, h1);
+                        } catch (BadLocationException ex) {
+                            ex.printStackTrace();
+                        }
+                    });
                 });
 
         // Restore saved offsets
         if (start != 0 || end != 0) {
-            setSelection(Bounds.of(start, end));
+            SwingUtilities.invokeLater(() -> setSelection(Bounds.of(start, end)));
         }
     }
 
     public void setSelection(Bounds bounds) {
-        this.requestFocus(true);
-        textCode.setSelectionStart(bounds.getStart());
-        textCode.setSelectionEnd(bounds.getEnd());
+        SwingUtilities.invokeLater(() -> {
+            this.requestFocus(true);
+            textCode.setSelectionStart(bounds.getStart());
+            textCode.setSelectionEnd(bounds.getEnd());
+        });
     }
 
     /**
@@ -463,18 +469,19 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
     }
     
     private Observable<Event> fileSelected(Pair<String, List<Markup>> pair) {
+        SwingUtilities.invokeLater(() -> highlighter.removeAllHighlights());
+        highlightMap.clear();
+        
         return Observable
                 .just(pair)
                 // Handle syntax highlighting in background
-                .observeOn(Schedulers.computation())
                 .doOnNext(p -> model.setText(p.getValue0()))
                 .flatMap(p -> new Lang2HTML()
                         .translate(p.getValue0())
                         .map(p::setAt0)
                 )
-                // Display text on UI Thread
-                .observeOn(SwingScheduler.getInstance())
-                .doOnNext(p -> setText(p.getValue0()))
+                // Display syntax highlighted code on UI Thread
+                .doOnNext(p -> SwingUtilities.invokeLater(() -> setText(p.getValue0())))
                 // Set highlights
                 .map(Pair::getValue1)
                 .flatMap(Observable::fromIterable)
@@ -491,24 +498,16 @@ public class MarkupView extends javax.swing.JPanel implements EventHandler {
      * @return Pipelined instructions
      */
     private Observable<Event> removeHighlight(Markup markup) {
-        LOG.info(Stream
-                .of(markup.getOffsets())
-                .map(Bounds::toString)
-                .reduce("Removing Markups: {", (s1, s2) -> s1 + "\n\t" + s2)
-                .concat("\n}")
-        );
-
         // Remove any highlights within requested bounds
         return Observable
-                .fromIterable(highlightMap.keySet())
-                // Perform the work on background thread
-                .observeOn(Schedulers.computation())
+                .fromIterable(highlightMap.keySet().stream().collect(Collectors.toList()))
                 // Find any highlights that match the request and remove them
                 .filter(markup::inRange)
                 .map(highlightMap::remove)
                 // Remove the visual highlights on UI Thread
-                .observeOn(SwingScheduler.getInstance())
-                .doOnNext(highlighter::removeHighlight)
+                .doOnNext(highlight -> SwingUtilities.invokeLater(
+                        () -> highlighter.removeHighlight(highlight)
+                ))
                 // We have handled the event, so no need for anything else.
                 .flatMap(Event::empty);
     }

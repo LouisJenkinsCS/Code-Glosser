@@ -60,7 +60,6 @@ public class Lang2HTML {
 
     public Observable<String> translate(final String code) {
         PublishSubject<String> pageLoaded = PublishSubject.create();
-        LOG.info("Getting extension for: " + Globals.CURRENT_FILE);
         String ext = FileUtils.getExtension(Globals.CURRENT_FILE);
         Platform.runLater(() -> {
             wv = new WebView();
@@ -72,24 +71,8 @@ public class Lang2HTML {
             Scene scene = new Scene(root, 300, 250);
 
             eng.getLoadWorker().stateProperty().addListener((ov,oldState,newState) -> {
-
-                switch (newState) {
-                    case SCHEDULED:
-                        System.out.println("state: scheduled");
-                        break;
-                    case RUNNING:
-                        System.out.println("state: running");
-                        break;
-                    case SUCCEEDED:
-                        System.out.println("state: succeeded");
-                        break;
-                    default:
-                        System.out.println("state: " + newState);
-                        break;
-                }
                 if (newState == Worker.State.SUCCEEDED) {
                     String newCode = (String) eng.executeScript("document.getElementById('code_segment').innerHTML");
-                    LOG.info("innerHTML=" + newCode);
                     pageLoaded.onNext(newCode);
                 }
             });

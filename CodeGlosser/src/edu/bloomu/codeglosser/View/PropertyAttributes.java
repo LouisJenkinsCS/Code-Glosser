@@ -31,8 +31,7 @@
 package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Events.Event;
-import edu.bloomu.codeglosser.Events.EventEngine;
-import edu.bloomu.codeglosser.Events.EventHandler;
+import edu.bloomu.codeglosser.Events.EventBus;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Utils.SwingScheduler;
 import io.reactivex.Observable;
@@ -42,14 +41,16 @@ import java.awt.Color;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import javax.swing.JColorChooser;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import edu.bloomu.codeglosser.Events.EventProcessor;
 
 /**
  *
  * @author Louis Jenkins
  */
-public class PropertyAttributes extends javax.swing.JPanel implements EventHandler {
+public class PropertyAttributes extends javax.swing.JPanel implements EventProcessor {
 
     private static final Logger LOG = Logger.getLogger(PropertyAttributes.class.getName());
     
@@ -64,7 +65,7 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
     private Color color = Color.YELLOW;
     private String message = "";
     
-    private final EventEngine engine = new EventEngine(this, Event.PROPERTIES_ATTRIBUTES);
+    private final EventBus engine = new EventBus(this, Event.PROPERTY_ATTRIBUTES);
 
     public PropertyAttributes() {
         // Initialize GUI components
@@ -78,7 +79,7 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
     }
     
     @Override
-    public Observable<Event> handleEvent(Event e) {
+    public Observable<Event> process(Event e) {
         switch (e.getSender()) {
             case Event.MARKUP_PROPERTIES:
                 switch (e.getCustom()) {
@@ -95,7 +96,7 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
     }
 
     @Override
-    public EventEngine getEventEngine() {
+    public EventBus getEventEngine() {
         return engine;
     }
     
@@ -107,11 +108,8 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
                 // We throttle text change events from the user to relieve backpressure.
                 // As well, all internal work is kept off the UI Thread and on a CPU-Bound one.
                 .debounce(TEXT_CHANGE_DEBOUNCE, TimeUnit.MILLISECONDS, Schedulers.computation())
-                .doOnNext(ignored -> LOG.info("Processing Text Change event"))
                 // We only proceed if the message != text, because 'setText' can trigger this
                 .filter(text -> !text.equals(message))
-                .observeOn(SwingScheduler.getInstance())
-                // Event handling and broadcasting are done on the UI Thread for simplicity
                 .subscribe(text -> engine.broadcast(Event.MARKUP_PROPERTIES, TEXT_CHANGE, text));
                 
                 
@@ -220,7 +218,8 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
     }//GEN-LAST:event_labelColorMousePressed
     
     private Observable<Event> setAttributes(Markup markup) {
-        LOG.info("Setting attributes: " + markup);
+        LOG.fine("Setting attributes: " + markup);
+        
         setColor(markup.getHighlightColor());
         setMessage(markup.getMsg());
         
@@ -228,7 +227,7 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
     }
     
     private Observable<Event> clearAttributes() {
-        LOG.info("Clearing attributes...");
+        LOG.fine("Clearing attributes...");
         
         setColor(Color.YELLOW);
         setMessage("");
@@ -243,16 +242,19 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
     public void setColor(Color c) {
         if (c != null) {
             color = c;
-            labelColor.setBackground(c);
-            labelColor.setForeground(c);
-            labelRGB.setText("(" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + ")");
+            
+            SwingUtilities.invokeLater(() -> {
+                labelColor.setBackground(c);
+                labelColor.setForeground(c);
+                labelRGB.setText("(" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + ")");
+            });
         }
     }
     
     public void setMessage(String msg) {
         if (msg != null && !msg.equals(message)) {
             message = msg;
-            noteMsg.setText(msg);
+            SwingUtilities.invokeLater(() -> noteMsg.setText(msg));
         }
     }
 

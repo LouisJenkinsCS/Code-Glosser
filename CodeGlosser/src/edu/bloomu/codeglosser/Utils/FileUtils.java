@@ -72,16 +72,13 @@ public class FileUtils {
         
         return Observable
                 .just(path)
-                .observeOn(Schedulers.io())
                 .map(Files::readAllLines)
-                .observeOn(Schedulers.computation())
                 .map(list -> list.stream().collect(Collectors.joining("\n")));         
     }
     
     public static String getExtension(Path path) {
         String fileName = path.toString();
         int offset = fileName.indexOf('.');
-        LOG.info("Extension: " + fileName.substring(offset + 1));
         return fileName.substring(offset + 1);
     }
     

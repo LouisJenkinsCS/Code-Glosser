@@ -32,8 +32,7 @@ package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Controller.MarkupController;
 import edu.bloomu.codeglosser.Events.Event;
-import edu.bloomu.codeglosser.Events.EventEngine;
-import edu.bloomu.codeglosser.Events.EventHandler;
+import edu.bloomu.codeglosser.Events.EventBus;
 import edu.bloomu.codeglosser.Model.Markup;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
@@ -42,6 +41,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import edu.bloomu.codeglosser.Events.EventProcessor;
 
 /**
  *
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
  * PropertiesAttributes, and PropertiesSelector. Due to technical difficulties
  * with NetBeans, we reserve space for all attributes and add them manually. 
  */
-public class MarkupProperties extends javax.swing.JPanel implements EventHandler {
+public class MarkupProperties extends javax.swing.JPanel implements EventProcessor {
     
     // MarkupController
     public static final int FILE_SELECTED = 0x1;
@@ -63,6 +63,7 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
     public static final int NEW_SELECTION = 0x2;
     public static final int SET_SELECTION = 0x3;
     public static final int RESTORE_SELECTIONS = 0x4;
+    public static final int REMOVE_SELECTION = 0x5;
     
     // PropertyAttributes
     public static final int CLEAR_ATTRIBUTES = 0x1;
@@ -70,7 +71,7 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
     
     private static final Logger LOG = Logger.getLogger(MarkupProperties.class.getName());
     
-    private final EventEngine engine = new EventEngine(this, Event.MARKUP_PROPERTIES);
+    private final EventBus engine = new EventBus(this, Event.MARKUP_PROPERTIES);
 
     public MarkupProperties() {
         // Initialize components
@@ -79,7 +80,7 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
     }
     
     @Override
-    public Observable<Event> handleEvent(Event e) {
+    public Observable<Event> process(Event e) {
         switch (e.getSender()) {
             case Event.MARKUP_CONTROLLER:
                 switch (e.getCustom()) {
@@ -89,31 +90,35 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
                         return displayMarkup((Markup) e.data);
                     case MarkupController.RESTORE_MARKUPS:
                         return restoreMarkups((List<Markup>) e.data);
+                    case MarkupController.REMOVE_MARKUP:
+                        return removeMarkup((Markup) e.data);
+                    case MarkupController.SELECTED_ID_RESPONSE:
+                        return selectedIdResponse((Markup) e.data);
                     default:
                         throw new RuntimeException("Bad Custom Tag from MarkupController!");
                 }
-            case Event.PROPERTIES_ATTRIBUTES:
+            case Event.PROPERTY_ATTRIBUTES:
                 switch (e.getCustom()) {
                     case PropertyAttributes.TEXT_CHANGE:
                         return textChange((String) e.data);
                     default:
                         throw new RuntimeException("Bad Custom Tag from PropertyAttributes!");
                 }
-            case Event.PROPERTIES_FILES:
+            case Event.PROPERTY_FILES:
                 switch (e.getCustom()) {
                     case PropertyFiles.FILE_SELECTED:
                         return fileSelected((Path) e.data);
                     default:
                         throw new RuntimeException("Bad Custom Tag from PropertyFiles!");
                 }
-            case Event.PROPERTIES_SELECTOR:
+            case Event.PROPERTY_SELECTOR:
                 switch (e.getCustom()) {
                     case PropertySelector.SELECTED_ID:
                         return selectedId((String) e.data);
                     default:
                         throw new RuntimeException("Bad Custom Tag from PropertySelector!");
                 }
-            case Event.PROPERTIES_TEMPLATES:
+            case Event.PROPERTY_TEMPLATES:
                 switch (e.getCustom()) {
                     case PropertyTemplates.APPLY_TEMPLATE:
                         return applyTemplate((Markup) e.data);
@@ -124,7 +129,7 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
     }
 
     @Override
-    public EventEngine getEventEngine() {
+    public EventBus getEventEngine() {
         return engine;
     }
     
@@ -135,18 +140,14 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
         engine.register(propertyTemplates.getEventEngine());
     }
     
-    private Observable<Event> displayMarkup(Markup markup) {
-        LOG.info("Handling displaying Markup: " + markup);
-        
+    private Observable<Event> displayMarkup(Markup markup) {        
         return Observable.just(
-                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_ATTRIBUTES, SET_ATTRIBUTES, markup),
-                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_SELECTOR, SET_SELECTION, markup.getId())
+                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTY_ATTRIBUTES, SET_ATTRIBUTES, markup),
+                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTY_SELECTOR, SET_SELECTION, markup.getId())
         );
     }
     
-    private Observable<Event> selectedId(String id) {
-        LOG.info("Propagating event for markup selection: " + id);
-        
+    private Observable<Event> selectedId(String id) {        
         return Observable.just(Event.of(Event.MARKUP_PROPERTIES, Event.MARKUP_CONTROLLER, SELECTED_ID, id));
     }
     
@@ -156,13 +157,11 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
      * @param template Partially filled Markup
      * @return Observable to emit event.
      */
-    private Observable<Event> applyTemplate(Markup template) {
-        LOG.info("Propagating event for applying template: " + template);
-        
+    private Observable<Event> applyTemplate(Markup template) {        
         // Make the change as a template
         return Observable.just(
                 Event.of(Event.MARKUP_PROPERTIES, Event.MARKUP_CONTROLLER, APPLY_TEMPLATE, template),
-                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_ATTRIBUTES, SET_ATTRIBUTES, template)
+                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTY_ATTRIBUTES, SET_ATTRIBUTES, template)
         );
     }
     
@@ -179,14 +178,12 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
      * @param fileName File path selected.
      * @return 
      */
-    private Observable<Event> fileSelected(Path filePath) {
-        LOG.info("Propagating event for file selection: " + filePath);
-        
+    private Observable<Event> fileSelected(Path filePath) {        
         // Notify controller, selector, and attributes.
         return Observable.just(
                 Event.of(Event.MARKUP_PROPERTIES, Event.MARKUP_CONTROLLER, FILE_SELECTED, filePath),
-                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_SELECTOR, CLEAR_SELECTION, null),
-                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_ATTRIBUTES, CLEAR_ATTRIBUTES, null)                
+                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTY_SELECTOR, CLEAR_SELECTION, null),
+                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTY_ATTRIBUTES, CLEAR_ATTRIBUTES, null)                
         );
     }
     
@@ -195,20 +192,16 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
      * @param markup Markup
      * @return 
      */
-    private Observable<Event> newMarkup(Markup markup) {
-        LOG.info("Propagating event for new markup: " + markup);
-        
+    private Observable<Event> newMarkup(Markup markup) {        
         // Notify attributes and selector
         return Observable.just(
-                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_ATTRIBUTES, SET_ATTRIBUTES, markup),
-                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_SELECTOR, NEW_SELECTION, markup)
+                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTY_ATTRIBUTES, SET_ATTRIBUTES, markup),
+                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTY_SELECTOR, NEW_SELECTION, markup)
         );
     }
     
-    private Observable<Event> restoreMarkups(List<Markup> markups) {
-        LOG.info("Restoring Markups for :" + markups);
-        
-        return Observable.just(Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTIES_SELECTOR, RESTORE_SELECTIONS, 
+    private Observable<Event> restoreMarkups(List<Markup> markups) {        
+        return Observable.just(Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTY_SELECTOR, RESTORE_SELECTIONS, 
                 markups
                     .stream()
                     .map(Markup::getId)
@@ -282,4 +275,14 @@ public class MarkupProperties extends javax.swing.JPanel implements EventHandler
     private edu.bloomu.codeglosser.View.PropertyTemplates propertyTemplates;
     private javax.swing.JTabbedPane tabbedTreeView;
     // End of variables declaration//GEN-END:variables
+
+    private Observable<Event> removeMarkup(Markup markup) {
+        return Observable.just(Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTY_SELECTOR, REMOVE_SELECTION, markup),
+                Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTY_ATTRIBUTES, CLEAR_ATTRIBUTES, markup)
+        );
+    }
+
+    private Observable<Event> selectedIdResponse(Markup markup) {
+        return Observable.just(Event.of(Event.MARKUP_PROPERTIES, Event.PROPERTY_ATTRIBUTES, SET_ATTRIBUTES, markup));
+    }
 }

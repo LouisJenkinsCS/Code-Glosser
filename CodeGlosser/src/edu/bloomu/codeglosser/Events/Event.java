@@ -31,6 +31,7 @@
 package edu.bloomu.codeglosser.Events;
 
 import io.reactivex.Observable;
+import java.util.function.Function;
 
 /**
  *
@@ -43,14 +44,34 @@ public class Event {
     /*
         The identifying bits
     */
-    public static final int MARKUP_VIEW = 1 << 0;
-    public static final int MARKUP_CONTROLLER = 1 << 1;
-    public static final int MARKUP_PROPERTIES = 1 << 2;
-    public static final int PROPERTIES_SELECTOR = 1 << 3;
-    public static final int PROPERTIES_TEMPLATES = 1 << 4;
-    public static final int PROPERTIES_FILES = 1 << 5;
-    public static final int PROPERTIES_ATTRIBUTES = 1 << 6;
+    public static final int MARKUP_VIEW = 0x01;
+    public static final int MARKUP_CONTROLLER = 0x02;
+    public static final int MARKUP_PROPERTIES = 0x03;
+    public static final int PROPERTY_SELECTOR = 0x04;
+    public static final int PROPERTY_TEMPLATES = 0x05;
+    public static final int PROPERTY_FILES = 0x06;
+    public static final int PROPERTY_ATTRIBUTES = 0x07;
     
+    private static String tagToString(int tag) {
+        switch (tag) {
+            case MARKUP_VIEW:
+                return "MarkupView";
+            case MARKUP_CONTROLLER:
+                return "MarkupController";
+            case MARKUP_PROPERTIES:
+                return "MarkupProperties";
+            case PROPERTY_SELECTOR:
+                return "PropertySelector";
+            case PROPERTY_TEMPLATES:
+                return "PropertyTemplates";
+            case PROPERTY_FILES:
+                return "PropertyFiles";
+            case PROPERTY_ATTRIBUTES:
+                return "PropertyAttributes";
+            default:
+                return "Unknown(" + tag + ")";
+        }
+    }   
     
     /*
         Helper bit shifts and masks to determine what is what.
@@ -129,7 +150,10 @@ public class Event {
 
     @Override
     public String toString() {
-        return "Event: {Sender: " + getSender() + ", Recipient: " + getRecipient() + ", Custom: " + getCustom() + ", data=" + data + "}";
+        return "Event: {Sender: " + tagToString(getSender()) + ", Recipient: " + tagToString(getRecipient()) + ", Custom: " + getCustom() + ", data=" + data + "}";
     }
     
+    public String toString(Function<Event, String> asString) {
+        return "Event: {Sender: " + tagToString(getSender()) + ", Recipient: " + tagToString(getRecipient()) + ", Custom: " + getCustom() + ", data=" + asString.apply(this) + "}";
+    }
 }
