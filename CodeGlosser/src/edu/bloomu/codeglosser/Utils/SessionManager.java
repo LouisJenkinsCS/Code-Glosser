@@ -55,7 +55,7 @@ import org.json.simple.parser.JSONParser;
  */
 public class SessionManager {
 
-    private static final Logger LOG = Logger.getLogger(SessionManager.class.getName());
+    private static final Logger LOG = Globals.LOGGER;
     
     private static final String FILE_NAME = "session.json";
     private static final String MARKUPS = "Markups";

@@ -45,6 +45,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import edu.bloomu.codeglosser.Events.EventProcessor;
+import edu.bloomu.codeglosser.Globals;
 
 /**
  *
@@ -52,7 +53,7 @@ import edu.bloomu.codeglosser.Events.EventProcessor;
  */
 public class PropertyAttributes extends javax.swing.JPanel implements EventProcessor {
 
-    private static final Logger LOG = Logger.getLogger(PropertyAttributes.class.getName());
+    private static final Logger LOG = Globals.LOGGER;
     
     public static final int COLOR_CHANGE = 0x1;
     public static final int TEXT_CHANGE = 0x2;

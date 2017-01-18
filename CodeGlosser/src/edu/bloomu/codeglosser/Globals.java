@@ -32,16 +32,30 @@ package edu.bloomu.codeglosser;
 
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.Executors;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  *
  * @author Louis Jenkins
+ * 
+ * Global Variables which are accessed across the program. All access to non-final 
+ * field MUST be performed on the WORKER_THREAD scheduler.
  */
 public final class Globals {
+    
+    private static FileHandler handler;
+    
+    // The application's central logger. It logs to a particular log file.
+    public static final Logger LOGGER = Logger.getLogger("Code-Glosser");
     
     // Scheduler for our background worker thread. The worker thread handles all
     // IO and CPU Bound processing.
@@ -65,6 +79,19 @@ public final class Globals {
      * memory leak, the previous values are not accidentally used.
      */
     public static void initGlobals() {
+        try {
+            handler = new FileHandler("log.txt");
+            handler.setLevel(Level.INFO);
+            handler.setFormatter(new SimpleFormatter());
+            
+            // Ensure we only log to log file.
+            LOGGER.setUseParentHandlers(false);
+            LOGGER.addHandler(handler);
+            
+            LOGGER.setLevel(Level.INFO);
+        } catch (IOException | SecurityException ex) {
+            throw new RuntimeException("Failed to initialized logger... " + ex.getMessage());
+        }
         PROJECT_FOLDER = null;
         URI_PREFIX = null;
         CURRENT_FILE = null;

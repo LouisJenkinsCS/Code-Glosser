@@ -129,72 +129,155 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
   position: absolute;
   display:block;
   z-index: 99;
-}</style><meta charset="UTF-8"></head><body><pre><code><span class="note" msg="Bad IDE Generated Comment"><span class="hljs-comment">/*</span></span><span class="hljs-comment">
- </span><span class="note" msg="Bad IDE Generated Comment"><span class="hljs-comment">* To change this template, choose Tools | Templates</span></span><span class="hljs-comment">
- </span><span class="note" msg="Bad IDE Generated Comment"><span class="hljs-comment">* and open the template in the editor.</span></span><span class="hljs-comment">
- </span><span class="note" msg="Bad IDE Generated Comment"><span class="hljs-comment">*/</span></span>
-<span class="hljs-keyword">package</span> springbreak;
+}</style><meta charset="UTF-8"></head><body><pre><code><span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious."><span class="hljs-comment">; Constant Declarations for Multiboot Header (GRUB)</span></span>
+<span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">ALIGN_ON_PAGE <span class="hljs-built_in">equ</span> <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">0</span> <span class="hljs-comment">; Align modules on page boundaries</span></span>
+<span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">USE_MMAP <span class="hljs-built_in">equ</span> <span class="hljs-number">1</span> &lt;&lt; <span class="hljs-number">1</span> <span class="hljs-comment">; Provide memory map</span></span>
+<span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">FLAGS <span class="hljs-built_in">equ</span> ALIGN_ON_PAGE | USE_MMAP <span class="hljs-comment">; Multiboot flag</span></span>
+<span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">MAGIC <span class="hljs-built_in">equ</span> <span class="hljs-number">0x1BADB002</span> <span class="hljs-comment">; 'Magic Number' needed to allow bootloader to find header</span></span>
+<span class="note" msg="Within a method, comments are needed to explain any code whose purpose is not obvious.">CHECKSUM <span class="hljs-built_in">equ</span> -(MAGIC + FLAGS) <span class="hljs-comment">; Checksum to prove we are multiboot</span></span>
 
-<span class="note" msg="Each class must have a properly structured doc comment including at least a summary fragment and the author's name (first and last)."><span class="hljs-comment">/**</span></span><span class="hljs-comment">
- </span><span class="note" msg="Each class must have a properly structured doc comment including at least a summary fragment and the author's name (first and last)."><span class="hljs-comment">*</span></span><span class="hljs-comment">
- </span><span class="note" msg="Each class must have a properly structured doc comment including at least a summary fragment and the author's name (first and last)."><span class="hljs-comment">* <span class="hljs-doctag">@author</span> theif519</span></span><span class="hljs-comment">
- </span><span class="note" msg="Each class must have a properly structured doc comment including at least a summary fragment and the author's name (first and last)."><span class="hljs-comment">*/</span></span>
-<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SpringBreak</span> </span>{
+<span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses."><span class="hljs-comment">; Declare the multiboot header needed by GRUB</span></span>
+<span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses."><span class="hljs-meta">section</span> .multiboot</span>
 
-    <span class="hljs-comment">/**
-     * <span class="hljs-doctag">@param</span> args the command line arguments
-     */</span>
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>{
-        System.out.println(firstDigit(<span class="hljs-number">123</span>));
-        System.out.println(lastDigit(<span class="hljs-number">123</span>));
-        System.out.println(digits(<span class="hljs-number">123</span>));
-        System.out.println(numInWords(<span class="hljs-string">"Mary had a little lamb"</span>));
-        System.out.println(vowels(<span class="hljs-string">"How many vowels are there in the alphabet?"</span>));
-    }
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">firstDigit</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span>
-    </span>{
-        String <span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">step1</span> = Integer.toString(n);
-        <span class="hljs-keyword">char</span> <span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">step2</span> = step1.charAt(<span class="hljs-number">0</span>);
-        <span class="hljs-keyword">return</span> Character.getNumericValue(step2);
-    }
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">lastDigit</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span>
-    </span>{
-        String <span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">step1</span> = Integer.toString(n);
-        <span class="hljs-keyword">char</span> <span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">step2</span> = step1.charAt(step1.length() - <span class="hljs-number">1</span>);
-        <span class="hljs-keyword">return</span> Character.getNumericValue(step2);
-    }
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">digits</span><span class="hljs-params">(<span class="hljs-keyword">int</span> n)</span>
-    </span>{
-        String <span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">step1</span> = Integer.toString(n);
-        <span class="hljs-keyword">return</span> step1.length();
-    }
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">numInWords</span><span class="hljs-params">(String str)</span>
-    </span>{
-        <span class="hljs-keyword">int</span> blank = <span class="hljs-number">0</span>;
-        <span class="hljs-keyword">char</span>[] <span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">step1</span> = str.toCharArray();
-        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; str.length() - <span class="hljs-number">1</span>; i++)
-        {
-          <span class="note" msg="Remove all unused variables, unneeded import statements, and commented-out code."><span class="hljs-comment">//if (Character.isWhitespace(step1[i]))</span></span><span class="hljs-comment"> </span>
-            <span class="hljs-keyword">if</span>(step1[i] == <span class="hljs-string">' '</span>)
-            {
-                blank++;
-            }
-        }
-        blank++;
-        <span class="hljs-keyword">return</span> blank;
-    }
-    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">vowels</span><span class="hljs-params">(String str)</span>
-    </span>{
-        <span class="hljs-keyword">int</span> vowels = <span class="hljs-number">0</span>;
-        str.toLowerCase();
-        <span class="hljs-keyword">char</span>[] <span class="note" msg="Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).">step1</span> = str.toCharArray();
-        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; str.length() - <span class="hljs-number">1</span>; i++)
-        {
-            <span class="hljs-keyword">if</span> (step1[i] == <span class="hljs-string">'a'</span> || step1[i] == <span class="hljs-string">'e'</span> || step1[i] == <span class="hljs-string">'i'</span> || step1[i] == <span class="hljs-string">'o'</span> || step1[i] == <span class="hljs-string">'u'</span>) 
-            {
-                vowels++;
-            }
-        }
-        <span class="hljs-keyword">return</span> vowels;
-    }
-}</code></pre></body></html>
+	<span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses."><span class="hljs-meta">align</span> <span class="hljs-number">4</span></span>
+		<span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses."><span class="hljs-built_in">dd</span> MAGIC</span>
+		<span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses."><span class="hljs-built_in">dd</span> FLAGS</span>
+		<span class="note" msg="Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses."><span class="hljs-built_in">dd</span> CHECKSUM</span>
+
+<span class="hljs-comment">; Setup stack pointer register (esp), as its contents are currently undefined. Allocate 16KBs</span>
+<span class="hljs-meta">section</span> .create_stack nobits
+
+	<span class="hljs-meta">align</span> <span class="hljs-number">4</span>
+<span class="hljs-symbol">		stack_bottom:</span>
+			<span class="hljs-built_in">resb</span> <span class="hljs-number">16</span> * <span class="hljs-number">1024</span>
+<span class="hljs-symbol">		stack_top:</span>
+
+<span class="hljs-comment">; Below we setup paging (virtual memory) and move our kernel to the higher half</span>
+VIRTUAL_ADDRESS_START <span class="hljs-built_in">equ</span> <span class="hljs-number">0xC0000000</span>
+<span class="hljs-comment">; Since each index in the Page Directory only uses the higher 12 bits, which is</span>
+<span class="hljs-comment">; used as it's index, we keep a convenient constant of it.</span>
+KERNEL_INDEX <span class="hljs-built_in">equ</span> (VIRTUAL_ADDRESS_START &gt;&gt; <span class="hljs-number">22</span>)
+<span class="hljs-comment">; A constant for Page Directory entries that sets the PS, RW, and P bits, which specify</span>
+<span class="hljs-comment">; that the pages should be 4MBs in size, that it can be read and written to, and is present</span>
+<span class="hljs-comment">; respectively.</span>
+PDE_DEFAULT <span class="hljs-built_in">equ</span> <span class="hljs-number">0x00000083</span>
+
+<span class="hljs-comment">; Setup the paging structures needed to bootstrap our kernel</span>
+<span class="hljs-meta">section</span> .data
+	<span class="hljs-meta">align</span> <span class="hljs-number">0x1000</span>
+
+	<span class="hljs-comment">; This is the Page Directory that we use to bootstrap.</span>
+<span class="hljs-symbol">	bootstrap_page_directory:</span>
+		<span class="hljs-comment">; Because we are remapping our kernel to KERNEL_START, our current</span>
+		<span class="hljs-comment">; instruction pointer will cause us to page fault (and then double fault and</span>
+		<span class="hljs-comment">; then triple fault) and trigger a hardware reset. Hence before we enable paging</span>
+		<span class="hljs-comment">; we must identity map each virtual address to it's respective physical address.</span>
+		<span class="hljs-built_in">dd</span> PDE_DEFAULT
+		<span class="hljs-comment">; All pages besides the kernel's are not present in memory</span>
+		<span class="hljs-built_in">times</span> (KERNEL_INDEX - <span class="hljs-number">1</span>) <span class="hljs-built_in">dd</span> <span class="hljs-number">0</span>
+		<span class="hljs-comment">; Kernel Entry</span>
+		<span class="hljs-built_in">dd</span> PDE_DEFAULT
+		<span class="hljs-comment">; Pages after the kernel</span>
+		<span class="hljs-built_in">times</span> (<span class="hljs-number">1024</span> - KERNEL_INDEX - <span class="hljs-number">1</span>) <span class="hljs-built_in">dd</span> <span class="hljs-number">0</span>
+
+<span class="hljs-meta">section</span> .text
+
+<span class="hljs-comment">; This is the entry point for the linker, which will start the instruction pointer in a</span>
+<span class="hljs-comment">; valid physical memory location.</span>
+<span class="hljs-meta">global</span> start
+	start <span class="hljs-built_in">equ</span> (_start - VIRTUAL_ADDRESS_START)
+
+<span class="hljs-meta">global</span> _start
+	
+	<span class="hljs-comment">; Setup paging -- Note that at this point, we are still in physical memory, and as such we need</span>
+	<span class="hljs-comment">; to ensure that we begin relative to the physical location 0x0.</span>
+<span class="hljs-symbol">	_start:</span>
+		<span class="hljs-comment">; Load the Page Directory we setup above</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">ecx</span>, (bootstrap_page_directory - VIRTUAL_ADDRESS_START)
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">cr3</span>, <span class="hljs-built_in">ecx</span>
+
+		<span class="hljs-comment">; Enable 4MB paging by setting the PSE bit in CR4</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">ecx</span>, <span class="hljs-built_in">cr4</span>
+		<span class="hljs-keyword">or</span> <span class="hljs-built_in">ecx</span>, <span class="hljs-number">0x00000010</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">cr4</span>, <span class="hljs-built_in">ecx</span>
+
+		<span class="hljs-comment">; Enable paging by setting the PG bit in CR4</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">ecx</span>, <span class="hljs-built_in">cr0</span>
+		<span class="hljs-keyword">or</span> <span class="hljs-built_in">ecx</span>, <span class="hljs-number">0x80000000</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">cr0</span>, <span class="hljs-built_in">ecx</span>
+
+		<span class="hljs-comment">; <span class="hljs-doctag">NOTE:</span> At this point in time, paging has been enabled, and we are now using virtual memory.</span>
+		<span class="hljs-comment">; This includes the instruction pointer, and as such we need to perform a long jump. As well,</span>
+		<span class="hljs-comment">; the CPU needs to clear it's instruction cache it prefetched, which can be cleaned out by</span>
+		<span class="hljs-comment">; performing a branch instruction, so this does performs double duty.</span>
+		<span class="hljs-keyword">lea</span> <span class="hljs-built_in">ecx</span>, [__start]
+		<span class="hljs-keyword">jmp</span> <span class="hljs-built_in">ecx</span>
+
+	<span class="hljs-comment">; Setting up the stack and finally passing control back to our preferred language (C)</span>
+<span class="hljs-symbol">	__start:</span>
+		<span class="hljs-comment">; Unmap the identity mapping established above of 0 - 4MBs, as we no longer require it.</span>
+		<span class="hljs-comment">; At this point, our instruction pointer no points into 0xC0000000+ area.</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">dword</span> [bootstrap_page_directory], <span class="hljs-number">0</span>
+		<span class="hljs-keyword">invlpg</span> [<span class="hljs-number">0</span>]
+
+		<span class="hljs-comment">; Setup the stack pointer to point to the stack allocated above</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">esp</span>, stack_top
+
+		<span class="hljs-comment">; EBX contains a pointer to the multiboot info structure that we should save for later</span>
+		<span class="hljs-comment">; Since it is the physical address, we need to convert it to it's virtual address</span>
+		<span class="hljs-keyword">add</span> <span class="hljs-built_in">ebx</span>, VIRTUAL_ADDRESS_START
+		<span class="hljs-keyword">push</span> <span class="hljs-built_in">ebx</span>
+
+		<span class="hljs-comment">; Zero EBP which is used to signify the end of a stack trace</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">ebp</span>, <span class="hljs-number">0</span>
+
+		<span class="hljs-comment">; Initialize the core facilities of the kernel</span>
+		<span class="hljs-meta">extern</span> kernel_init
+		<span class="hljs-keyword">call</span> kernel_init
+
+		<span class="hljs-comment">; Clean up stack frame</span>
+		<span class="hljs-keyword">add</span> <span class="hljs-built_in">esp</span>, <span class="hljs-number">4</span>
+
+		<span class="hljs-comment">; Zero EBP again since kernel_init will have changed it</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">ebp</span>, <span class="hljs-number">0</span>
+
+		<span class="hljs-comment">; Finally, jump to kmain, and leave assembly behind for good</span>
+		<span class="hljs-meta">extern</span> kernel_main
+		<span class="hljs-keyword">call</span> kernel_main
+
+		<span class="hljs-comment">; If we do end up back here, the bootloader is gone and hence there is nothing left to do but halt permanently</span>
+		<span class="hljs-keyword">cli</span>
+<span class="hljs-symbol">	.hang:</span>
+		<span class="hljs-keyword">hlt</span>
+		<span class="hljs-keyword">jmp</span> .hang
+
+
+<span class="hljs-comment">; gdt_flush -- Load the GDT (Global Descriptor Table)</span>
+<span class="hljs-meta">global</span> gdt_flush
+<span class="hljs-symbol">
+	gdt_flush:</span>
+		<span class="hljs-comment">; Obtain the gdt_ptr passed and load it</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">esp</span> + <span class="hljs-number">4</span>]
+		<span class="hljs-keyword">lgdt</span> [<span class="hljs-built_in">eax</span>]
+
+		<span class="hljs-comment">; Setup the kernel's Data Segment Descriptor</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">ax</span>, <span class="hljs-number">0x10</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">ds</span>, <span class="hljs-built_in">ax</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">es</span>, <span class="hljs-built_in">ax</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">fs</span>, <span class="hljs-built_in">ax</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">gs</span>, <span class="hljs-built_in">ax</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">ss</span>, <span class="hljs-built_in">ax</span>
+
+		<span class="hljs-comment">; Far Jump to the kernel's Code Segment flush label</span>
+		<span class="hljs-keyword">jmp</span> <span class="hljs-number">0x8</span>:.flush
+<span class="hljs-symbol">	.flush:</span>
+		<span class="hljs-keyword">ret</span>
+
+<span class="hljs-comment">; idt_flush -- Load the IDT (Interrupt Descriptor Table)</span>
+<span class="hljs-meta">global</span> idt_flush
+<span class="hljs-symbol">
+	idt_flush:</span>
+		<span class="hljs-comment">; Obtain idt_ptr structure on stack and load it.</span>
+		<span class="hljs-keyword">mov</span> <span class="hljs-built_in">eax</span>, [<span class="hljs-built_in">esp</span> + <span class="hljs-number">4</span>]
+		<span class="hljs-keyword">lidt</span> [<span class="hljs-built_in">eax</span>]
+		<span class="hljs-keyword">ret</span></code></pre></body></html>

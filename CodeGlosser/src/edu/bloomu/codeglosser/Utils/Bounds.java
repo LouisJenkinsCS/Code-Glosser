@@ -35,6 +35,10 @@ import org.json.simple.JSONObject;
 /**
  *
  * @author Louis
+ * 
+ * Utility object that keeps track of the boundary of a markup. Each Bounds has both
+ * a start and end, and also has the ability to determine if another markup collides with
+ * it.
  */
 public class Bounds implements Comparable<Bounds> {
     

@@ -31,6 +31,7 @@
 package edu.bloomu.codeglosser.Model;
 
 import edu.bloomu.codeglosser.Exceptions.InvalidTextSelectionException;
+import edu.bloomu.codeglosser.Globals;
 import edu.bloomu.codeglosser.HTML.Lang2HTML;
 import edu.bloomu.codeglosser.Utils.Bounds;
 import io.reactivex.Observable;
@@ -48,12 +49,12 @@ import java.util.logging.Logger;
  */
 public class MarkupViewModel {
     
-    private static final Logger LOG = Logger.getLogger(MarkupViewModel.class.getName());
+    private static final Logger LOG = Globals.LOGGER;
     private String text = "";
     private String title = "";
 
     public MarkupViewModel() {
-        LOG.info("MarkupViewModel initialized...");
+        LOG.finest("MarkupViewModel initialized...");
     }
     
     /**
@@ -76,8 +77,8 @@ public class MarkupViewModel {
             throw new InvalidTextSelectionException();
         }
         
-        LOG.info("Offsets: " + start + " to " + end);
-        LOG.info("[Phase 1] Text: \"" + text.substring(start, end) + "\"");
+        LOG.fine("Offsets: " + start + " to " + end);
+        LOG.finest("[Phase 1] Text: \"" + text.substring(start, end) + "\"");
         StringCharacterIterator iter = new StringCharacterIterator(text.substring(start, end));
         
         // Segment highlighting based on newline character
@@ -100,7 +101,7 @@ public class MarkupViewModel {
             }
         }
         
-        LOG.info("[Phase 2] Text: \"" + text.substring(start, end) + "\"");
+        LOG.finest("[Phase 2] Text: \"" + text.substring(start, end) + "\"");
         Collection<Bounds> bounds = new ArrayList<>();
         // Find everything up to newline character.
         int whiteSpaceOffset = start;
@@ -118,7 +119,7 @@ public class MarkupViewModel {
                 case '\n':
                     String orig = text.substring(start, currOffset);
                     String trimmed = orig.trim();
-                    LOG.info("Chunk: " + trimmed);
+                    LOG.finest("Chunk: " + trimmed);
                     if (trimmed.length() == 0) {
                         break;
                     }
@@ -146,7 +147,7 @@ public class MarkupViewModel {
                     if("".equals(trimmed))
                         break;
                     
-                    LOG.info("End: " + trimmed);
+                    LOG.finest("End: " + trimmed);
                     
                     int startOffset = 0;
                     while (trimmed.length() != 0 && orig.charAt(startOffset) != trimmed.charAt(0))

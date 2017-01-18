@@ -43,7 +43,7 @@ public class EventBus {
     
     private final int id;
     
-    private static final Logger LOG = Logger.getLogger(EventBus.class.getName());
+    private static final Logger LOG = Globals.LOGGER;
     
     private Function<Event, String> stringifyEvent;
     

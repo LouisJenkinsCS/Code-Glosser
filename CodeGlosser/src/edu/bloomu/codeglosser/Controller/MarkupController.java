@@ -64,6 +64,7 @@ import java.util.stream.Collectors;
 import org.javatuples.Pair;
 import org.javatuples.Unit;
 import edu.bloomu.codeglosser.Events.EventProcessor;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -84,7 +85,7 @@ public class MarkupController implements EventProcessor {
     public static final int SET_CURSOR = 0x3;
     public static final int FILE_SELECTED = 0x4;
     
-    private static final Logger LOG = Logger.getLogger(MarkupController.class.getName());
+    private static final Logger LOG = Globals.LOGGER;
     
     private final HashMap<String, Markup> markupMap = new HashMap<>();
     private Markup currentMarkup = null;
@@ -141,7 +142,7 @@ public class MarkupController implements EventProcessor {
     }
     
     private Observable<Event> selectedId(String id) {
-        LOG.info("Handling event for id selection: " + id);
+        LOG.fine("Handling event for id selection: " + id);
         
         // MarkupView must update its cursor and MarkupProperties needs to be notified
         return Observable
@@ -186,7 +187,7 @@ public class MarkupController implements EventProcessor {
      * @param bounds Boundary of the created markup.
      */
     private Observable<Event> createMarkup(Bounds[] bounds) {
-        LOG.info("Creating markup with offsets... " + Arrays.toString(bounds));
+        LOG.fine("Creating markup with offsets... " + Arrays.toString(bounds));
         
         // Create a new markup. We must ensure each id is unique however.
         while (true) {
@@ -211,7 +212,7 @@ public class MarkupController implements EventProcessor {
      * to remove it's own attributes.
      */
     private Observable<Event> deleteMarkup() {
-        LOG.info("Deleting current markup...");
+        LOG.fine("Deleting current markup...");
         
         Observable<Event> obs;
         
@@ -245,14 +246,14 @@ public class MarkupController implements EventProcessor {
      * @param model The model used for generating HTML.
      */
     private Observable<Event> previewHTML(MarkupViewModel model) {
-        LOG.log(Level.INFO, "Generating HTML preview for {0}", model.getTitle());
+        LOG.log(Level.FINE, "Generating HTML preview for {0}", model.getTitle());
         String html = HTMLGenerator.syntaxHighlight(
                 model.getText(), model.getTitle(), 
                 markupMap.values().stream().collect(Collectors.toList())
         ).blockingFirst();
         
         // Show in browser.
-        LOG.info("Displaying preview in browser...");
+        LOG.fine("Displaying preview in browser...");
         try {
             File f = new File("tmp.html");
             f.createNewFile();
@@ -262,6 +263,8 @@ public class MarkupController implements EventProcessor {
             stream.close();
             Desktop.getDesktop().browse(f.toURI());
         } catch (IOException ex) {
+            LOG.severe("Error attempting to display HTML Preview: " + ex.getMessage());
+            JOptionPane.showMessageDialog(null, "Error attempting to display HTML Preview", "Error", JOptionPane.ERROR_MESSAGE);
         }
         
         return Observable.empty();
@@ -309,11 +312,16 @@ public class MarkupController implements EventProcessor {
                     events.add(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, FILE_SELECTED, pair));
 
                     return Observable.fromIterable(events);
+                })
+                .doOnError(e -> {
+                    LOG.severe("Error while processing file selection event: " + e.getMessage());
+                    JOptionPane.showMessageDialog(null, "Error while processing file selection event!", "Error", JOptionPane.ERROR_MESSAGE);
+                    System.exit(1);
                 });
     }
     
     private Observable<Event> exportProject() {
-        LOG.info("Exporting project...");
+        LOG.fine("Exporting project...");
         
         HTMLGenerator.generateAll();
         return Observable.empty();
@@ -331,7 +339,7 @@ public class MarkupController implements EventProcessor {
      * @param b Bounds to check.
      */
     private Observable<Event> getMarkupSelection(Bounds bounds) {
-        LOG.log(Level.INFO, "Obtaining Markup Selection for boundary: {0}", bounds);
+        LOG.log(Level.FINE, "Obtaining Markup Selection for boundary: {0}", bounds);
         
         // Return markup selections (if present) and notify MarkupProperties that selection changed
         return Observable

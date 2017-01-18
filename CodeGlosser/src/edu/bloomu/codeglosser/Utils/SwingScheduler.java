@@ -30,12 +30,11 @@
  */
 package edu.bloomu.codeglosser.Utils;
 
+import edu.bloomu.codeglosser.Globals;
 import io.reactivex.Scheduler;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import javax.swing.Timer;
 
@@ -48,7 +47,7 @@ import javax.swing.Timer;
  */
 public class SwingScheduler extends Scheduler {
 
-    private static final Logger LOG = Logger.getLogger(SwingScheduler.class.getName());
+    private static final Logger LOG = Globals.LOGGER;
 
     private static final SwingScheduler INSTANCE = new SwingScheduler();
     
@@ -64,7 +63,7 @@ public class SwingScheduler extends Scheduler {
             
             @Override
             public Disposable schedule(Runnable run, long delay, TimeUnit unit) {
-                LOG.info("Inside of Scheduler");
+                LOG.fine("Inside of Scheduler");
                 int timeout = Math.min(Math.max(0, (int) unit.toMillis(delay)), Integer.MAX_VALUE);
                 isDisposed = false;
                 Timer timer = new Timer(timeout, e -> {
@@ -80,13 +79,13 @@ public class SwingScheduler extends Scheduler {
             
             @Override
             public void dispose() {
-                LOG.info("Disposing...");
+                LOG.finest("Disposing...");
                 isDisposed = true;
             }
 
             @Override
             public boolean isDisposed() {
-                LOG.info("IsDisposed called...");
+                LOG.finest("IsDisposed called...");
                 return isDisposed;
             }
         };

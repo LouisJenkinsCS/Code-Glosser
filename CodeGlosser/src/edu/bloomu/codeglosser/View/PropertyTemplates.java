@@ -53,6 +53,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import edu.bloomu.codeglosser.Events.EventProcessor;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -62,6 +64,7 @@ public class PropertyTemplates extends javax.swing.JPanel implements EventProces
     
     public static final int APPLY_TEMPLATE = 0x1;
     
+    private static final Logger LOG = Globals.LOGGER;
     private final EventBus engine = new EventBus(this, Event.PROPERTY_TEMPLATES);
 
     /**
@@ -124,6 +127,8 @@ public class PropertyTemplates extends javax.swing.JPanel implements EventProces
         try {
             populateTree(root, rootNode);
         } catch (IOException ex) {
+            LOG.severe("Error attempting to populate tree: " + ex.getMessage());
+            JOptionPane.showMessageDialog(null, "Error attempting to populate tree", "Error", JOptionPane.ERROR_MESSAGE);
         }
         DefaultTreeModel model = (DefaultTreeModel) templateTree.getModel();
         model.setRoot(rootNode);

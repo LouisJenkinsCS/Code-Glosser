@@ -52,6 +52,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javax.swing.JOptionPane;
 import org.json.simple.JSONObject;
 
 
@@ -62,7 +63,7 @@ import org.json.simple.JSONObject;
  */
 public class HTMLGenerator {
 
-    private static final Logger LOG = Logger.getLogger(HTMLGenerator.class.getName());
+    private static final Logger LOG = Globals.LOGGER;
     
     public static String generate(String code) {
         return "";
@@ -101,6 +102,8 @@ public class HTMLGenerator {
                 FileUtils.temporaryFile("script.js", js);
                 eng.load(file.toURI().toURL().toString());
             } catch (IOException ex) {
+                LOG.severe("Error while attempting to create temporary file: " + ex.getMessage());
+                JOptionPane.showMessageDialog(null, "Error while attempting to create temporary file!", "Error", JOptionPane.ERROR_MESSAGE);
                 throw new RuntimeException("Error while attempting to create temporary file!");
             }
         });
@@ -175,11 +178,11 @@ public class HTMLGenerator {
     }
     
     public static void generateDirectory(File dir, JSONObject data, ZipOutputStream stream) throws IOException {
-        LOG.info("Archiving Directory: " + dir);
+        LOG.finest("Archiving Directory: " + dir);
         
         // Only generate if directory contains a file that is marked up.
         if (!isValidDirectory(dir, data)) {
-            LOG.info("Not a valid directory...");
+            LOG.finest("Not a valid directory...");
             return;
         }
         
@@ -199,7 +202,7 @@ public class HTMLGenerator {
     
     public static void generateFile(File file, JSONObject data, ZipOutputStream ostream) {
         try {
-            LOG.info("Archiving file: " + file);
+            LOG.finest("Archiving file: " + file);
             // Copy contents into zip file (We replace carriage returns for standard newlines)
             String title = fileToString(file);
             Globals.CURRENT_FILE = file.toPath();
@@ -210,15 +213,17 @@ public class HTMLGenerator {
             ostream.write(result.getBytes());
             ostream.closeEntry();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOG.severe("Error while attempting to generate zip file: " + ex.getMessage());
+            JOptionPane.showMessageDialog(null, "Error while attempting to generate zip file!", "Error", JOptionPane.ERROR_MESSAGE);
+            throw new RuntimeException("Error while attempting to generate zip file!");
         }
     }
     
     private static void generateAll(JSONObject data) {
         String zipFileName = Globals.PROJECT_FOLDER + "\\" + "exported.zip";
-        LOG.info(zipFileName);
+        LOG.fine(zipFileName);
         try(ZipOutputStream stream = new ZipOutputStream(new FileOutputStream(new File(zipFileName)))) {
-            LOG.info("Created zip archive...");
+            LOG.finest("Created zip archive...");
             File dir = Globals.PROJECT_FOLDER.toFile();
             for (final File f : dir.listFiles()) {
                 if (f.isDirectory()) {
@@ -228,7 +233,9 @@ public class HTMLGenerator {
                 }
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOG.severe("Error while attempting to generate zip file: " + ex.getMessage());
+            JOptionPane.showMessageDialog(null, "Error while attempting to generate zip file!", "Error", JOptionPane.ERROR_MESSAGE);
+            throw new RuntimeException("Error while attempting to generate zip file!");
         }
     }
     

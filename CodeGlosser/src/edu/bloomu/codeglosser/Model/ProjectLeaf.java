@@ -30,6 +30,7 @@
  */
 package edu.bloomu.codeglosser.Model;
 
+import edu.bloomu.codeglosser.Globals;
 import java.io.File;
 import java.util.logging.Logger;
 
@@ -39,14 +40,14 @@ import java.util.logging.Logger;
  */
 public class ProjectLeaf implements TreeViewLeaf {
 
-    private static final Logger LOG = Logger.getLogger(ProjectLeaf.class.getName());
+    private static final Logger LOG = Globals.LOGGER;
     
     private File file;
     
     ProjectLeaf(File file) {
         this.file = file;
         
-        LOG.info("Leaf: " + file.getName());
+        LOG.fine("Leaf: " + file.getName());
         if (!file.isFile()) {
             LOG.severe("Not a valid file: " + file.getName());
             throw new RuntimeException("Not a valid file: " + file.getName());

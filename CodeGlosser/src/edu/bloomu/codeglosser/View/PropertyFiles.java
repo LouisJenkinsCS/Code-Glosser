@@ -48,6 +48,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import edu.bloomu.codeglosser.Events.EventProcessor;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -56,6 +58,8 @@ import edu.bloomu.codeglosser.Events.EventProcessor;
 public class PropertyFiles extends javax.swing.JPanel implements EventProcessor {
     
     public static final int FILE_SELECTED = 0x1;
+    
+    private static final Logger LOG = Globals.LOGGER;
     
     private final EventBus engine = new EventBus(this, Event.PROPERTY_FILES);
     
@@ -108,7 +112,8 @@ public class PropertyFiles extends javax.swing.JPanel implements EventProcessor 
         try {
             populateTree(root, rootNode);
         } catch (IOException ex) {
-            
+            LOG.severe("Error attempting to populate tree: " + ex.getMessage());
+            JOptionPane.showMessageDialog(null, "Error attempting to populate tree", "Error", JOptionPane.ERROR_MESSAGE);
         }
         DefaultTreeModel model = (DefaultTreeModel) projectFileTree.getModel();
         model.setRoot(rootNode);

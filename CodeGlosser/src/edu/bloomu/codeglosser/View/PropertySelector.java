@@ -33,9 +33,7 @@ package edu.bloomu.codeglosser.View;
 import edu.bloomu.codeglosser.Events.Event;
 import edu.bloomu.codeglosser.Events.EventBus;
 import edu.bloomu.codeglosser.Model.Markup;
-import edu.bloomu.codeglosser.Utils.SwingScheduler;
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +41,7 @@ import java.util.logging.Logger;
 import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
 import edu.bloomu.codeglosser.Events.EventProcessor;
+import edu.bloomu.codeglosser.Globals;
 
 /**
  *
@@ -53,7 +52,7 @@ public class PropertySelector extends javax.swing.JPanel implements EventProcess
     // MarkupProperties
     public static final int SELECTED_ID = 0x1;
     
-    private static final Logger LOG = Logger.getLogger(PropertySelector.class.getName());
+    private static final Logger LOG = Globals.LOGGER;
     
     private final EventBus engine = new EventBus(this, Event.PROPERTY_SELECTOR);
     
@@ -116,7 +115,7 @@ public class PropertySelector extends javax.swing.JPanel implements EventProcess
     }
 
     private Observable<Event> clearSelection() {
-        LOG.info("Handling event for clearing markup selection...");
+        LOG.fine("Handling event for clearing markup selection...");
         
         SwingUtilities.invokeLater(() -> {
             noteSelector.removeAllItems();
@@ -127,7 +126,7 @@ public class PropertySelector extends javax.swing.JPanel implements EventProcess
     }
     
     private Observable<Event> newSelection(Markup markup) {
-        LOG.info("Handling event for creating a new markup selection: " + markup);
+        LOG.fine("Handling event for creating a new markup selection: " + markup);
         
         return Observable
                 .just(markup)
@@ -159,12 +158,22 @@ public class PropertySelector extends javax.swing.JPanel implements EventProcess
     }
     
     private Observable<Event> restoreSelections(List<String> selections) {
-        LOG.info("Restoring Selections: " + selections);
+        LOG.fine("Restoring Selections: " + selections);
         
         selections
                 .stream()
                 .sorted()
                 .forEach(id -> SwingUtilities.invokeLater(() -> noteSelector.addItem(id)));
+        
+        return Observable.empty();
+    }
+    
+    private Observable<Event> removeSelection() {
+        SwingUtilities.invokeLater(() -> {
+                noteSelector.removeItem(noteSelector.getSelectedItem());
+                noteSelector.setSelectedItem(Markup.DEFAULT);
+            }
+        );
         
         return Observable.empty();
     }
@@ -197,14 +206,4 @@ public class PropertySelector extends javax.swing.JPanel implements EventProcess
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<java.lang.String> noteSelector;
     // End of variables declaration//GEN-END:variables
-
-    private Observable<Event> removeSelection() {
-        SwingUtilities.invokeLater(() -> {
-                noteSelector.removeItem(noteSelector.getSelectedItem());
-                noteSelector.setSelectedItem(Markup.DEFAULT);
-            }
-        );
-        
-        return Observable.empty();
-    }
 }

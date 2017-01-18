@@ -48,10 +48,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class MarkupFrame extends javax.swing.JFrame {
 
-    private static final Logger LOG = Logger.getLogger(MarkupFrame.class.getName());
+    private static final Logger LOG = Globals.LOGGER;
     
     public MarkupFrame() {
         initComponents();
+        
+        // Setup global data
+        Globals.initGlobals();
         
         File project = null;
         JFileChooser jfc = new JFileChooser();
@@ -63,6 +66,9 @@ public class MarkupFrame extends javax.swing.JFrame {
         if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             LOG.info("Current Directory: " + jfc.getCurrentDirectory().getName() + ", Selected File: " + jfc.getSelectedFile().getName());
             project = jfc.getSelectedFile();
+        } else {
+            LOG.severe("User Did Not Select File!!!");
+            System.exit(0);
         }
         
         // Setup global data

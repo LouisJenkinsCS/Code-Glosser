@@ -150,10 +150,10 @@ public class Event {
 
     @Override
     public String toString() {
-        return "Event: {Sender: " + tagToString(getSender()) + ", Recipient: " + tagToString(getRecipient()) + ", Custom: " + getCustom() + ", data=" + data + "}";
+        return "Event: {Sender: " + tagToString(getSender()) + ", Recipient: " + tagToString(getRecipient()) + ", Custom: " + getCustom() + "}";
     }
     
     public String toString(Function<Event, String> asString) {
-        return "Event: {Sender: " + tagToString(getSender()) + ", Recipient: " + tagToString(getRecipient()) + ", Custom: " + getCustom() + ", data=" + asString.apply(this) + "}";
+        return "Event: {Sender: " + tagToString(getSender()) + ", Recipient: " + tagToString(getRecipient()) + ", Custom: " + getCustom() + "}";
     }
 }

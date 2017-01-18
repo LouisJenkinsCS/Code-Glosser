@@ -49,6 +49,11 @@ import javax.swing.UIManager;
 /**
  *
  * @author Louis Jenkins
+ * 
+ * As the name implies, the entrypoint to the program. main is in charge of setting
+ * up the core MarkupFrame which handles it's own initialization of components.
+ * As well, it does the deed of enabling JavaFX WebView which is invaluable in
+ * syntax highlighting.
  */
 public class main extends JApplet {
     
@@ -66,6 +71,8 @@ public class main extends JApplet {
             @Override
             public void run() {
                 try {
+                    // We use the system's look and feel to ensure that it does not
+                    // look alien to the user.
                     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                 } catch (Exception e) {
                 }

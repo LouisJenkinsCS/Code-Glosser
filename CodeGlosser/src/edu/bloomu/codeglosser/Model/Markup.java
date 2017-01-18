@@ -30,26 +30,29 @@
  */
 package edu.bloomu.codeglosser.Model;
 
+import edu.bloomu.codeglosser.Globals;
 import edu.bloomu.codeglosser.Utils.Bounds;
 import edu.bloomu.codeglosser.Utils.ColorUtils;
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author Louis
+ * 
+ * The base model for a Markup. A Markup contains the message, the highlighting color,
+ * as well as it's identifier and the bounds it exists in. Markups are immutable
+ * after creation.
  */
 public class Markup {
 
-    private static final Logger LOG = Logger.getLogger(Markup.class.getName());
+    private static final Logger LOG = Globals.LOGGER;
     public static Markup DEFAULT = new Markup("", "<None Selected>");
     
     public static final String COLOR = "color";
@@ -65,7 +68,7 @@ public class Markup {
     }
     
     public static Markup deserialize(JSONObject obj) {
-        LOG.info("Deserializing: " + obj);
+        LOG.fine("Deserializing: " + obj);
         Color color = Color.decode((String) obj.get(COLOR));
         String id = (String) obj.get(ID);
         String msg = (String) obj.get(MESSAGE);

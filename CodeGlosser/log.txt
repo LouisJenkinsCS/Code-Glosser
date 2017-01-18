@@ -1,0 +1,8 @@
+Jan 18, 2017 2:55:31 PM edu.bloomu.codeglosser.View.MarkupFrame <init>
+INFO: Current Directory: CodeGlosser, Selected File: example_project
+Jan 18, 2017 2:55:34 PM edu.bloomu.codeglosser.Events.EventBus lambda$new$1
+INFO: Event: {Sender: PropertyFiles, Recipient: MarkupProperties, Custom: 1}
+Jan 18, 2017 2:55:34 PM edu.bloomu.codeglosser.Events.EventBus lambda$new$1
+INFO: Event: {Sender: MarkupProperties, Recipient: MarkupController, Custom: 1}
+Jan 18, 2017 2:55:34 PM edu.bloomu.codeglosser.Controller.MarkupController lambda$fileSelected$13
+SEVERE: Error while processing file selection event: Input length = 1

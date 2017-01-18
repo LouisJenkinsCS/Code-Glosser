@@ -101,6 +101,8 @@ public class MarkupProperties extends javax.swing.JPanel implements EventProcess
                 switch (e.getCustom()) {
                     case PropertyAttributes.TEXT_CHANGE:
                         return textChange((String) e.data);
+                    case PropertyAttributes.COLOR_CHANGE:
+                        return colorChange((Color) e.data);
                     default:
                         throw new RuntimeException("Bad Custom Tag from PropertyAttributes!");
                 }
