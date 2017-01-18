@@ -30,17 +30,31 @@
  */
 package edu.bloomu.codeglosser.Utils;
 
+import org.json.simple.JSONObject;
+
 /**
  *
  * @author Louis
  */
 public class Bounds implements Comparable<Bounds> {
+    
+    private static final String START = "start";
+    private static final String END = "end";
+    
     private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(Bounds.class.getName());
+    
     private int start;
     private int end;
     
     public static Bounds of(int start, int end) {
         return new Bounds(start, end);
+    }
+    
+    public static Bounds deserialize(JSONObject obj) {
+        int start = (int) (long) obj.get(START);
+        int end = (int) (long) obj.get(END);
+        
+        return Bounds.of(start, end);
     }
     
     public Bounds(int start, int end) {
@@ -71,6 +85,14 @@ public class Bounds implements Comparable<Bounds> {
 
     public void setEnd(int end) {
         this.end = end;
+    }
+    
+    public JSONObject serialize() {
+        JSONObject obj = new JSONObject();
+        obj.put(START, start);
+        obj.put(END, end);
+        
+        return obj;
     }
 
     @Override

@@ -1,165 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://www.netbeans.org/ns/project/1">
-    <type>org.netbeans.modules.apisupport.project</type>
+    <type>org.netbeans.modules.java.j2seproject</type>
     <configuration>
-        <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>edu.bloomu.codeglosser</code-name-base>
-            <standalone/>
-            <module-dependencies>
-                <dependency>
-                    <code-name-base>net.java.html</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>1.2.3</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>net.java.html.boot</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>1.2.3</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>net.java.html.json</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>1.2.3</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.jdesktop.beansbinding</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>1</release-version>
-                        <specification-version>1.26.1.121</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.api.htmlui</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>1.4.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.modules.editor</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>3</release-version>
-                        <specification-version>1.84.1.5.1.22.44</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.modules.editor.lib2</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>1</release-version>
-                        <specification-version>1.85.1.43</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.modules.print</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>7.25.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.netbeans.modules.settings</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>1</release-version>
-                        <specification-version>1.45.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.actions</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>6.38.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.awt</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>7.62.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.text</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>6.66.3</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.util</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>8.39.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.util.lookup</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>8.25.1</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>org.openide.windows</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>6.71.1</specification-version>
-                    </run-dependency>
-                </dependency>
-            </module-dependencies>
-            <public-packages/>
-            <class-path-extension>
-                <runtime-relative-path>ext/rxswing-0.27.0-sources.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/rxswing-0.27.0-sources.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/reactive-streams-1.0.0.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/reactive-streams-1.0.0.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/rxjava-2.0.0-RC3.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/rxjava-2.0.0-RC3.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/rxswing-0.27.0-javadoc.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/rxswing-0.27.0-javadoc.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/json-simple-1.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/json-simple-1.1.1.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/rxswing-0.27.0.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/rxswing-0.27.0.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/javatuples-1.2.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/javatuples-1.2.jar</binary-origin>
-            </class-path-extension>
+        <buildExtensions xmlns="http://www.netbeans.org/ns/ant-build-extender/1">
+            <extension file="jfx-impl.xml" id="jfx3">
+                <dependency dependsOn="-jfx-copylibs" target="-post-jar"/>
+                <dependency dependsOn="-rebase-libs" target="-post-jar"/>
+                <dependency dependsOn="jfx-deployment" target="-post-jar"/>
+                <dependency dependsOn="jar" target="debug"/>
+                <dependency dependsOn="jar" target="profile"/>
+                <dependency dependsOn="jar" target="run"/>
+            </extension>
+        </buildExtensions>
+        <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
+            <name>CodeGlosser</name>
+            <source-roots>
+                <root id="src.dir"/>
+            </source-roots>
+            <test-roots>
+                <root id="test.src.dir"/>
+            </test-roots>
         </data>
     </configuration>
 </project>

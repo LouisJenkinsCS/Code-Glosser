@@ -31,8 +31,7 @@
 package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Events.Event;
-import edu.bloomu.codeglosser.Events.EventEngine;
-import edu.bloomu.codeglosser.Events.EventHandler;
+import edu.bloomu.codeglosser.Events.EventBus;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Utils.SwingScheduler;
 import io.reactivex.Observable;
@@ -42,14 +41,16 @@ import java.awt.Color;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import javax.swing.JColorChooser;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import edu.bloomu.codeglosser.Events.EventProcessor;
 
 /**
  *
  * @author Louis Jenkins
  */
-public class PropertyAttributes extends javax.swing.JPanel implements EventHandler {
+public class PropertyAttributes extends javax.swing.JPanel implements EventProcessor {
 
     private static final Logger LOG = Logger.getLogger(PropertyAttributes.class.getName());
     
@@ -64,17 +65,21 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
     private Color color = Color.YELLOW;
     private String message = "";
     
-    private final EventEngine engine = new EventEngine(this, Event.PROPERTIES_ATTRIBUTES);
+    private final EventBus engine = new EventBus(this, Event.PROPERTY_ATTRIBUTES);
 
     public PropertyAttributes() {
         // Initialize GUI components
         initComponents();
+        noteMsg.setLineWrap(true);
+        noteMsg.setWrapStyleWord(true);
+        labelName.setText("Color");
+        textLabel.setText("Message");
         initListeners();
         setColor(Color.YELLOW);     
     }
     
     @Override
-    public Observable<Event> handleEvent(Event e) {
+    public Observable<Event> process(Event e) {
         switch (e.getSender()) {
             case Event.MARKUP_PROPERTIES:
                 switch (e.getCustom()) {
@@ -91,7 +96,7 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
     }
 
     @Override
-    public EventEngine getEventEngine() {
+    public EventBus getEventEngine() {
         return engine;
     }
     
@@ -103,11 +108,8 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
                 // We throttle text change events from the user to relieve backpressure.
                 // As well, all internal work is kept off the UI Thread and on a CPU-Bound one.
                 .debounce(TEXT_CHANGE_DEBOUNCE, TimeUnit.MILLISECONDS, Schedulers.computation())
-                .doOnNext(ignored -> LOG.info("Processing Text Change event"))
                 // We only proceed if the message != text, because 'setText' can trigger this
                 .filter(text -> !text.equals(message))
-                .observeOn(SwingScheduler.getInstance())
-                // Event handling and broadcasting are done on the UI Thread for simplicity
                 .subscribe(text -> engine.broadcast(Event.MARKUP_PROPERTIES, TEXT_CHANGE, text));
                 
                 
@@ -143,12 +145,11 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
         labelColor = new javax.swing.JLabel();
         labelName = new javax.swing.JLabel();
         labelRGB = new javax.swing.JLabel();
-        textLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         noteMsg = new javax.swing.JTextArea();
+        textLabel = new javax.swing.JLabel();
 
         labelColor.setBackground(new java.awt.Color(255, 255, 102));
-        org.openide.awt.Mnemonics.setLocalizedText(labelColor, org.openide.util.NbBundle.getMessage(PropertyAttributes.class, "PropertyAttributes.labelColor.text")); // NOI18N
         labelColor.setOpaque(true);
         labelColor.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
@@ -157,22 +158,16 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
         });
 
         labelName.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(labelName, org.openide.util.NbBundle.getMessage(PropertyAttributes.class, "PropertyAttributes.labelName.text")); // NOI18N
-        labelName.setToolTipText(org.openide.util.NbBundle.getMessage(PropertyAttributes.class, "PropertyAttributes.labelName.toolTipText")); // NOI18N
 
         labelRGB.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(labelRGB, org.openide.util.NbBundle.getMessage(PropertyAttributes.class, "PropertyAttributes.labelRGB.text")); // NOI18N
-
-        textLabel.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(textLabel, org.openide.util.NbBundle.getMessage(PropertyAttributes.class, "PropertyAttributes.textLabel.text")); // NOI18N
 
         noteMsg.setColumns(20);
-        noteMsg.setLineWrap(true);
         noteMsg.setRows(5);
-        noteMsg.setText(org.openide.util.NbBundle.getMessage(PropertyAttributes.class, "PropertyAttributes.noteMsg.text")); // NOI18N
-        noteMsg.setToolTipText(org.openide.util.NbBundle.getMessage(PropertyAttributes.class, "PropertyAttributes.noteMsg.toolTipText")); // NOI18N
-        noteMsg.setWrapStyleWord(true);
         jScrollPane1.setViewportView(noteMsg);
+
+        textLabel.setFont(new java.awt.Font("sansserif", 1, 12)); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("edu/bloomu/codeglosser/View/Bundle"); // NOI18N
+        textLabel.setToolTipText(bundle.getString("PropertyAttributes.textLabel.toolTipText")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -188,9 +183,9 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(labelColor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(textLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(textLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1)))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -204,12 +199,13 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
                             .addComponent(labelRGB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(19, 19, 19)
-                        .addComponent(labelColor, javax.swing.GroupLayout.DEFAULT_SIZE, 19, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(textLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1))
-                .addContainerGap())
+                        .addComponent(labelColor, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)))
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(textLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -222,7 +218,8 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
     }//GEN-LAST:event_labelColorMousePressed
     
     private Observable<Event> setAttributes(Markup markup) {
-        LOG.info("Setting attributes: " + markup);
+        LOG.fine("Setting attributes: " + markup);
+        
         setColor(markup.getHighlightColor());
         setMessage(markup.getMsg());
         
@@ -230,7 +227,7 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
     }
     
     private Observable<Event> clearAttributes() {
-        LOG.info("Clearing attributes...");
+        LOG.fine("Clearing attributes...");
         
         setColor(Color.YELLOW);
         setMessage("");
@@ -245,16 +242,19 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventHandl
     public void setColor(Color c) {
         if (c != null) {
             color = c;
-            labelColor.setBackground(c);
-            labelColor.setForeground(c);
-            labelRGB.setText("(" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + ")");
+            
+            SwingUtilities.invokeLater(() -> {
+                labelColor.setBackground(c);
+                labelColor.setForeground(c);
+                labelRGB.setText("(" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + ")");
+            });
         }
     }
     
     public void setMessage(String msg) {
         if (msg != null && !msg.equals(message)) {
             message = msg;
-            noteMsg.setText(msg);
+            SwingUtilities.invokeLater(() -> noteMsg.setText(msg));
         }
     }
 

@@ -31,37 +31,35 @@
 package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Events.Event;
-import edu.bloomu.codeglosser.Events.EventEngine;
-import edu.bloomu.codeglosser.Events.EventHandler;
+import edu.bloomu.codeglosser.Events.EventBus;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Utils.SwingScheduler;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.PublishSubject;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 import javax.swing.JComboBox;
+import javax.swing.SwingUtilities;
+import edu.bloomu.codeglosser.Events.EventProcessor;
 
 /**
  *
  * @author Louis
  */
-public class PropertySelector extends javax.swing.JPanel implements EventHandler {
+public class PropertySelector extends javax.swing.JPanel implements EventProcessor {
     
     // MarkupProperties
     public static final int SELECTED_ID = 0x1;
     
     private static final Logger LOG = Logger.getLogger(PropertySelector.class.getName());
     
-    private final EventEngine engine = new EventEngine(this, Event.PROPERTIES_SELECTOR);
+    private final EventBus engine = new EventBus(this, Event.PROPERTY_SELECTOR);
     
     public PropertySelector() {
         initComponents();
-        initListeners();
-//        clear();
-        
+        initListeners();        
     }
     
     private void initListeners() {
@@ -75,41 +73,55 @@ public class PropertySelector extends javax.swing.JPanel implements EventHandler
         });
     }
     
-//    public void update(Markup... notes) {
-//        Markup n = currentNote;
-//        clear();
-//        Stream.of(notes).forEach(noteSelector::addItem);
-//        if (!Stream.of(notes).anyMatch(n::equals)) {
-//            noteSelector.setSelectedItem(Markup.DEFAULT);
-//        }
-//    }
-//    
-//    public void clear() {
-//        noteSelector.removeAllItems();
-//        currentNote = Markup.DEFAULT;
-//        noteSelector.addItem(currentNote);
-//    }
+    @Override
+    public Observable<Event> process(Event e) {
+        switch (e.getSender()) {
+            case Event.MARKUP_PROPERTIES:
+                switch (e.getCustom()) {
+                    case MarkupProperties.NEW_SELECTION:
+                        return newSelection((Markup) e.data);
+                    case MarkupProperties.CLEAR_SELECTION:
+                        return clearSelection();
+                    case MarkupProperties.SET_SELECTION:
+                        return setSelection((String) e.data);
+                    case MarkupProperties.REMOVE_SELECTION:
+                        return removeSelection();
+                    case MarkupProperties.RESTORE_SELECTIONS:
+                        return restoreSelections((List<String>) e.data);
+                    default:
+                        throw new RuntimeException("Bad Custom Tag from MarkupProperties!");
+                }
+            default:
+                throw new RuntimeException("Bad Sender!");
+        }
+    }
+
+    @Override
+    public EventBus getEventEngine() {
+        return engine;
+    }
     
     private Observable<Event> setSelection(String id) {
-        LOG.info("Handling event for setting selection: " + id);
-        
-        if (!noteSelector.getSelectedItem().equals(id)) {
-            noteSelector.setSelectedItem(id);
-        } else {
-            LOG.info("Id was already set, ignored...");
-        }
+        SwingUtilities.invokeLater(() -> {
+            if (!noteSelector.getSelectedItem().equals(id)) {
+                noteSelector.setSelectedItem(id);
+            }
+        });
         
         return Observable.empty();
     }
     
     public void setSelectedNote(String id) {
-        noteSelector.setSelectedItem(id);
+        SwingUtilities.invokeLater(() -> noteSelector.setSelectedItem(id));
     }
 
     private Observable<Event> clearSelection() {
         LOG.info("Handling event for clearing markup selection...");
         
-        noteSelector.removeAllItems();
+        SwingUtilities.invokeLater(() -> {
+            noteSelector.removeAllItems();
+            noteSelector.addItem(Markup.DEFAULT.getId());
+        });
         
         return Observable.empty();
     }
@@ -119,10 +131,10 @@ public class PropertySelector extends javax.swing.JPanel implements EventHandler
         
         return Observable
                 .just(markup)
-                // Perform on computation thread
-                .observeOn(Schedulers.computation())
                 .map(Markup::getId)
-                // Sort the identifiers
+                // We need to collect all identifiers into a list so we can sort them
+                // with the new id. This is necessary because there currently is no
+                // JComboBox Model that does this for us.
                 .flatMap(id -> {
                     ArrayList<String> idList = new ArrayList<>();
                     
@@ -135,14 +147,26 @@ public class PropertySelector extends javax.swing.JPanel implements EventHandler
                     // Now it becomes the new Observable
                     return Observable.fromIterable(idList);
                 })
-                .sorted((s1, s2) -> s2.compareTo(s1))
-                // Switch back to Swing thread to update
-                .observeOn(SwingScheduler.getInstance())
-                // Remove all items as they are stale
-                .doOnNext(noteSelector::removeItem)
-                // Re-add them again
-                .doOnNext(noteSelector::addItem)
+                // Sort in descending order
+                .sorted((id1, id2) -> id2.compareTo(id1))
+                // Remove all items first and then add them again as they are out of order
+                .doOnNext(id -> SwingUtilities.invokeLater(() -> {
+                        noteSelector.removeItem(id);
+                        noteSelector.addItem(id);
+                    }
+                ))
                 .flatMap(Event::empty);
+    }
+    
+    private Observable<Event> restoreSelections(List<String> selections) {
+        LOG.info("Restoring Selections: " + selections);
+        
+        selections
+                .stream()
+                .sorted()
+                .forEach(id -> SwingUtilities.invokeLater(() -> noteSelector.addItem(id)));
+        
+        return Observable.empty();
     }
     
     /**
@@ -174,27 +198,13 @@ public class PropertySelector extends javax.swing.JPanel implements EventHandler
     private javax.swing.JComboBox<java.lang.String> noteSelector;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public Observable<Event> handleEvent(Event e) {
-        switch (e.getSender()) {
-            case Event.MARKUP_PROPERTIES:
-                switch (e.getCustom()) {
-                    case MarkupProperties.NEW_SELECTION:
-                        return newSelection((Markup) e.data);
-                    case MarkupProperties.CLEAR_SELECTION:
-                        return clearSelection();
-                    case MarkupProperties.SET_SELECTION:
-                        return setSelection((String) e.data);
-                    default:
-                        throw new RuntimeException("Bad Custom Tag from MarkupProperties!");
-                }
-            default:
-                throw new RuntimeException("Bad Sender!");
-        }
-    }
-
-    @Override
-    public EventEngine getEventEngine() {
-        return engine;
+    private Observable<Event> removeSelection() {
+        SwingUtilities.invokeLater(() -> {
+                noteSelector.removeItem(noteSelector.getSelectedItem());
+                noteSelector.setSelectedItem(Markup.DEFAULT);
+            }
+        );
+        
+        return Observable.empty();
     }
 }

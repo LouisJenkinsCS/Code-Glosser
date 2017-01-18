@@ -31,8 +31,7 @@
 package edu.bloomu.codeglosser.View;
 
 import edu.bloomu.codeglosser.Events.Event;
-import edu.bloomu.codeglosser.Events.EventEngine;
-import edu.bloomu.codeglosser.Events.EventHandler;
+import edu.bloomu.codeglosser.Events.EventBus;
 import edu.bloomu.codeglosser.Globals;
 import edu.bloomu.codeglosser.Model.ProjectBranch;
 import edu.bloomu.codeglosser.Model.ProjectLeaf;
@@ -48,17 +47,17 @@ import java.io.IOException;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import org.openide.util.Exceptions;
+import edu.bloomu.codeglosser.Events.EventProcessor;
 
 /**
  *
  * @author Louis Jenkins
  */
-public class PropertyFiles extends javax.swing.JPanel implements EventHandler {
+public class PropertyFiles extends javax.swing.JPanel implements EventProcessor {
     
     public static final int FILE_SELECTED = 0x1;
     
-    private final EventEngine engine = new EventEngine(this, Event.PROPERTIES_FILES);
+    private final EventBus engine = new EventBus(this, Event.PROPERTY_FILES);
     
     /**
      * Creates new form PropertyFiles
@@ -70,12 +69,12 @@ public class PropertyFiles extends javax.swing.JPanel implements EventHandler {
     }
     
     @Override
-    public Observable<Event> handleEvent(Event e) {
+    public Observable<Event> process(Event e) {
         return Observable.empty();
     }
 
     @Override
-    public EventEngine getEventEngine() {
+    public EventBus getEventEngine() {
         return engine;
     }
     
@@ -109,7 +108,7 @@ public class PropertyFiles extends javax.swing.JPanel implements EventHandler {
         try {
             populateTree(root, rootNode);
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            
         }
         DefaultTreeModel model = (DefaultTreeModel) projectFileTree.getModel();
         model.setRoot(rootNode);

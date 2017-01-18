@@ -62,7 +62,7 @@ public class ProjectBranch implements TreeViewBranch {
                 if (dir.getChildren().length > 0) {
                     children.add(dir);
                 }
-            } else if (f.getName().toLowerCase().endsWith(".java")){
+            } else {
                 children.add(new ProjectLeaf(f));
             }
         }

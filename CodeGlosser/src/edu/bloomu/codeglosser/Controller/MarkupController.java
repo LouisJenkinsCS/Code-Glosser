@@ -31,8 +31,8 @@
 package edu.bloomu.codeglosser.Controller;
 
 import edu.bloomu.codeglosser.Events.Event;
-import edu.bloomu.codeglosser.Events.EventEngine;
-import edu.bloomu.codeglosser.Events.EventHandler;
+import edu.bloomu.codeglosser.Events.EventBus;
+import edu.bloomu.codeglosser.Globals;
 import edu.bloomu.codeglosser.Model.MarkupViewModel;
 import edu.bloomu.codeglosser.Utils.HTMLGenerator;
 import edu.bloomu.codeglosser.View.MarkupView;
@@ -42,6 +42,7 @@ import java.io.BufferedOutputStream;
 import edu.bloomu.codeglosser.Utils.Bounds;
 import edu.bloomu.codeglosser.Model.Markup;
 import edu.bloomu.codeglosser.Utils.IdentifierGenerator;
+import edu.bloomu.codeglosser.Utils.SessionManager;
 import edu.bloomu.codeglosser.Utils.SwingScheduler;
 import edu.bloomu.codeglosser.View.MarkupProperties;
 import io.reactivex.schedulers.Schedulers;
@@ -54,22 +55,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.openide.util.Exceptions;
+import org.javatuples.Pair;
+import org.javatuples.Unit;
+import edu.bloomu.codeglosser.Events.EventProcessor;
 
 /**
  *
  * @author Louis
  */
-public class MarkupController implements EventHandler {
+public class MarkupController implements EventProcessor {
     
     // MarkupProperties events
     public static final int NEW_MARKUP = 0x1;
     public static final int REMOVE_MARKUP = 0x2;
     public static final int DISPLAY_MARKUP = 0x3;
+    public static final int RESTORE_MARKUPS = 0x4;
+    public static final int SELECTED_ID_RESPONSE = 0x5;
     
     // MarkupView events
     public static final int REMOVE_HIGHLIGHTS = 0x1;
@@ -86,14 +93,14 @@ public class MarkupController implements EventHandler {
     // identifier for it to map correctly, so the current tag must be unique.
     private final IdentifierGenerator idGen = new IdentifierGenerator("Markup");
     
-    private final EventEngine engine = new EventEngine(this, Event.MARKUP_CONTROLLER);
+    private final EventBus engine = new EventBus(this, Event.MARKUP_CONTROLLER);
     
     public MarkupController() {
-
+        
     }
     
     @Override
-    public Observable<Event> handleEvent(Event e) {
+    public Observable<Event> process(Event e) {
         switch (e.getSender()) {
             case Event.MARKUP_VIEW:
                 switch (e.getCustom()) {
@@ -129,7 +136,7 @@ public class MarkupController implements EventHandler {
     }
 
     @Override
-    public EventEngine getEventEngine() {
+    public EventBus getEventEngine() {
         return engine;
     }
     
@@ -140,18 +147,23 @@ public class MarkupController implements EventHandler {
         return Observable
                 .just(id)
                 // Check if it is currently selected
-                .filter(id_ -> currentMarkup == null || !currentMarkup.getId().equals(id_))
+                .filter(id_ -> !id_.equals(Markup.DEFAULT.getId()) && (currentMarkup == null || !currentMarkup.getId().equals(id_)))
                 // Find the markup's range
                 .map(markupMap::get)
                 // Set as currently selected
                 .doOnNext(markup -> currentMarkup = markup)
                 .flatMap(markup -> Observable.just(
                         Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, SET_CURSOR, markup.getRange()),
-                        Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, DISPLAY_MARKUP, markup)
+                        Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, SELECTED_ID_RESPONSE, markup)
                 ));
     }
     
     private Observable<Event> applyTemplate(Markup template) {
+        // If there is no currently selected markup, we can't do anything.
+        if (currentMarkup == null) {
+            return Observable.empty();
+        }
+        
         ArrayList<Event> events = new ArrayList<>();
         Color c = template.getHighlightColor();
         String msg = template.getMsg();
@@ -176,10 +188,18 @@ public class MarkupController implements EventHandler {
     private Observable<Event> createMarkup(Bounds[] bounds) {
         LOG.info("Creating markup with offsets... " + Arrays.toString(bounds));
         
-        // Create a new markup
-        String id = idGen.getNextId();
-        currentMarkup = new Markup("", id, bounds);
-        markupMap.put(id, currentMarkup);
+        // Create a new markup. We must ensure each id is unique however.
+        while (true) {
+            String id = idGen.getNextId();
+            if (markupMap.containsKey(id)) {
+                continue;
+            }
+            
+            currentMarkup = new Markup("", id, bounds);
+            markupMap.put(id, currentMarkup);
+            break;
+        }
+        
         
         // Notify the MarkupProperties to display new Markup.
         return Observable.just(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, NEW_MARKUP, currentMarkup));
@@ -226,10 +246,10 @@ public class MarkupController implements EventHandler {
      */
     private Observable<Event> previewHTML(MarkupViewModel model) {
         LOG.log(Level.INFO, "Generating HTML preview for {0}", model.getTitle());
-        String html = HTMLGenerator.generate(
-                model.getTitle(), model.getText(), 
+        String html = HTMLGenerator.syntaxHighlight(
+                model.getText(), model.getTitle(), 
                 markupMap.values().stream().collect(Collectors.toList())
-        );
+        ).blockingFirst();
         
         // Show in browser.
         LOG.info("Displaying preview in browser...");
@@ -242,35 +262,67 @@ public class MarkupController implements EventHandler {
             stream.close();
             Desktop.getDesktop().browse(f.toURI());
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
         }
         
         return Observable.empty();
     }
 
-    private Observable<Event> fileSelected(Path filePath) {
-        LOG.info("Handling file change event for " + filePath);
-        
-        // Notify MarkupView of file
+    /**
+     * Save the current and restore a previous session (if present) and display
+     * the requested file contents. If a previous session of the current file exists,
+     * it will overwrite it. If a previous session of the new file exists, it will be
+     * loaded and the preserved markups are restored.
+     * @param filePath Path to file
+     * @return Observable
+     */
+    private Observable<Event> fileSelected(Path filePath) {        
         return Observable
                 .just(filePath)
-                // Handle reading on IO thread
-                .observeOn(Schedulers.io())
-                .map(Files::readAllLines)
-                // Handle computation on computation thread
-                .observeOn(Schedulers.computation())
-                .map(list -> list.stream().collect(Collectors.joining("\n")))
-                .map(fileContents -> Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, FILE_SELECTED, fileContents))
-                // Switch back to Swing UI thread
-                .observeOn(SwingScheduler.getInstance());
+                // First, save the user's session. 
+                .doOnNext(ignored -> SessionManager.saveSession(markupMap.values().stream().collect(Collectors.toList())))
+                .doOnNext(path -> Globals.CURRENT_FILE = path)
+                // Second, if there exists any, restore any preserved markups. 
+                // To maintain this pipeline, we tuple the list of
+                // restored markups with the current path, becoming of type 
+                // Pair<Path, List<Markup>>.
+                .map(path -> Pair.with(path, SessionManager.loadSession(path)))
+                // Third, update the current file, as it is used in the the SessionManager.
+                // Fourth, we begin reading in the requested file. We drop the path 
+                // for it's files respective contents (as lines) as it is no longer needed,
+                // becoming of type Pair<List<String>, List<Markup>>
+                .map(pair -> pair.setAt0(Files.readAllLines(pair.getValue0())))
+                // Fifth, as we have both the file contents and (potentially) the Markups,
+                // we need to send the markups to MarkupProperties (for it to update itself)
+                // and both contents and Markups to the MarkupView, as well as update our own. 
+                // However, first we must reduce all lines into a single stream, becoming of type Pair<String, List<Markup>>
+                .map(pair -> pair.setAt0(pair.getValue0().stream().collect(Collectors.joining("\n"))))
+                .doOnNext(pair -> restoreMarkups(pair.getValue1()))
+                .flatMap(pair -> {
+                    List<Event> events = new ArrayList<>();
+                    
+                    // We only inform the MarkupProperties if and only if there are previous Markups to restore.
+                    if (!pair.getValue1().isEmpty()) {
+                        events.add(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, RESTORE_MARKUPS, pair.getValue1()));
+                    }
+                    
+                    // We always inform the MarkupView
+                    events.add(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, FILE_SELECTED, pair));
+
+                    return Observable.fromIterable(events);
+                });
     }
     
     private Observable<Event> exportProject() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        LOG.info("Exporting project...");
+        
+        HTMLGenerator.generateAll();
+        return Observable.empty();
     }
     
     private Observable<Event> saveSession() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        SessionManager.saveSession(markupMap.values().stream().collect(Collectors.toList()));
+        
+        return Observable.empty();
     }
 
     /**
@@ -284,14 +336,10 @@ public class MarkupController implements EventHandler {
         // Return markup selections (if present) and notify MarkupProperties that selection changed
         return Observable
                 .fromIterable(markupMap.values())
-                // Handle in background
-                .observeOn(Schedulers.computation())
                 // Obtain the range from start to end of markup and check for collision
                 .filter(markup -> markup.getRange().collidesWith(bounds))
                 // Note: There should only ever be one, but just in case.
                 .take(1)
-                // Switch back to Swing UI thread
-                .observeOn(SwingScheduler.getInstance())
                 // Set as current markup
                 .doOnNext(markup -> currentMarkup = markup)
                 // Broadcast events
@@ -299,5 +347,16 @@ public class MarkupController implements EventHandler {
                         Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, SET_CURSOR, markup.getRange()),
                         Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_PROPERTIES, DISPLAY_MARKUP, markup)
                 ));
+    }
+
+    private void restoreMarkups(List<Markup> markups) {
+        markupMap.clear();
+        
+        if (markups.isEmpty()) {
+            LOG.fine("No Markups to restore...");
+            return;
+        }
+        
+        markups.forEach(markup -> markupMap.put(markup.getId(), markup));
     }
 }
