@@ -312,11 +312,6 @@ public class MarkupController implements EventProcessor {
                     events.add(Event.of(Event.MARKUP_CONTROLLER, Event.MARKUP_VIEW, FILE_SELECTED, pair));
 
                     return Observable.fromIterable(events);
-                })
-                .doOnError(e -> {
-                    LOG.severe("Error while processing file selection event: " + e.getMessage());
-                    JOptionPane.showMessageDialog(null, "Error while processing file selection event!", "Error", JOptionPane.ERROR_MESSAGE);
-                    System.exit(1);
                 });
     }
     

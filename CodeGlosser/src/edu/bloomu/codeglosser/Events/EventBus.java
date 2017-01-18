@@ -32,8 +32,12 @@ package edu.bloomu.codeglosser.Events;
 
 import edu.bloomu.codeglosser.Globals;
 import io.reactivex.subjects.PublishSubject;
+import java.util.Arrays;
 import java.util.function.Function;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -65,8 +69,21 @@ public class EventBus {
                 // All events received are processed by the background worker thread.
                 // This includes any and all events above.
                 .subscribeOn(Globals.WORKER_THREAD)
-                // If it emits any events, send them as outgoing.
-                .subscribe(outgoingEvent::onNext);
+                // If it emits any events, send them as outgoing. Any errors will cause
+                // a runtime exception and termination! (This may be more dynamic in the future
+                // depending on need.
+                .subscribe(outgoingEvent::onNext, e -> {
+                    LOG.severe("Error while processing event: " + e.getMessage());
+                    LOG.severe(Stream
+                            .of(e.getStackTrace())
+                            .map(Object::toString)
+                            .collect(Collectors.joining("\n")));
+                    JOptionPane.showMessageDialog(null, "Error while processing an event!!!\n"
+                            + "A stacktrace has been written to the log file, 'log.txt'.\n"
+                            + "Please Submit this to the developer: LouisJenkinsCS@hotmail.com\n"
+                            + "Error Message: " + e.getMessage(), "Critical Error", JOptionPane.ERROR_MESSAGE);
+                    System.exit(1);
+                });
     }
     
     public void setStringification(Function<Event, String> toString) {
