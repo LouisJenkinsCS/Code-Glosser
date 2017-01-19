@@ -80,12 +80,12 @@ import edu.bloomu.codeglosser.Globals;
 public class MarkupView extends javax.swing.JPanel implements EventProcessor {
 
     // The events we send
-    public static final int CREATE_MARKUP = 0x1;
-    public static final int DELETE_MARKUP = 0x2;
-    public static final int GET_MARKUP_SELECTION = 0x3;
-    public static final int SAVE_SESSION = 0x4;
-    public static final int PREVIEW_HTML = 0x5;
-    public static final int EXPORT_PROJECT = 0x6;
+    public static final String CREATE_MARKUP = "Create Markup";
+    public static final String DELETE_MARKUP = "Delete Current Markup";
+    public static final String GET_MARKUP_SELECTION = "(Double Click) Requesting Markup Selection";
+    public static final String SAVE_SESSION = "Save Current Session";
+    public static final String PREVIEW_HTML = "Preview Current File";
+    public static final String EXPORT_PROJECT = "Export Project";
 
     private static final Logger LOG = Globals.LOGGER;
 
@@ -111,16 +111,6 @@ public class MarkupView extends javax.swing.JPanel implements EventProcessor {
         initializePopup();
         initializeView();
         initializeListeners();
-        
-        // Setup stringification for logging events.
-        engine.setStringification(e -> {
-            switch (e.getCustom()) {
-                case MarkupController.FILE_SELECTED:
-                    return ((Pair<String, List<Markup>>) e.data).getValue1().toString();
-                default:
-                    return e.toString();
-            }
-        });
     }
     
     private void initializeView() {
@@ -137,9 +127,9 @@ public class MarkupView extends javax.swing.JPanel implements EventProcessor {
 
     @Override
     public Observable<Event> process(Event e) {
-        switch (e.getSender()) {
+        switch (e.sender) {
             case Event.MARKUP_CONTROLLER:
-                switch (e.getCustom()) {
+                switch (e.descriptor) {
                     case MarkupController.REMOVE_HIGHLIGHTS:
                         return removeHighlight((Markup) e.data);
                     case MarkupController.CHANGE_HIGHLIGHT_COLOR:

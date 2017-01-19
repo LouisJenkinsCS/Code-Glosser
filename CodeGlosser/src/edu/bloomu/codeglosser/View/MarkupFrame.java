@@ -35,12 +35,8 @@ import edu.bloomu.codeglosser.Globals;
 import edu.bloomu.codeglosser.Utils.SessionManager;
 import java.awt.BorderLayout;
 import java.io.File;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *

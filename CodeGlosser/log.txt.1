@@ -1,97 +1,32 @@
-Jan 18, 2017 3:09:47 PM edu.bloomu.codeglosser.Events.EventBus lambda$new$1
-INFO: Event: {Sender: PropertyFiles, Recipient: MarkupProperties, Custom: 1}
-Jan 18, 2017 3:09:47 PM edu.bloomu.codeglosser.Events.EventBus lambda$new$1
-INFO: Event: {Sender: MarkupProperties, Recipient: MarkupController, Custom: 1}
-Jan 18, 2017 3:09:47 PM edu.bloomu.codeglosser.Events.EventBus lambda$new$2
-SEVERE: Error while processing event: Input length = 1
-Jan 18, 2017 3:09:47 PM edu.bloomu.codeglosser.Events.EventBus lambda$new$2
-SEVERE: java.nio.charset.CoderResult.throwException(CoderResult.java:281)
-sun.nio.cs.StreamDecoder.implRead(StreamDecoder.java:339)
-sun.nio.cs.StreamDecoder.read(StreamDecoder.java:178)
-java.io.InputStreamReader.read(InputStreamReader.java:184)
-java.io.BufferedReader.fill(BufferedReader.java:161)
-java.io.BufferedReader.readLine(BufferedReader.java:324)
-java.io.BufferedReader.readLine(BufferedReader.java:389)
-java.nio.file.Files.readAllLines(Files.java:3205)
-java.nio.file.Files.readAllLines(Files.java:3242)
-edu.bloomu.codeglosser.Controller.MarkupController.lambda$fileSelected$9(MarkupController.java:296)
-io.reactivex.internal.operators.observable.ObservableMap$MapObserver.onNext(ObservableMap.java:58)
-io.reactivex.internal.operators.observable.ObservableMap$MapObserver.onNext(ObservableMap.java:63)
-io.reactivex.internal.operators.observable.ObservableDoOnEach$DoOnEachObserver.onNext(ObservableDoOnEach.java:103)
-io.reactivex.internal.operators.observable.ObservableDoOnEach$DoOnEachObserver.onNext(ObservableDoOnEach.java:103)
-io.reactivex.internal.operators.observable.ObservableScalarXMap$ScalarDisposable.run(ObservableScalarXMap.java:235)
-io.reactivex.internal.operators.observable.ObservableJust.subscribeActual(ObservableJust.java:35)
-io.reactivex.Observable.subscribe(Observable.java:9945)
-io.reactivex.internal.operators.observable.ObservableDoOnEach.subscribeActual(ObservableDoOnEach.java:42)
-io.reactivex.Observable.subscribe(Observable.java:9945)
-io.reactivex.internal.operators.observable.ObservableDoOnEach.subscribeActual(ObservableDoOnEach.java:42)
-io.reactivex.Observable.subscribe(Observable.java:9945)
-io.reactivex.internal.operators.observable.ObservableMap.subscribeActual(ObservableMap.java:32)
-io.reactivex.Observable.subscribe(Observable.java:9945)
-io.reactivex.internal.operators.observable.ObservableMap.subscribeActual(ObservableMap.java:32)
-io.reactivex.Observable.subscribe(Observable.java:9945)
-io.reactivex.internal.operators.observable.ObservableMap.subscribeActual(ObservableMap.java:32)
-io.reactivex.Observable.subscribe(Observable.java:9945)
-io.reactivex.internal.operators.observable.ObservableDoOnEach.subscribeActual(ObservableDoOnEach.java:42)
-io.reactivex.Observable.subscribe(Observable.java:9945)
-io.reactivex.internal.operators.observable.ObservableFlatMap.subscribeActual(ObservableFlatMap.java:52)
-io.reactivex.Observable.subscribe(Observable.java:9945)
-io.reactivex.internal.operators.observable.ObservableFlatMap$MergeObserver.subscribeInner(ObservableFlatMap.java:148)
-io.reactivex.internal.operators.observable.ObservableFlatMap$MergeObserver.onNext(ObservableFlatMap.java:131)
-io.reactivex.internal.operators.observable.ObservableDoOnEach$DoOnEachObserver.onNext(ObservableDoOnEach.java:103)
-io.reactivex.internal.operators.observable.ObservableFilter$FilterObserver.onNext(ObservableFilter.java:77)
-io.reactivex.subjects.PublishSubject$PublishDisposable.onNext(PublishSubject.java:263)
-io.reactivex.subjects.PublishSubject.onNext(PublishSubject.java:182)
-io.reactivex.internal.observers.LambdaObserver.onNext(LambdaObserver.java:59)
-io.reactivex.subjects.PublishSubject$PublishDisposable.onNext(PublishSubject.java:263)
-io.reactivex.subjects.PublishSubject.onNext(PublishSubject.java:182)
-io.reactivex.internal.observers.LambdaObserver.onNext(LambdaObserver.java:59)
-io.reactivex.internal.operators.observable.ObservableSubscribeOn$SubscribeOnObserver.onNext(ObservableSubscribeOn.java:63)
-io.reactivex.internal.operators.observable.ObservableFlatMap$MergeObserver.drainLoop(ObservableFlatMap.java:424)
-io.reactivex.internal.operators.observable.ObservableFlatMap$MergeObserver.drain(ObservableFlatMap.java:317)
-io.reactivex.internal.operators.observable.ObservableFlatMap$InnerObserver.onSubscribe(ObservableFlatMap.java:582)
-io.reactivex.internal.operators.observable.ObservableFromArray.subscribeActual(ObservableFromArray.java:29)
-io.reactivex.Observable.subscribe(Observable.java:9945)
-io.reactivex.internal.operators.observable.ObservableFlatMap$MergeObserver.subscribeInner(ObservableFlatMap.java:148)
-io.reactivex.internal.operators.observable.ObservableFlatMap$MergeObserver.onNext(ObservableFlatMap.java:131)
-io.reactivex.internal.operators.observable.ObservableDoOnEach$DoOnEachObserver.onNext(ObservableDoOnEach.java:103)
-io.reactivex.internal.operators.observable.ObservableFilter$FilterObserver.onNext(ObservableFilter.java:77)
-io.reactivex.subjects.PublishSubject$PublishDisposable.onNext(PublishSubject.java:263)
-io.reactivex.subjects.PublishSubject.onNext(PublishSubject.java:182)
-io.reactivex.internal.observers.LambdaObserver.onNext(LambdaObserver.java:59)
-io.reactivex.subjects.PublishSubject$PublishDisposable.onNext(PublishSubject.java:263)
-io.reactivex.subjects.PublishSubject.onNext(PublishSubject.java:182)
-edu.bloomu.codeglosser.Events.EventBus.broadcast(EventBus.java:101)
-edu.bloomu.codeglosser.View.PropertyFiles$1.mousePressed(PropertyFiles.java:96)
-java.awt.AWTEventMulticaster.mousePressed(AWTEventMulticaster.java:280)
-java.awt.Component.processMouseEvent(Component.java:6530)
-javax.swing.JComponent.processMouseEvent(JComponent.java:3324)
-java.awt.Component.processEvent(Component.java:6298)
-java.awt.Container.processEvent(Container.java:2236)
-java.awt.Component.dispatchEventImpl(Component.java:4889)
-java.awt.Container.dispatchEventImpl(Container.java:2294)
-java.awt.Component.dispatchEvent(Component.java:4711)
-java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4888)
-java.awt.LightweightDispatcher.processMouseEvent(Container.java:4522)
-java.awt.LightweightDispatcher.dispatchEvent(Container.java:4466)
-java.awt.Container.dispatchEventImpl(Container.java:2280)
-java.awt.Window.dispatchEventImpl(Window.java:2746)
-java.awt.Component.dispatchEvent(Component.java:4711)
-java.awt.EventQueue.dispatchEventImpl(EventQueue.java:758)
-java.awt.EventQueue.access$500(EventQueue.java:97)
-java.awt.EventQueue$3.run(EventQueue.java:709)
-java.awt.EventQueue$3.run(EventQueue.java:703)
-java.security.AccessController.doPrivileged(Native Method)
-java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:76)
-java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:86)
-java.awt.EventQueue$4.run(EventQueue.java:731)
-java.awt.EventQueue$4.run(EventQueue.java:729)
-java.security.AccessController.doPrivileged(Native Method)
-java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:76)
-java.awt.EventQueue.dispatchEvent(EventQueue.java:728)
-java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
-java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
-java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
-java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
-java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
-java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+Message: "Event: {Sender: PropertyFiles, Recipient: MarkupProperties, Descriptor: "File Selected"}"
+(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+Message: "Event: {Sender: MarkupProperties, Recipient: MarkupController, Descriptor: "File Selected"}"
+(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+Message: "Event: {Sender: MarkupController, Recipient: MarkupProperties, Descriptor: "Restore Markup"}"
+(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+Message: "Event: {Sender: MarkupController, Recipient: MarkupView, Descriptor: "Display Selected File"}"
+(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+Message: "Event: {Sender: MarkupProperties, Recipient: PropertySelector, Descriptor: "Clear Selections"}"
+(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+Message: "Event: {Sender: MarkupProperties, Recipient: PropertyAttributes, Descriptor: "Clear Attributes"}"
+(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+Message: "Event: {Sender: MarkupProperties, Recipient: PropertySelector, Descriptor: "Restore Selections"}"
+(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+Message: "Event: {Sender: PropertySelector, Recipient: MarkupProperties, Descriptor: "Id Selected"}"
+(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+Message: "Event: {Sender: MarkupProperties, Recipient: MarkupController, Descriptor: "Id Selected"}"
+(Thu Jan 19 16:40:06 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+Message: "Event: {Sender: MarkupView, Recipient: MarkupController, Descriptor: "(Double Click) Requesting Markup Selection"}"
+(Thu Jan 19 16:40:06 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+Message: "Event: {Sender: MarkupController, Recipient: MarkupView, Descriptor: "Set Cursor Position"}"
+(Thu Jan 19 16:40:06 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+Message: "Event: {Sender: MarkupController, Recipient: MarkupProperties, Descriptor: "Display Markup"}"
+(Thu Jan 19 16:40:06 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+Message: "Event: {Sender: MarkupProperties, Recipient: PropertyAttributes, Descriptor: "Set Attributes"}"
+(Thu Jan 19 16:40:06 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+Message: "Event: {Sender: MarkupProperties, Recipient: PropertySelector, Descriptor: "Set Selection"}"
+(Thu Jan 19 16:40:06 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+Message: "Event: {Sender: PropertySelector, Recipient: MarkupProperties, Descriptor: "Id Selected"}"
+(Thu Jan 19 16:40:06 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+Message: "Event: {Sender: MarkupProperties, Recipient: MarkupController, Descriptor: "Id Selected"}"

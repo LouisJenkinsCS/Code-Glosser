@@ -57,7 +57,7 @@ import javax.swing.JOptionPane;
  */
 public class PropertyFiles extends javax.swing.JPanel implements EventProcessor {
     
-    public static final int FILE_SELECTED = 0x1;
+    public static final String FILE_SELECTED = "File Selected";
     
     private static final Logger LOG = Globals.LOGGER;
     

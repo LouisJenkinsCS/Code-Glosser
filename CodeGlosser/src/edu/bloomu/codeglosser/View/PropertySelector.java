@@ -50,7 +50,7 @@ import edu.bloomu.codeglosser.Globals;
 public class PropertySelector extends javax.swing.JPanel implements EventProcessor {
     
     // MarkupProperties
-    public static final int SELECTED_ID = 0x1;
+    public static final String SELECTED_ID = "Id Selected";
     
     private static final Logger LOG = Globals.LOGGER;
     
@@ -74,9 +74,9 @@ public class PropertySelector extends javax.swing.JPanel implements EventProcess
     
     @Override
     public Observable<Event> process(Event e) {
-        switch (e.getSender()) {
+        switch (e.sender) {
             case Event.MARKUP_PROPERTIES:
-                switch (e.getCustom()) {
+                switch (e.descriptor) {
                     case MarkupProperties.NEW_SELECTION:
                         return newSelection((Markup) e.data);
                     case MarkupProperties.CLEAR_SELECTION:

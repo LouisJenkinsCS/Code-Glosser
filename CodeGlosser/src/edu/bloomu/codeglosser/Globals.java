@@ -79,6 +79,8 @@ public final class Globals {
      * memory leak, the previous values are not accidentally used.
      */
     public static void initGlobals() {
+        System.setProperty("java.util.logging.SimpleFormatter.format", 
+            "(%1$tc) [%4$s] ~%2$s~%nMessage: \"%5$s\"%n");
         try {
             handler = new FileHandler("log.txt");
             handler.setLevel(Level.INFO);

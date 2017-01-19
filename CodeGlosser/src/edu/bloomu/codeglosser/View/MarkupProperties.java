@@ -35,7 +35,6 @@ import edu.bloomu.codeglosser.Events.Event;
 import edu.bloomu.codeglosser.Events.EventBus;
 import edu.bloomu.codeglosser.Model.Markup;
 import io.reactivex.Observable;
-import io.reactivex.subjects.PublishSubject;
 import java.awt.Color;
 import java.nio.file.Path;
 import java.util.List;
@@ -54,20 +53,20 @@ import edu.bloomu.codeglosser.Events.EventProcessor;
 public class MarkupProperties extends javax.swing.JPanel implements EventProcessor {
     
     // MarkupController
-    public static final int FILE_SELECTED = 0x1;
-    public static final int APPLY_TEMPLATE = 0x2;
-    public static final int SELECTED_ID = 0x3;
+    public static final String FILE_SELECTED = "File Selected";
+    public static final String APPLY_TEMPLATE = "Apply Markup Template";
+    public static final String SELECTED_ID = "Id Selected";
     
     // PropertySelector
-    public static final int CLEAR_SELECTION = 0x1;
-    public static final int NEW_SELECTION = 0x2;
-    public static final int SET_SELECTION = 0x3;
-    public static final int RESTORE_SELECTIONS = 0x4;
-    public static final int REMOVE_SELECTION = 0x5;
+    public static final String CLEAR_SELECTION = "Clear Selections";
+    public static final String NEW_SELECTION = "New Selection";
+    public static final String SET_SELECTION = "Set Selection";
+    public static final String RESTORE_SELECTIONS = "Restore Selections";
+    public static final String REMOVE_SELECTION = "Remove Current Selection";
     
     // PropertyAttributes
-    public static final int CLEAR_ATTRIBUTES = 0x1;
-    public static final int SET_ATTRIBUTES = 0x2;
+    public static final String CLEAR_ATTRIBUTES = "Clear Attributes";
+    public static final String SET_ATTRIBUTES = "Set Attributes";
     
     private static final Logger LOG = Logger.getLogger(MarkupProperties.class.getName());
     
@@ -81,9 +80,9 @@ public class MarkupProperties extends javax.swing.JPanel implements EventProcess
     
     @Override
     public Observable<Event> process(Event e) {
-        switch (e.getSender()) {
+        switch (e.sender) {
             case Event.MARKUP_CONTROLLER:
-                switch (e.getCustom()) {
+                switch (e.descriptor) {
                     case MarkupController.NEW_MARKUP:
                         return newMarkup((Markup) e.data);
                     case MarkupController.DISPLAY_MARKUP:
@@ -98,7 +97,7 @@ public class MarkupProperties extends javax.swing.JPanel implements EventProcess
                         throw new RuntimeException("Bad Custom Tag from MarkupController!");
                 }
             case Event.PROPERTY_ATTRIBUTES:
-                switch (e.getCustom()) {
+                switch (e.descriptor) {
                     case PropertyAttributes.TEXT_CHANGE:
                         return textChange((String) e.data);
                     case PropertyAttributes.COLOR_CHANGE:
@@ -107,21 +106,21 @@ public class MarkupProperties extends javax.swing.JPanel implements EventProcess
                         throw new RuntimeException("Bad Custom Tag from PropertyAttributes!");
                 }
             case Event.PROPERTY_FILES:
-                switch (e.getCustom()) {
+                switch (e.descriptor) {
                     case PropertyFiles.FILE_SELECTED:
                         return fileSelected((Path) e.data);
                     default:
                         throw new RuntimeException("Bad Custom Tag from PropertyFiles!");
                 }
             case Event.PROPERTY_SELECTOR:
-                switch (e.getCustom()) {
+                switch (e.descriptor) {
                     case PropertySelector.SELECTED_ID:
                         return selectedId((String) e.data);
                     default:
                         throw new RuntimeException("Bad Custom Tag from PropertySelector!");
                 }
             case Event.PROPERTY_TEMPLATES:
-                switch (e.getCustom()) {
+                switch (e.descriptor) {
                     case PropertyTemplates.APPLY_TEMPLATE:
                         return applyTemplate((Markup) e.data);
                 }

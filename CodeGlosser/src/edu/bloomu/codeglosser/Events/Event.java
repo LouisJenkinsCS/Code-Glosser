@@ -41,71 +41,38 @@ import java.util.function.Function;
  */
 public class Event {
     
-    /*
-        The identifying bits
-    */
-    public static final int MARKUP_VIEW = 0x01;
-    public static final int MARKUP_CONTROLLER = 0x02;
-    public static final int MARKUP_PROPERTIES = 0x03;
-    public static final int PROPERTY_SELECTOR = 0x04;
-    public static final int PROPERTY_TEMPLATES = 0x05;
-    public static final int PROPERTY_FILES = 0x06;
-    public static final int PROPERTY_ATTRIBUTES = 0x07;
-    
-    private static String tagToString(int tag) {
-        switch (tag) {
-            case MARKUP_VIEW:
-                return "MarkupView";
-            case MARKUP_CONTROLLER:
-                return "MarkupController";
-            case MARKUP_PROPERTIES:
-                return "MarkupProperties";
-            case PROPERTY_SELECTOR:
-                return "PropertySelector";
-            case PROPERTY_TEMPLATES:
-                return "PropertyTemplates";
-            case PROPERTY_FILES:
-                return "PropertyFiles";
-            case PROPERTY_ATTRIBUTES:
-                return "PropertyAttributes";
-            default:
-                return "Unknown(" + tag + ")";
-        }
-    }   
-    
-    /*
-        Helper bit shifts and masks to determine what is what.
-    */
-    public static final int SENDER_MASK = 0xFF;
-    
-    public static final int RECIPIENT_SHIFT = 8;
-    public static final int RECIPIENT_MASK = 0xFF00;
-    
-    public static final int CUSTOM_SHIFT = 16;
-    public static final int CUSTOM_MASK = 0xFFFF0000;
+    // The possible components in this event-driven system must be one of these.
+    // The strings themselves are used as descriptors which help with event sourcing
+    // and general logging.
+    public static final String MARKUP_VIEW = "MarkupView";
+    public static final String MARKUP_CONTROLLER = "MarkupController";
+    public static final String MARKUP_PROPERTIES = "MarkupProperties";
+    public static final String PROPERTY_SELECTOR = "PropertySelector";
+    public static final String PROPERTY_TEMPLATES = "PropertyTemplates";
+    public static final String PROPERTY_FILES = "PropertyFiles";
+    public static final String PROPERTY_ATTRIBUTES = "PropertyAttributes"; 
     
     
+    // Fields to determine WHO sent it, WHO this is for, and WHAT this event is.
+    public final String sender;
+    public final String recipient;
+    public final String descriptor;
     
-    // Special flags; The lowest 8 bits are used to represent WHO the sender is,
-    // the next 8 bits are used to represent WHO the intended recipients are.
-    // The next 16 bits can be used for other purposes.
-    public final int tag;
-    
-    // The data that is associated with this event. It is an opaque reference, and
-    // it is up to the sender and recipient to determine what type it is or how it
-    // should be represented.
+    // The data that is associated with this event. The actual type and how it is
+    // used is up to the sender and intended recipient to determine. 
     public final Object data;
     
     /**
-     * A static helper method for encoding events to be passed around.
+     * Create an instance of an Event. This is used over the constructor in case
+     * we make some further changed and/or optimizations.
      * @param from Who are we?
      * @param to Who should see this?
-     * @param customTag What event tag is being sent?
+     * @param what What kind of event is this?
      * @param data What is the event data?
      * @return Event encoded.
      */
-    public static Event of(int from, int to, int customTag, Object data) {
-        return new Event(from | (to << RECIPIENT_SHIFT) | (customTag << CUSTOM_SHIFT), data);
+    public static Event of(String from, String to, String what, Object data) {
+        return new Event(from, to, what, data);
     }
     
     /**
@@ -119,41 +86,19 @@ public class Event {
         return Observable.empty();
     }
     
-    private Event(int tag, Object data) {
-        this.tag = tag;
+    private Event(String sender, String recipient, String descriptor, Object data) {
+        this.sender = sender;
+        this.recipient = recipient;
+        this.descriptor = descriptor;
         this.data = data;
-    }
-    
-    /**
-     * Get the set sender bits only.
-     * @return Sender.
-     */
-    public int getSender() {
-        return this.tag & SENDER_MASK;
-    }
-    
-    /**
-     * Get the set recipient bits only. 
-     * @return Recipient.
-     */
-    public int getRecipient() {
-        return (this.tag & RECIPIENT_MASK) >> RECIPIENT_SHIFT;
-    }
-    
-    /**
-     * Get the set custom bits only.
-     * @return Custom.
-     */
-    public int getCustom() {
-        return (this.tag & CUSTOM_MASK) >> CUSTOM_SHIFT;
     }
 
     @Override
     public String toString() {
-        return "Event: {Sender: " + tagToString(getSender()) + ", Recipient: " + tagToString(getRecipient()) + ", Custom: " + getCustom() + "}";
+        return "Event: {Sender: " + sender + ", Recipient: " + recipient + ", Descriptor: \"" + descriptor + "\"}";
     }
     
     public String toString(Function<Event, String> asString) {
-        return "Event: {Sender: " + tagToString(getSender()) + ", Recipient: " + tagToString(getRecipient()) + ", Custom: " + getCustom() + "}";
+        return "Event: {Sender: " + sender + ", Recipient: " + recipient + ", Descriptor: \"" + descriptor + "\"}";
     }
 }

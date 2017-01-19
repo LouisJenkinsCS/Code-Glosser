@@ -34,6 +34,7 @@ import edu.bloomu.codeglosser.Globals;
 import io.reactivex.subjects.PublishSubject;
 import java.util.Arrays;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,23 +46,24 @@ import javax.swing.JOptionPane;
  */
 public class EventBus {
     
-    private final int id;
-    
     private static final Logger LOG = Globals.LOGGER;
+    
+    
+    private final String id;
     
     private Function<Event, String> stringifyEvent;
     
     
-    PublishSubject<Event> outgoingEvent = PublishSubject.create();
-    PublishSubject<Event> ingoingEvent = PublishSubject.create();
+    private final PublishSubject<Event> outgoingEvent = PublishSubject.create();
+    private final PublishSubject<Event> ingoingEvent = PublishSubject.create();
     
-    public EventBus(EventProcessor handler, int id) {
+    public EventBus(EventProcessor handler, String id) {
         this.id = id;
         
         // Handle receiving events
         ingoingEvent
                 // Only accept events if they are addressed to use
-                .filter(e -> e.getRecipient() == id)
+                .filter(e -> e.recipient.equals(id))
                 // Log any and all events
                 .doOnNext(e -> LOG.info(stringifyEvent != null ? e.toString(stringifyEvent) : e.toString()))
                 // Convert it to the implementor's Observable
@@ -73,7 +75,7 @@ public class EventBus {
                 // a runtime exception and termination! (This may be more dynamic in the future
                 // depending on need.
                 .subscribe(outgoingEvent::onNext, e -> {
-                    LOG.severe("Error while processing event: " + e.getMessage());
+                    LOG.log(Level.SEVERE, "Error while processing event: {0}", e.getMessage());
                     LOG.severe(Stream
                             .of(e.getStackTrace())
                             .map(Object::toString)
@@ -97,8 +99,8 @@ public class EventBus {
      * @param custom Custom
      * @param data Data
      */
-    public void broadcast(int to, int custom, Object data) {
-        outgoingEvent.onNext(Event.of(id, to, custom, data));
+    public void broadcast(String to, String descr, Object data) {
+        outgoingEvent.onNext(Event.of(id, to, descr, data));
     }
     
     /**

@@ -55,13 +55,14 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventProce
 
     private static final Logger LOG = Globals.LOGGER;
     
-    public static final int COLOR_CHANGE = 0x1;
-    public static final int TEXT_CHANGE = 0x2;
-    
     // Determines how many milliseconds of time must pass between the last user input
     // before automatically saving it. This is very useful in both performance and user
     // experience.
     private static final long TEXT_CHANGE_DEBOUNCE = 500;
+    
+    public static final String COLOR_CHANGE = "Color Changed";
+    public static final String TEXT_CHANGE = "Text Changed (" + TEXT_CHANGE_DEBOUNCE + "ms)";
+
     
     private Color color = Color.YELLOW;
     private String message = "";
@@ -81,9 +82,9 @@ public class PropertyAttributes extends javax.swing.JPanel implements EventProce
     
     @Override
     public Observable<Event> process(Event e) {
-        switch (e.getSender()) {
+        switch (e.sender) {
             case Event.MARKUP_PROPERTIES:
-                switch (e.getCustom()) {
+                switch (e.descriptor) {
                     case MarkupProperties.SET_ATTRIBUTES:
                         return setAttributes((Markup) e.data);
                     case MarkupProperties.CLEAR_ATTRIBUTES:

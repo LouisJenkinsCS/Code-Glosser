@@ -62,7 +62,7 @@ import javax.swing.JOptionPane;
  */
 public class PropertyTemplates extends javax.swing.JPanel implements EventProcessor {
     
-    public static final int APPLY_TEMPLATE = 0x1;
+    public static final String APPLY_TEMPLATE = "Apply Markup Template";
     
     private static final Logger LOG = Globals.LOGGER;
     private final EventBus engine = new EventBus(this, Event.PROPERTY_TEMPLATES);

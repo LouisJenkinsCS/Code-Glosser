@@ -73,17 +73,17 @@ import javax.swing.JOptionPane;
 public class MarkupController implements EventProcessor {
     
     // MarkupProperties events
-    public static final int NEW_MARKUP = 0x1;
-    public static final int REMOVE_MARKUP = 0x2;
-    public static final int DISPLAY_MARKUP = 0x3;
-    public static final int RESTORE_MARKUPS = 0x4;
-    public static final int SELECTED_ID_RESPONSE = 0x5;
+    public static final String NEW_MARKUP = "New Markup";
+    public static final String REMOVE_MARKUP = "Remove Markup";
+    public static final String DISPLAY_MARKUP = "Display Markup";
+    public static final String RESTORE_MARKUPS = "Restore Markup";
+    public static final String SELECTED_ID_RESPONSE = "(Response) Sending Requested Markup";
     
     // MarkupView events
-    public static final int REMOVE_HIGHLIGHTS = 0x1;
-    public static final int CHANGE_HIGHLIGHT_COLOR = 0x2;
-    public static final int SET_CURSOR = 0x3;
-    public static final int FILE_SELECTED = 0x4;
+    public static final String REMOVE_HIGHLIGHTS = "Remove Highlights";
+    public static final String CHANGE_HIGHLIGHT_COLOR = "Change Highlight Color";
+    public static final String SET_CURSOR = "Set Cursor Position";
+    public static final String FILE_SELECTED = "Display Selected File";
     
     private static final Logger LOG = Globals.LOGGER;
     
@@ -102,9 +102,9 @@ public class MarkupController implements EventProcessor {
     
     @Override
     public Observable<Event> process(Event e) {
-        switch (e.getSender()) {
+        switch (e.sender) {
             case Event.MARKUP_VIEW:
-                switch (e.getCustom()) {
+                switch (e.descriptor) {
                     case MarkupView.CREATE_MARKUP:
                         return createMarkup((Bounds []) e.data);
                     case MarkupView.DELETE_MARKUP:
@@ -121,7 +121,7 @@ public class MarkupController implements EventProcessor {
                         throw new RuntimeException("Bad Custom Tag for MarkupView!");
                 }
             case Event.MARKUP_PROPERTIES:
-                switch (e.getCustom()) {
+                switch (e.descriptor) {
                     case MarkupProperties.FILE_SELECTED:
                         return fileSelected((Path) e.data);
                     case MarkupProperties.APPLY_TEMPLATE:
