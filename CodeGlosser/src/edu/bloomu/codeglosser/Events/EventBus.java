@@ -57,7 +57,7 @@ public class EventBus {
     private final PublishSubject<Event> outgoingEvent = PublishSubject.create();
     private final PublishSubject<Event> ingoingEvent = PublishSubject.create();
     
-    public EventBus(EventProcessor handler, String id) {
+    public EventBus(EventProcessor processor, String id) {
         this.id = id;
         
         // Handle receiving events
@@ -65,27 +65,33 @@ public class EventBus {
                 // Only accept events if they are addressed to use
                 .filter(e -> e.recipient.equals(id))
                 // Log any and all events
-                .doOnNext(e -> LOG.info(stringifyEvent != null ? e.toString(stringifyEvent) : e.toString()))
-                // Convert it to the implementor's Observable
-                .flatMap(handler::process)
+                .doOnNext(e -> LOG.info(e.toString()))
+                // Defer processing. The processor is free to go between schedulers
+                // all they like, and may return zero or more Events.
+                .flatMap(processor::process)
                 // All events received are processed by the background worker thread.
-                // This includes any and all events above.
                 .subscribeOn(Globals.WORKER_THREAD)
                 // If it emits any events, send them as outgoing. Any errors will cause
-                // a runtime exception and termination! (This may be more dynamic in the future
-                // depending on need.
-                .subscribe(outgoingEvent::onNext, e -> {
-                    LOG.log(Level.SEVERE, "Error while processing event: {0}", e.getMessage());
-                    LOG.severe(Stream
-                            .of(e.getStackTrace())
-                            .map(Object::toString)
-                            .collect(Collectors.joining("\n")));
-                    JOptionPane.showMessageDialog(null, "Error while processing an event!!!\n"
-                            + "A stacktrace has been written to the log file, 'log.txt'.\n"
-                            + "Please Submit this to the developer: LouisJenkinsCS@hotmail.com\n"
-                            + "Error Message: " + e.getMessage(), "Critical Error", JOptionPane.ERROR_MESSAGE);
-                    System.exit(1);
-                });
+                // a runtime exception and termination! In the future, there will be 
+                // a way to recover from errors that are recoverable, but that will be
+                // implemented based on need.
+                .subscribe(outgoingEvent::onNext, this::onError);
+    }
+    
+    private void onError(Throwable ex) {
+        // Dump stack frame
+        LOG.log(Level.SEVERE, "Error while processing event: {0}", ex.getMessage());
+        LOG.severe(Stream
+                .of(ex.getStackTrace())
+                .map(Object::toString)
+                .collect(Collectors.joining("\n")));
+        
+        // User informed of critical error before exiting.
+        JOptionPane.showMessageDialog(null, "Error while processing an event!!!\n"
+                + "A stacktrace has been written to the log file, 'log.txt'.\n"
+                + "Please Submit this to the developer: LouisJenkinsCS@hotmail.com\n"
+                + "Error Message: " + ex.getMessage(), "Critical Error", JOptionPane.ERROR_MESSAGE);
+        System.exit(1);
     }
     
     public void setStringification(Function<Event, String> toString) {
