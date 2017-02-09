@@ -48,24 +48,20 @@ Below are screenshots of various projects I have worked in the past that are dis
 
 #### C
 
-![heap.c](screenshots/heap_c.png)
+![task.c](screenshots/CG_MoltarOS_C_Final.png)
 
 #### Java (Android)
 
-![BaseWidget.java](screenshots/base_widget_java.png)
+![GoogleMapsWidget.java](screenshots/CG_SAK_Final.png)
 
 #### Haskell
 
-![bytecode.hs](screenshots/bytecode_hs.png)
-
-#### C++
-
-![PerfectGame.cpp](screenshots/perfect_game_cpp.png)
+![bytecode.hs](screenshots/CG_JVM_Final.png)
 
 #### x86 Assembly
 
-![boot.asm](screenshots/boot_asm.png)
+![boot.asm](screenshots/CG_MoltarOS_ASM_Final.png)
 
 #### Go
 
-![concurrent_map.go](screenshots/concurrent_map_go.png)
+![concurrent_map.go](screenshots/CG_Go_Final.png)
