@@ -47,8 +47,12 @@ public class TemplateNodeFactory {
         if (obj.containsKey(TemplateBranch.KEY_CATEGORY)) {
             node = new TemplateBranch(obj);
         } else {
-            // While color and msg can be null, the title cannot be 
-            Color color = Color.decode((String) obj.get("color"));
+            // While color and msg can be null, the title cannot be
+            Color color = Color.YELLOW;
+            if (obj.containsKey("color")) {
+                color = Color.decode((String) obj.get("color"));
+            }
+            
             String msg = (String) obj.get("message");
             String title = (String) obj.get("title");
             if (title == null) {

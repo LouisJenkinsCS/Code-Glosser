@@ -8,20 +8,20 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
   display: block;
   overflow-x: auto;
   padding: 0.5em;
-  color: #333;
+  color: #333333;
   background: #f8f8f8;
 }
 
 .hljs-comment,
 .hljs-quote {
-  color: #998;
+  color: #999988;
   font-style: italic;
 }
 
 .hljs-keyword,
 .hljs-selector-tag,
 .hljs-subst {
-  color: #333;
+  color: #333333;
   font-weight: bold;
 }
 
@@ -35,13 +35,13 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 
 .hljs-string,
 .hljs-doctag {
-  color: #d14;
+  color: #dd1144;
 }
 
 .hljs-title,
 .hljs-section,
 .hljs-selector-id {
-  color: #900;
+  color: #990000;
   font-weight: bold;
 }
 
@@ -51,7 +51,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 
 .hljs-type,
 .hljs-class .hljs-title {
-  color: #458;
+  color: #445588;
   font-weight: bold;
 }
 
@@ -78,16 +78,16 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 }
 
 .hljs-meta {
-  color: #999;
+  color: #999999;
   font-weight: bold;
 }
 
 .hljs-deletion {
-  background: #fdd;
+  background: #ffdddd;
 }
 
 .hljs-addition {
-  background: #dfd;
+  background: #ddffdd;
 }
 
 .hljs-emphasis {
@@ -129,238 +129,82 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
   position: absolute;
   display:block;
   z-index: 99;
-}</style><meta charset="UTF-8"></head><body><pre><code><span class="hljs-keyword">package</span> combined_testing
+}</style><meta charset="UTF-8"></head><body><pre><code><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"Game.h"</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;cstdlib&gt;</span></span>
 
-<span class="hljs-keyword">import</span> (
-	<span class="hljs-string">"math/rand"</span>
-	<span class="hljs-string">"runtime"</span>
-	<span class="hljs-string">"settings"</span>
-	<span class="hljs-string">"strconv"</span>
-	<span class="hljs-string">"sync"</span>
-	<span class="hljs-string">"testing"</span>
-	<span class="hljs-string">"time"</span>
+<span class="note" msg="Namespace names are all lower-case, and based on project names and possibly their directory structure: google_awesome_project."><span class="hljs-keyword">namespace</span> ns_game</span>
+{
+    <span class="hljs-keyword">void</span> Game::start() 
+    {
+        <span class="hljs-keyword">while</span>(<span class="hljs-literal">true</span>)
+        {
+            reset();
+            <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; print(board) &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span> &lt;&lt; <span class="hljs-built_in">std</span>::flush;
 
-	cmap <span class="hljs-string">"github.com/streamrail/concurrent-map"</span>
-	gotomic <span class="hljs-string">"github.com/zond/gotomic"</span>
-)
+            <span class="hljs-keyword">while</span>(<span class="hljs-literal">true</span>) 
+            {
+                process_turn(board, turn);
+                turns++;
+                <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; print(board) &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span> &lt;&lt; <span class="hljs-built_in">std</span>::flush;
 
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BenchmarkConcurrentCombined</span><span class="hljs-params">(b *testing.B)</span></span> {
-	cmap := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-keyword">int64</span>]settings.Unused, settings.COMBINED_KEY_RANGE, runtime.GOMAXPROCS(<span class="hljs-number">0</span>))
+                <span class="hljs-keyword">if</span>(has_player_won(board, turn)) 
+                {
+                    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span>
+                            &lt;&lt; (turn == AI ? <span class="hljs-string">"AI "</span> : <span class="hljs-string">"PLAYER "</span>)
+                            &lt;&lt; <span class="hljs-string">"wins..."</span> &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span>;
+                    <span class="hljs-keyword">break</span>;
+                }
+                <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(turns &gt; board.size()) 
+                {
+                    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span> &lt;&lt; <span class="hljs-string">"Number of turns has"</span>
+                            <span class="hljs-string">" exceeded the amount of free spaces on the"</span>
+                            <span class="hljs-string">" board! DRAW!"</span> &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span>;
+                    <span class="hljs-keyword">break</span>;
+                }
 
-	<span class="note" msg="Create a better way to reserve space ahead of time. As well, make it dynamic enough so that it can be benchmarked from empty to test resizing overhead as well."><span class="hljs-comment">// Fill map to reduce overhead of resizing</span></span>
-	<span class="note" msg="Create a better way to reserve space ahead of time. As well, make it dynamic enough so that it can be benchmarked from empty to test resizing overhead as well."><span class="hljs-keyword">for</span> i := <span class="hljs-keyword">int64</span>(<span class="hljs-number">0</span>); i &lt; settings.COMBINED_KEY_RANGE; i++ {</span>
-		<span class="note" msg="Create a better way to reserve space ahead of time. As well, make it dynamic enough so that it can be benchmarked from empty to test resizing overhead as well.">cmap[i] = settings.UNUSED</span>
-	<span class="note" msg="Create a better way to reserve space ahead of time. As well, make it dynamic enough so that it can be benchmarked from empty to test resizing overhead as well.">}</span>
-	<span class="note" msg="Create a better way to reserve space ahead of time. As well, make it dynamic enough so that it can be benchmarked from empty to test resizing overhead as well."><span class="hljs-keyword">for</span> i := <span class="hljs-keyword">int64</span>(<span class="hljs-number">0</span>); i &lt; settings.COMBINED_KEY_RANGE; i++ {</span>
-		<span class="note" msg="Create a better way to reserve space ahead of time. As well, make it dynamic enough so that it can be benchmarked from empty to test resizing overhead as well."><span class="hljs-built_in">delete</span>(cmap, i)</span>
-	<span class="note" msg="Create a better way to reserve space ahead of time. As well, make it dynamic enough so that it can be benchmarked from empty to test resizing overhead as well.">}</span>
+                change_turn();
+            }
 
-	b.ResetTimer()
-	b.RunParallel(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(pb *testing.PB)</span></span> {
-		rng := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
+            <span class="hljs-keyword">if</span>(!repeat())
+                <span class="hljs-keyword">break</span>;
+        }
+    }
+    
+    <span class="hljs-keyword">bool</span> Game::is_game_over(<span class="hljs-keyword">const</span> ns_matrix::Matrix&lt;<span class="hljs-keyword">int</span>&gt;&amp; board)
+    {
+        <span class="hljs-keyword">return</span> has_player_won(board, AI) || has_player_won(board, PLAYER)
+                || turns &gt; board.size();
+    }
+    
+    <span class="hljs-keyword">void</span> Game::reset() 
+    {
+        turns = <span class="hljs-number">0</span>;
+        board.clear();
 
-		<span class="hljs-keyword">for</span> pb.Next() {
-			randRatio := rng.Float64()
-			randNum := rng.Int63n(settings.COMBINED_KEY_RANGE)
-			<span class="hljs-keyword">switch</span> {
-			<span class="hljs-comment">// 0 &lt;= randRatio &lt; .25 -&gt; Insert</span>
-			<span class="hljs-keyword">case</span> randRatio &lt; settings.COMBINED_FAIR_RATIO:
-				cmap[randNum] = settings.UNUSED
-			<span class="hljs-comment">// .25 &lt;= randRatio &lt; .5 -&gt; Delete</span>
-			<span class="hljs-keyword">case</span> randRatio &lt; <span class="hljs-number">2</span>*settings.COMBINED_FAIR_RATIO:
-				<span class="hljs-built_in">delete</span>(cmap, randNum)
-			<span class="hljs-comment">// .5 &lt;= randRatio &lt; .75 -&gt; Lookup</span>
-			<span class="hljs-keyword">case</span> randRatio &lt; <span class="hljs-number">3</span>*settings.COMBINED_FAIR_RATIO:
-				tmp := cmap[randNum]
-				tmp++
-			<span class="hljs-comment">// .75 &lt;= randRatio &lt; 1 -&gt; Iterate</span>
-			<span class="hljs-keyword">default</span>:
-				<span class="hljs-comment">// Each iteration counts as an operation (as it calls mapiternext)</span>
-				<span class="hljs-keyword">for</span> k, v := <span class="hljs-keyword">range</span> cmap {
-					k++
-					v++
-				}
-			}
-		}
-	})
-	b.StopTimer()
-}
+        <span class="hljs-comment">// Seed and randomly set player turn.</span>
+        <span class="hljs-built_in">std</span>::srand(<span class="hljs-built_in">std</span>::time(<span class="hljs-literal">nullptr</span>));
+        turn = (<span class="hljs-built_in">std</span>::rand() % <span class="hljs-number">1</span>) ? AI : PLAYER;
+    }
+    
+    <span class="hljs-keyword">void</span> Game::change_turn()
+    {
+        turn = (turn == AI ? PLAYER : AI);
+    }
+    
+    <span class="hljs-keyword">bool</span> Game::repeat() <span class="hljs-keyword">const</span> 
+    {     
+        <span class="hljs-keyword">char</span> c;
+        <span class="hljs-keyword">while</span>(<span class="hljs-literal">true</span>)
+        {
+            c = <span class="hljs-string">'\0'</span>;
+            <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span> &lt;&lt; <span class="hljs-string">"Play again?[\'Y\'|\'N\']"</span> 
+                    &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span> &lt;&lt; <span class="hljs-string">"=&gt; "</span>;
+            <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cin</span> &gt;&gt; c;
 
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BenchmarkStreamrailConcurrentCombined</span><span class="hljs-params">(b *testing.B)</span></span> {
-	scmap := cmap.New()
+            <span class="hljs-keyword">if</span>(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">tolower</span>(c) != <span class="hljs-string">'y'</span> || <span class="hljs-built_in">std</span>::<span class="hljs-built_in">tolower</span>(c) != <span class="hljs-string">'n'</span>)
+                <span class="hljs-keyword">break</span>;
+        }
 
-	<span class="hljs-comment">// Fill map to reduce overhead of resizing</span>
-	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">int64</span>(<span class="hljs-number">0</span>); i &lt; settings.COMBINED_KEY_RANGE; i++ {
-		scmap.Set(strconv.FormatInt(i, <span class="hljs-number">10</span>), settings.UNUSED)
-	}
-	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">int64</span>(<span class="hljs-number">0</span>); i &lt; settings.COMBINED_KEY_RANGE; i++ {
-		scmap.Remove(strconv.FormatInt(i, <span class="hljs-number">10</span>))
-	}
-
-	b.ResetTimer()
-	b.RunParallel(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(pb *testing.PB)</span></span> {
-		rng := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
-
-		<span class="hljs-keyword">for</span> pb.Next() {
-			randRatio := rng.Float64()
-			randNum := rng.Int63n(settings.COMBINED_KEY_RANGE)
-			<span class="hljs-keyword">switch</span> {
-			<span class="hljs-comment">// 0 &lt;= randRatio &lt; .25 -&gt; Insert</span>
-			<span class="hljs-keyword">case</span> randRatio &lt; settings.COMBINED_FAIR_RATIO:
-				scmap.Set(strconv.FormatInt(randNum, <span class="hljs-number">10</span>), settings.UNUSED)
-			<span class="hljs-comment">// .25 &lt;= randRatio &lt; .5 -&gt; Delete</span>
-			<span class="hljs-keyword">case</span> randRatio &lt; <span class="hljs-number">2</span>*settings.COMBINED_FAIR_RATIO:
-				scmap.Remove(strconv.FormatInt(randNum, <span class="hljs-number">10</span>))
-			<span class="hljs-comment">// .5 &lt;= randRatio &lt; .75 -&gt; Lookup</span>
-			<span class="hljs-keyword">case</span> randRatio &lt; <span class="hljs-number">3</span>*settings.COMBINED_FAIR_RATIO:
-				scmap.Get(strconv.FormatInt(randNum, <span class="hljs-number">10</span>))
-			<span class="hljs-comment">// .75 &lt;= randRatio &lt; 1 -&gt; Iterate</span>
-			<span class="hljs-keyword">default</span>:
-				<span class="hljs-comment">// Each iteration counts as an operation (as it calls mapiternext)</span>
-				<span class="hljs-keyword">for</span> item := <span class="hljs-keyword">range</span> scmap.Iter() {
-					_ = item.Key
-					_ = item.Val
-				}
-			}
-		}
-	})
-}
-
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BenchmarkGotomicConcurrentCombined</span><span class="hljs-params">(b *testing.B)</span></span> {
-	gcmap := gotomic.NewHash()
-
-	<span class="hljs-comment">// Fill map to reduce overhead of resizing</span>
-	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">int64</span>(<span class="hljs-number">0</span>); i &lt; settings.COMBINED_KEY_RANGE; i++ {
-		gcmap.Put(gotomic.IntKey(<span class="hljs-keyword">int</span>(i)), settings.UNUSED)
-	}
-	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">int64</span>(<span class="hljs-number">0</span>); i &lt; settings.COMBINED_KEY_RANGE; i++ {
-		gcmap.Delete(gotomic.IntKey(<span class="hljs-keyword">int</span>(i)))
-	}
-
-	b.ResetTimer()
-	b.RunParallel(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(pb *testing.PB)</span></span> {
-		rng := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
-
-		<span class="hljs-keyword">for</span> pb.Next() {
-			randRatio := rng.Float64()
-			randNum := rng.Int63n(settings.COMBINED_KEY_RANGE)
-			<span class="hljs-keyword">switch</span> {
-			<span class="hljs-comment">// 0 &lt;= randRatio &lt; .25 -&gt; Insert</span>
-			<span class="hljs-keyword">case</span> randRatio &lt; settings.COMBINED_FAIR_RATIO:
-				gcmap.Put(gotomic.IntKey(<span class="hljs-keyword">int</span>(randNum)), settings.UNUSED)
-			<span class="hljs-comment">// .25 &lt;= randRatio &lt; .5 -&gt; Delete</span>
-			<span class="hljs-keyword">case</span> randRatio &lt; <span class="hljs-number">2</span>*settings.COMBINED_FAIR_RATIO:
-				gcmap.Delete(gotomic.IntKey(<span class="hljs-keyword">int</span>(randNum)))
-			<span class="hljs-comment">// .5 &lt;= randRatio &lt; .75 -&gt; Lookup</span>
-			<span class="hljs-keyword">case</span> randRatio &lt; <span class="hljs-number">3</span>*settings.COMBINED_FAIR_RATIO:
-				gcmap.Get(gotomic.IntKey(<span class="hljs-keyword">int</span>(randNum)))
-			<span class="hljs-comment">// .75 &lt;= randRatio &lt; 1 -&gt; Iterate</span>
-			<span class="hljs-keyword">default</span>:
-				<span class="hljs-comment">// Each iteration counts as an operation (as it calls mapiternext)</span>
-				gcmap.Each(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(k gotomic.Hashable, v gotomic.Thing)</span> <span class="hljs-title">bool</span></span> {
-					_ = k
-					_ = v
-					<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
-				})
-			}
-		}
-	})
-}
-
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BenchmarkSynchronizedCombined</span><span class="hljs-params">(b *testing.B)</span></span> {
-	smap := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-keyword">int64</span>]settings.Unused, settings.COMBINED_KEY_RANGE)
-	<span class="hljs-keyword">var</span> mtx sync.Mutex
-
-	<span class="hljs-comment">// Fill map to reduce overhead of resizing</span>
-	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">int64</span>(<span class="hljs-number">0</span>); i &lt; settings.COMBINED_KEY_RANGE; i++ {
-		smap[i] = settings.UNUSED
-	}
-	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">int64</span>(<span class="hljs-number">0</span>); i &lt; settings.COMBINED_KEY_RANGE; i++ {
-		<span class="hljs-built_in">delete</span>(smap, i)
-	}
-
-	b.ResetTimer()
-	b.RunParallel(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(pb *testing.PB)</span></span> {
-		rng := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
-
-		<span class="hljs-keyword">for</span> pb.Next() {
-			randRatio := rng.Float64()
-			randNum := rng.Int63n(settings.COMBINED_KEY_RANGE)
-			<span class="hljs-keyword">switch</span> {
-			<span class="hljs-comment">// 0 &lt;= randRatio &lt; .25 -&gt; Insert</span>
-			<span class="hljs-keyword">case</span> randRatio &lt; settings.COMBINED_FAIR_RATIO:
-				mtx.Lock()
-				smap[randNum] = settings.UNUSED
-				mtx.Unlock()
-			<span class="hljs-comment">// .25 &lt;= randRatio &lt; .5 -&gt; Delete</span>
-			<span class="hljs-keyword">case</span> randRatio &lt; <span class="hljs-number">2</span>*settings.COMBINED_FAIR_RATIO:
-				mtx.Lock()
-				<span class="hljs-built_in">delete</span>(smap, randNum)
-				mtx.Unlock()
-			<span class="hljs-comment">// .5 &lt;= randRatio &lt; .75 -&gt; Lookup</span>
-			<span class="hljs-keyword">case</span> randRatio &lt; <span class="hljs-number">3</span>*settings.COMBINED_FAIR_RATIO:
-				mtx.Lock()
-				tmp := smap[randNum]
-				mtx.Unlock()
-				tmp++
-			<span class="hljs-comment">// .75 &lt;= randRatio &lt; 1 -&gt; Iterate</span>
-			<span class="hljs-keyword">default</span>:
-				mtx.Lock()
-				<span class="hljs-keyword">for</span> k, v := <span class="hljs-keyword">range</span> smap {
-					k++
-					v++
-				}
-				mtx.Unlock()
-			}
-		}
-	})
-}
-
-<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BenchmarkReaderWriterCombined</span><span class="hljs-params">(b *testing.B)</span></span> {
-	rwmap := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-keyword">int64</span>]settings.Unused, settings.COMBINED_KEY_RANGE)
-	<span class="hljs-keyword">var</span> mtx sync.RWMutex
-
-	<span class="hljs-comment">// Fill map to reduce overhead of resizing</span>
-	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">int64</span>(<span class="hljs-number">0</span>); i &lt; settings.COMBINED_KEY_RANGE; i++ {
-		rwmap[i] = settings.UNUSED
-	}
-	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">int64</span>(<span class="hljs-number">0</span>); i &lt; settings.COMBINED_KEY_RANGE; i++ {
-		<span class="hljs-built_in">delete</span>(rwmap, i)
-	}
-
-	b.ResetTimer()
-	b.RunParallel(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(pb *testing.PB)</span></span> {
-		rng := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
-
-		<span class="hljs-keyword">for</span> pb.Next() {
-			randRatio := rng.Float64()
-			randNum := rng.Int63n(settings.COMBINED_KEY_RANGE)
-			<span class="hljs-keyword">switch</span> {
-			<span class="hljs-comment">// 0 &lt;= randRatio &lt; .25 -&gt; Insert</span>
-			<span class="hljs-keyword">case</span> randRatio &lt; settings.COMBINED_FAIR_RATIO:
-				mtx.Lock()
-				rwmap[randNum] = settings.UNUSED
-				mtx.Unlock()
-			<span class="hljs-comment">// .25 &lt;= randRatio &lt; .5 -&gt; Delete</span>
-			<span class="hljs-keyword">case</span> randRatio &lt; <span class="hljs-number">2</span>*settings.COMBINED_FAIR_RATIO:
-				mtx.Lock()
-				<span class="hljs-built_in">delete</span>(rwmap, randNum)
-				mtx.Unlock()
-			<span class="hljs-comment">// .5 &lt;= randRatio &lt; .75 -&gt; Lookup</span>
-			<span class="hljs-keyword">case</span> randRatio &lt; <span class="hljs-number">3</span>*settings.COMBINED_FAIR_RATIO:
-				mtx.RLock()
-				tmp := rwmap[randNum]
-				mtx.RUnlock()
-				tmp++
-			<span class="hljs-comment">// .75 &lt;= randRatio &lt; 1 -&gt; Iterate</span>
-			<span class="hljs-keyword">default</span>:
-				mtx.RLock()
-				<span class="hljs-keyword">for</span> k, v := <span class="hljs-keyword">range</span> rwmap {
-					k++
-					v++
-				}
-				mtx.RUnlock()
-			}
-		}
-	})
+        <span class="hljs-keyword">return</span> <span class="hljs-built_in">std</span>::<span class="hljs-built_in">tolower</span>(c) == <span class="hljs-string">'y'</span>;
+    };
 }</code></pre></body></html>

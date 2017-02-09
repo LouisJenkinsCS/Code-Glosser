@@ -1,60 +1,430 @@
 {
-    "templates": [
+  "templates": [
+    {
+      "category": true,
+      "title": "C++ (Google Style Guide)",
+      "body": [
         {
-            "category":true,
-            "title":"Java",
-            "body": [
-                {
-                    "category":true,
-                    "title":"Naming",
-                    "body":[
-                        {"title":"Variable Names", "message":"Use lowerCamelCase for variables names", "color":"#00FFFF"},
-                        {"title":"Method Names", "message":"Use lowerCamelCase verbs or verb phrases for method names.", "color":"#00FFFF"},
-                        {"title":"Class Names", "message":"Use UpperCamelCase nouns or noun phrases for class names.", "color":"#00FFFF"},
-                        {"title":"Magic Numbers", "message":"Use named constants instead of multiple occurrences of the same numerical literal.", "color":"#00FFFF"},
-                        {"title":"Descriptive Naming", "message":"Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters).", "color":"#00FFFF"},
-                        {"title":"Constant Case", "message":"Use CONSTANT_CASE for variables declared final if they are primitive-type variables or references to immutable types (like Color or String).", "color":"#00FFFF"}
-                    ]
-                },
-                {
-                    "category":true,
-                    "title":"Documentation",
-                    "body":[
-                        {"title":"Missing Header", "message":"Each class must have a properly structured doc comment including at least a summary fragment and the author's name (first and last).", "color":"#FF0000"},
-                        {"title":"Errors and Warnings", "message":"Document all known errors and deficiencies in the doc comment of the relevant class.", "color":"#FF0000"},
-                        {"title":"Constructors and Methods", "message":"Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses.", "color":"#FF0000"},
-                        {"title":"Self-Explanatory Method or Constructor", "message":"If a method is self-explanatory, at-clauses may be omitted from the doc comment.", "color":"#FF0000"},
-                        {"title":"Non-Obvious Code", "message":"Within a method, comments are needed to explain any code whose purpose is not obvious.", "color":"#FF0000"},
-                        {"title":"Non-Obvious Variable Name", "message":"Write a comment to explain the purpose of a variable unless the purpose is obvious from the name.", "color":"#FF0000"}
-                    ]
-                },
-                {
-                    "category":true,
-                    "title":"Indentation and Whitespace",
-                    "body":[
-                        {"title":"Consistent Formatting", "message":"Consistently indent all statements appearing within a block to clarify the logic and flow of control.", "color":"#0000FF"},
-                        {"title":"Consistent Closing Braces", "message":"Line up closing braces of blocks with the keyword owning the block.", "color":"#0000FF"},
-                        {"title":"Code Drift", "message":"Avoid code drift: each line should be at most 100 characters long.", "color":"#0000FF"},
-                        {"title":"Logical Separation", "message":"Use blank lines to separate parts of a method that are logically distinct.", "color":"#0000FF"},
-                        {"title":"Binary Operator", "message":"Leave a space before and after every binary operator.", "color":"#0000FF"},
-                        {"title":"Method and Constructor Formatting", "message":"Leave a blank line after every method and constructor.", "color":"#0000FF"},
-                        {"title":"Excess Blank Lines", "message":"There should be no more than two consecutive blank lines.", "color":"#0000FF"}
-                    ]
-                },
-                {
-                    "category":true,
-                    "title":"Miscellaneous",
-                    "body":[
-                        {"title":"IDE-Generated Comments", "message":"Remove generic IDE-generated comments.", "color":"#FFFF00"},
-                        {"title":"Typos/Grammatical Errors", "message":"Remove typos and grammatical errors from output and documentation.", "color":"#FFFF00"},
-                        {"title":"Unused Code", "message":"Remove all unused variables, unneeded import statements, and commented-out code.", "color":"#FFFF00"},
-                        {"title":"Long Methods", "message":"Methods should not be longer than about 30 lines, and usually not longer than 20. Implement utility methods for subtasks.", "color":"#FFFF00"},
-                        {"title":"Variable Ordering", "message":"Class members should be ordered as follows: class variables, instance variables, constructors, methods.", "color":"#FFFF00"},
-                        {"title":"Limit Scope", "message":"Declare local variables as close as possible to the point where they are first used.", "color":"#FFFF00"},
-                        {"title":"Initialization", "message":"Initialize local variables at the point of declaration whenever possible.", "color":"#FFFF00"}
-                    ]
-                }
-            ]
+          "category": true,
+          "title": "Header Files",
+          "body": [
+            {
+              "title": "The '#define' Guard",
+              "message": "All header files should have '#define' guards to prevent multiple inclusion. The format of the symbol name should be <PROJECT>_<PATH>_<FILE>_H_."
+            },
+            {
+              "title": "Header File Dependencies",
+              "message": "Don't use an #include when a forward declaration would suffice."
+            },
+            {
+              "title": "Inline Functions",
+              "message": "Define functions inline only when they are small, say, 10 lines or less."
+            },
+            {
+              "title": "The -inl.h Files",
+              "message": "You may use file names with a -inl.h suffix to define complex inline functions when needed."
+            },
+            {
+              "title": "Function Parameter Ordering",
+              "message": "When defining a function, parameter order is: inputs, then outputs."
+            },
+            {
+              "title": "Names and Order of Includes",
+              "message": "Use standard order for readability and to avoid hidden dependencies: C library, C++ library, other libraries' .h, your project's .h."
+            }
+          ]
+        },
+        {
+          "category": true,
+          "title": "Scoping",
+          "body": [
+            {
+              "title": "Namespaces",
+              "message": "Unnamed namespaces in .cc files are encouraged. With named namespaces, choose the name based on the project, and possibly its path. Do not use a using directive."
+            },
+            {
+              "title": "Nested Classes",
+              "message": "Although you may use public nested classes when they are part of an interface, consider a namespace to keep declarations out of the global scope."
+            },
+            {
+              "title": "Nonmember, Static Member, and Global Functions",
+              "message": "Prefer nonmember functions within a namespace or static member functions to global functions; use completely global functions rarely."
+            },
+            {
+              "title": "Local Variables",
+              "message": "Place a function's variables in the narrowest scope possible, and initialize variables in the declaration."
+            },
+            {
+              "title": "Static and Global Variables",
+              "message": "Static or global variables of class type are forbidden: they cause hard-to-find bugs due to indeterminate order of construction and destruction."
+            }
+          ]
+        },
+        {
+          "category": true,
+          "title": "Classes",
+          "body": [
+            {
+              "title": "Doing Work in Constructors",
+              "message": "In general, constructors should merely set member variables to their initial values. Any complex initialization should go in an explicit Init() method."
+            },
+            {
+              "title": "Default Constructors",
+              "message": "You must define a default constructor if your class defines member variables and has no other constructors. Otherwise the compiler will do it for you, badly."
+            },
+            {
+              "title": "Explicit Constructors",
+              "message": "Use the C++ keyword explicit for constructors with one argument."
+            },
+            {
+              "title": "Copy Constructors",
+              "message": "Provide a copy constructor and assignment operator only when necessary. Otherwise, disable them with DISALLOW_COPY_AND_ASSIGN."
+            },
+            {
+              "title": "Structs vs. Classes",
+              "message": "Use a struct only for passive objects that carry data; everything else is a class."
+            },
+            {
+              "title": "Inheritance",
+              "message": "Composition is often more appropriate than inheritance. When using inheritance, make it public."
+            },
+            {
+              "title": "Multiple Inheritance",
+              "message": "Only very rarely is multiple implementation inheritance actually useful. We allow multiple inheritance only when at most one of the base classes has an implementation; all other base classes must be pure interface classes tagged with the Interface suffix."
+            },
+            {
+              "title": "Interfaces",
+              "message": "Classes that satisfy certain conditions are allowed, but not required, to end with an Interface suffix."
+            },
+            {
+              "title": "Operator Overloading",
+              "message": "Do not overload operators except in rare, special circumstances."
+            },
+            {
+              "title": "Access Control",
+              "message": "Make data members private, and provide access to them through accessor functions as needed (for technical reasons, we allow data members of a test fixture class to be protected when using Google Test). Typically a variable would be called foo_ and the accessor function foo(). You may also want a mutator function set_foo(). Exception: static const data members (typically called kFoo) need not be private."
+            },
+            {
+              "title": "Declaration Order",
+              "message": "Use the specified order of declarations within a class: public: before private:, methods before data members (variables), etc."
+            },
+            {
+              "title": "Write Short Functions",
+              "message": "Prefer small and focused functions."
+            }
+          ]
+        },
+        {
+          "category": true,
+          "title": "Google-Specific Magic",
+          "body": [
+            {
+              "title": "Smart Pointers",
+              "message": "If you actually need pointer semantics, scoped_ptr is great. You should only use std::tr1::shared_ptr under very specific conditions, such as when objects need to be held by STL containers. You should never use auto_ptr."
+            },
+            {
+              "title": "cpplint",
+              "message": "Use cpplint.py to detect style errors"
+            }
+          ]
+        },
+        {
+          "category": true,
+          "title": "Other C++ Features",
+          "body": [
+            {
+              "title": "Reference Arguments",
+              "message": "All parameters passed by reference must be labeled const."
+            },
+            {
+              "title": "Function Overloading",
+              "message": "Use overloaded functions (including constructors) only if a reader looking at a call site can get a good idea of what is happening without having to first figure out exactly which overload is being called."
+            },
+            {
+              "title": "Default Arguments",
+              "message": "We do not allow default function parameters, except in a few uncommon situations explained below."
+            },
+            {
+              "title": "Variable-Length Arrays and alloca()",
+              "message": "We do not allow variable-length arrays or alloca()."
+            },
+            {
+              "title": "Friends",
+              "message": "We allow use of friend classes and functions, within reason."
+            },
+            {
+              "title": "Exceptions",
+              "message": "We do not use C++ exceptions."
+            },
+            {
+              "title": "Run-Time Type Information (RTTI)",
+              "message": "We do not use Run Time Type Information (RTTI)."
+            },
+            {
+              "title": "Casting",
+              "message": "Use C++ casts like static_cast<>(). Do not use other cast formats like int y = (int)x; or int y = int(x);."
+            },
+            {
+              "title": "Streams",
+              "message": "Use streams only for logging."
+            },
+            {
+              "title": "Preincrement and Predecrement",
+              "message": "Use prefix form (++i) of the increment and decrement operators with iterators and other template objects."
+            },
+            {
+              "title": "Use of const",
+              "message": "We strongly recommend that you use const whenever it makes sense to do so."
+            },
+            {
+              "title": "Integer Types",
+              "message": "Of the built-in C++ integer types, the only one used is int. If a program needs a variable of a different size, use a precise-width integer type from <stdint.h>, such as int16_t."
+            },
+            {
+              "title": "64-bit Portability",
+              "message": "Code should be 64-bit and 32-bit friendly. Bear in mind problems of printing, comparisons, and structure alignment."
+            },
+            {
+              "title": "Preprocessor Macros",
+              "message": "Be very cautious with macros. Prefer inline functions, enums, and const variables to macros."
+            },
+            {
+              "title": "0 and NULL",
+              "message": "Use 0 for integers, 0.0 for reals, NULL for pointers, and '\\0' for chars."
+            },
+            {
+              "title": "sizeof",
+              "message": "Use sizeof(varname) instead of sizeof(type) whenever possible."
+            },
+            {
+              "title": "Boost",
+              "message": "Use only approved libraries from the Boost library collection."
+            },
+            {
+              "title": "C++0x",
+              "message": "Use only approved libraries and language extensions from C++0x. Currently, none are approved."
+            }
+          ]
+        },
+        {
+          "category": true,
+          "title": "Naming",
+          "body": [
+            {
+              "title": "General Naming Rules",
+              "message": "Function names, variable names, and filenames should be descriptive; eschew abbreviation. Types and variables should be nouns, while functions should be \"command\" verbs."
+            },
+            {
+              "title": "File Names",
+              "message": "Filenames should be all lowercase and can include underscores (_) or dashes (-). Follow the convention that your project uses. If there is no consistent local pattern to follow, prefer \"_\"."
+            },
+            {
+              "title": "Type Names",
+              "message": "Type names start with a capital letter and have a capital letter for each new word, with no underscores: MyExcitingClass, MyExcitingEnum."
+            },
+            {
+              "title": "Variable Names",
+              "message": "Variable names are all lowercase, with underscores between words. Class member variables have trailing underscores. For instance: my_exciting_local_variable, my_exciting_member_variable_."
+            },
+            {
+              "title": "Constant Names",
+              "message": "Use a k followed by mixed case: kDaysInAWeek."
+            },
+            {
+              "title": "Function Names",
+              "message": "Regular functions have mixed case; accessors and mutators match the name of the variable: MyExcitingFunction(), MyExcitingMethod(), my_exciting_member_variable(), set_my_exciting_member_variable()."
+            },
+            {
+              "title": "Namespace Names",
+              "message": "Namespace names are all lower-case, and based on project names and possibly their directory structure: google_awesome_project."
+            },
+            {
+              "title": "Enumerator Names",
+              "message": "Enumerators should be named either like constants or like macros: either kEnumName or ENUM_NAME."
+            },
+            {
+              "title": "Macro Names",
+              "message": "You're not really going to define a macro, are you? If you do, they're like this: MY_MACRO_THAT_SCARES_SMALL_CHILDREN."
+            },
+            {
+              "title": "Exceptions to Naming Rules",
+              "message": "If you are naming something that is analogous to an existing C or C++ entity then you can follow the existing naming convention scheme."
+            }
+          ]
+        },
+        {
+          "category": true,
+          "title": "Comments",
+          "body": [
+            {
+              "title": "Comment Style",
+              "message": "Use either the // or /* */ syntax, as long as you are consistent."
+            },
+            {
+              "title": "File Comments",
+              "message": "Start each file with a copyright notice, followed by a description of the contents of the file."
+            },
+            {
+              "title": "Class Comments",
+              "message": "Every class definition should have an accompanying comment that describes what it is for and how it should be used."
+            },
+            {
+              "title": "Function Comments",
+              "message": "Declaration comments describe use of the function; comments at the definition of a function describe operation."
+            },
+            {
+              "title": "Variable Comments",
+              "message": "In general the actual name of the variable should be descriptive enough to give a good idea of what the variable is used for. In certain cases, more comments are required."
+            },
+            {
+              "title": "Implementation Comments",
+              "message": "In your implementation you should have comments in tricky, non-obvious, interesting, or important parts of your code."
+            },
+            {
+              "title": "Punctuation, Spelling and Grammar",
+              "message": "Pay attention to punctuation, spelling, and grammar; it is easier to read well-written comments than badly written ones."
+            },
+            {
+              "title": "TODO Comments",
+              "message": "Use TODO comments for code that is temporary, a short-term solution, or goodenough but not perfect."
+            },
+            {
+              "title": "Deprecation Comments",
+              "message": "Mark deprecated interface points with DEPRECATED comments."
+            }
+          ]
+        },
+        {
+          "category": true,
+          "title": "Formatting",
+          "body": [
+            {
+              "title": "Line Length",
+              "message": "Each line of text in your code should be at most 80 characters long."
+            },
+            {
+              "title": "Non-ASCII Characters",
+              "message": "Non-ASCII characters should be rare, and must use UTF-8 formatting."
+            },
+            {
+              "title": "Spaces vs. Tabs",
+              "message": "Use only spaces, and indent 2 spaces at a time."
+            },
+            {
+              "title": "Function Declarations and Definitions",
+              "message": "Return type on the same line as function name, parameters on the same line if they fit."
+            },
+            {
+              "title": "Function Calls",
+              "message": "On one line if it fits; otherwise, wrap arguments at the parenthesis."
+            },
+            {
+              "title": "Conditionals",
+              "message": "Prefer no spaces inside parentheses. The else keyword belongs on a new line."
+            },
+            {
+              "title": "Loops and Switch Statements",
+              "message": "Switch statements may use braces for blocks. Empty loop bodies should use {} or continue."
+            },
+            {
+              "title": "Pointer and Reference Expressions",
+              "message": "No spaces around period or arrow. Pointer operators do not have trailing spaces."
+            },
+            {
+              "title": "Boolean Expressions",
+              "message": "When you have a boolean expression that is longer than the standard line length, be consistent in how you break up the lines."
+            },
+            {
+              "title": "Return Values",
+              "message": "Do not needlessly surround the return expression with parentheses."
+            },
+            {
+              "title": "Variable and Array Initialization",
+              "message": "Your choice of = or ()."
+            },
+            {
+              "title": "Preprocessor Directives",
+              "message": "Preprocessor directives should not be indented but should instead start at the beginning of the line."
+            },
+            {
+              "title": "Class Format",
+              "message": "Sections in public, protected and private order, each indented one space."
+            },
+            {
+              "title": "Constructor Initializer Lists",
+              "message": "Constructor initializer lists can be all on one line or with subsequent lines indented four spaces."
+            },
+            {
+              "title": "Namespace Formatting",
+              "message": "The contents of namespaces are not indented."
+            },
+            {
+              "title": "Horizontal Whitespace",
+              "message": "Use of horizontal whitespace depends on location. Never put trailing whitespace at the end of a line."
+            },
+            {
+              "title": "Vertical Whitespace",
+              "message": "Minimize use of vertical whitespace."
+            }
+          ]
         }
-    ]
+      ]
+    },
+    {
+        "category":true,
+        "title":"Java",
+        "body": [
+            {
+                "category":true,
+                "title":"Naming",
+                "body":[
+                    {"title":"Variable Names", "message":"Use lowerCamelCase for variables names"},
+                    {"title":"Method Names", "message":"Use lowerCamelCase verbs or verb phrases for method names."},
+                    {"title":"Class Names", "message":"Use UpperCamelCase nouns or noun phrases for class names."},
+                    {"title":"Magic Numbers", "message":"Use named constants instead of multiple occurrences of the same numerical literal."},
+                    {"title":"Descriptive Naming", "message":"Use descriptive names for identifiers except for local variables whose purpose is completely obvious (such as loop counters)."},
+                    {"title":"Constant Case", "message":"Use CONSTANT_CASE for variables declared final if they are primitive-type variables or references to immutable types (like Color or String)."}
+                ]
+            },
+            {
+                "category":true,
+                "title":"Documentation",
+                "body":[
+                    {"title":"Missing Header", "message":"Each class must have a properly structured doc comment including at least a summary fragment and the author's name (first and last)."},
+                    {"title":"Errors and Warnings", "message":"Document all known errors and deficiencies in the doc comment of the relevant class."},
+                    {"title":"Constructors and Methods", "message":"Each method and constructor must have a doc comment with a summary fragment and applicable at-clauses."},
+                    {"title":"Self-Explanatory Method or Constructor", "message":"If a method is self-explanatory, at-clauses may be omitted from the doc comment."},
+                    {"title":"Non-Obvious Code", "message":"Within a method, comments are needed to explain any code whose purpose is not obvious."},
+                    {"title":"Non-Obvious Variable Name", "message":"Write a comment to explain the purpose of a variable unless the purpose is obvious from the name."}
+                ]
+            },
+            {
+                "category":true,
+                "title":"Indentation and Whitespace",
+                "body":[
+                    {"title":"Consistent Formatting", "message":"Consistently indent all statements appearing within a block to clarify the logic and flow of control."},
+                    {"title":"Consistent Closing Braces", "message":"Line up closing braces of blocks with the keyword owning the block."},
+                    {"title":"Code Drift", "message":"Avoid code drift: each line should be at most 100 characters long."},
+                    {"title":"Logical Separation", "message":"Use blank lines to separate parts of a method that are logically distinct."},
+                    {"title":"Binary Operator", "message":"Leave a space before and after every binary operator."},
+                    {"title":"Method and Constructor Formatting", "message":"Leave a blank line after every method and constructor."},
+                    {"title":"Excess Blank Lines", "message":"There should be no more than two consecutive blank lines."}
+                ]
+            },
+            {
+                "category":true,
+                "title":"Miscellaneous",
+                "body":[
+                    {"title":"IDE-Generated Comments", "message":"Remove generic IDE-generated comments."},
+                    {"title":"Typos/Grammatical Errors", "message":"Remove typos and grammatical errors from output and documentation."},
+                    {"title":"Unused Code", "message":"Remove all unused variables, unneeded import statements, and commented-out code."},
+                    {"title":"Long Methods", "message":"Methods should not be longer than about 30 lines, and usually not longer than 20. Implement utility methods for subtasks."},
+                    {"title":"Variable Ordering", "message":"Class members should be ordered as follows: class variables, instance variables, constructors, methods."},
+                    {"title":"Limit Scope", "message":"Declare local variables as close as possible to the point where they are first used."},
+                    {"title":"Initialization", "message":"Initialize local variables at the point of declaration whenever possible."}
+                ]
+            }
+        ]
+    }
+  ]
 }
