@@ -131,29 +131,8 @@ public class PropertySelector extends javax.swing.JPanel implements EventProcess
         return Observable
                 .just(markup)
                 .map(Markup::getId)
-                // We need to collect all identifiers into a list so we can sort them
-                // with the new id. This is necessary because there currently is no
-                // JComboBox Model that does this for us.
-                .flatMap(id -> {
-                    ArrayList<String> idList = new ArrayList<>();
-                    
-                    // Obtain all identifiers (including one to add)
-                    for (int i = 0; i < noteSelector.getItemCount(); i++) {
-                        idList.add(noteSelector.getItemAt(i));
-                    }
-                    idList.add(id);
-                    
-                    // Now it becomes the new Observable
-                    return Observable.fromIterable(idList);
-                })
-                // Sort in descending order
-                .sorted((id1, id2) -> id2.compareTo(id1))
-                // Remove all items first and then add them again as they are out of order
-                .doOnNext(id -> SwingUtilities.invokeLater(() -> {
-                        noteSelector.removeItem(id);
-                        noteSelector.addItem(id);
-                    }
-                ))
+                .doOnNext(noteSelector::addItem)
+                .doOnNext(noteSelector::setSelectedItem)
                 .flatMap(Event::empty);
     }
     

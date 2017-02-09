@@ -1,34 +1,20 @@
-(Thu Jan 19 16:40:02 EST 2017) [INFO] ~edu.bloomu.codeglosser.View.MarkupFrame <init>~
-Message: "Current Directory: CodeGlosser, Selected File: example_project"
-(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+(Thu Feb 09 13:16:36 EST 2017) [INFO] ~edu.bloomu.codeglosser.View.MarkupFrame <init>~
+Message: "Current Directory: Github, Selected File: go"
+(Thu Feb 09 13:16:56 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
 Message: "Event: {Sender: PropertyFiles, Recipient: MarkupProperties, Descriptor: "File Selected"}"
-(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+(Thu Feb 09 13:16:56 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
 Message: "Event: {Sender: MarkupProperties, Recipient: MarkupController, Descriptor: "File Selected"}"
-(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+(Thu Feb 09 13:16:56 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
 Message: "Event: {Sender: MarkupController, Recipient: MarkupProperties, Descriptor: "Restore Markup"}"
-(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+(Thu Feb 09 13:16:56 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
 Message: "Event: {Sender: MarkupController, Recipient: MarkupView, Descriptor: "Display Selected File"}"
-(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+(Thu Feb 09 13:16:56 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
 Message: "Event: {Sender: MarkupProperties, Recipient: PropertySelector, Descriptor: "Clear Selections"}"
-(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+(Thu Feb 09 13:16:56 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
 Message: "Event: {Sender: MarkupProperties, Recipient: PropertyAttributes, Descriptor: "Clear Attributes"}"
-(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+(Thu Feb 09 13:16:56 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
 Message: "Event: {Sender: MarkupProperties, Recipient: PropertySelector, Descriptor: "Restore Selections"}"
-(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+(Thu Feb 09 13:16:56 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
 Message: "Event: {Sender: PropertySelector, Recipient: MarkupProperties, Descriptor: "Id Selected"}"
-(Thu Jan 19 16:40:04 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
-Message: "Event: {Sender: MarkupProperties, Recipient: MarkupController, Descriptor: "Id Selected"}"
-(Thu Jan 19 16:40:06 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
-Message: "Event: {Sender: MarkupView, Recipient: MarkupController, Descriptor: "(Double Click) Requesting Markup Selection"}"
-(Thu Jan 19 16:40:06 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
-Message: "Event: {Sender: MarkupController, Recipient: MarkupView, Descriptor: "Set Cursor Position"}"
-(Thu Jan 19 16:40:06 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
-Message: "Event: {Sender: MarkupController, Recipient: MarkupProperties, Descriptor: "Display Markup"}"
-(Thu Jan 19 16:40:06 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
-Message: "Event: {Sender: MarkupProperties, Recipient: PropertyAttributes, Descriptor: "Set Attributes"}"
-(Thu Jan 19 16:40:06 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
-Message: "Event: {Sender: MarkupProperties, Recipient: PropertySelector, Descriptor: "Set Selection"}"
-(Thu Jan 19 16:40:06 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
-Message: "Event: {Sender: PropertySelector, Recipient: MarkupProperties, Descriptor: "Id Selected"}"
-(Thu Jan 19 16:40:06 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
+(Thu Feb 09 13:16:56 EST 2017) [INFO] ~edu.bloomu.codeglosser.Events.EventBus lambda$new$1~
 Message: "Event: {Sender: MarkupProperties, Recipient: MarkupController, Descriptor: "Id Selected"}"
