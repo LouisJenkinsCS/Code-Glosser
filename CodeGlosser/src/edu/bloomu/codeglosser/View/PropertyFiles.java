@@ -48,8 +48,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import edu.bloomu.codeglosser.Events.EventProcessor;
+import edu.bloomu.codeglosser.Utils.ProgressDialog;
+import edu.bloomu.codeglosser.Utils.SwingScheduler;
+import java.awt.BorderLayout;
+import java.awt.Frame;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -103,8 +112,22 @@ public class PropertyFiles extends javax.swing.JPanel implements EventProcessor 
     }
     
     private void initFileTree() {
-        ProjectBranch root = new ProjectBranch(Globals.PROJECT_FOLDER.toFile());
-        setRoot(root);
+        projectFileTree.setModel(null);
+        
+        ProgressDialog dialog = new ProgressDialog()
+                .setText("Setting Up File View...")
+                .setTitle("Initializing File View");
+        dialog.show();
+        
+        Observable
+                .just(Globals.PROJECT_FOLDER.toFile())
+                .subscribeOn(Globals.WORKER_THREAD)
+                .map(ProjectBranch::new)
+                .observeOn(SwingScheduler.getInstance())
+                .subscribe(root -> {
+                    setRoot(root);
+                    dialog.done();
+                });
     }
     
     public void setRoot(TreeViewBranch root) {
@@ -115,8 +138,8 @@ public class PropertyFiles extends javax.swing.JPanel implements EventProcessor 
             LOG.severe("Error attempting to populate tree: " + ex.getMessage());
             JOptionPane.showMessageDialog(null, "Error attempting to populate tree", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        DefaultTreeModel model = (DefaultTreeModel) projectFileTree.getModel();
-        model.setRoot(rootNode);
+        DefaultTreeModel model = new DefaultTreeModel(rootNode);
+        projectFileTree.setModel(model);
     }
     
     private void populateTree(TreeViewBranch branch, DefaultMutableTreeNode root) throws IOException {
@@ -142,6 +165,8 @@ public class PropertyFiles extends javax.swing.JPanel implements EventProcessor 
         jScrollPane1 = new javax.swing.JScrollPane();
         projectFileTree = new javax.swing.JTree();
 
+        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Empty");
+        projectFileTree.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
         jScrollPane1.setViewportView(projectFileTree);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

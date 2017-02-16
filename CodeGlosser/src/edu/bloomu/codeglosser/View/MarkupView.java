@@ -64,6 +64,7 @@ import javax.swing.text.html.StyleSheet;
 import org.javatuples.Pair;
 import edu.bloomu.codeglosser.Events.EventProcessor;
 import edu.bloomu.codeglosser.Globals;
+import edu.bloomu.codeglosser.Utils.ProgressDialog;
 
 /**
  *
@@ -278,6 +279,7 @@ public class MarkupView extends javax.swing.JPanel implements EventProcessor {
     public void setText(String str) {
         SwingUtilities.invokeLater(() -> {
             textCode.setText("<html><head></head><body style=\"font-size: 1.15em\"><pre><code>" + str.trim() + "</code></pre></body></html>");
+            textCode.setCaretPosition(0);
         });
     }
 
@@ -420,7 +422,14 @@ public class MarkupView extends javax.swing.JPanel implements EventProcessor {
     }
     
     private Observable<Event> fileSelected(Pair<String, List<Markup>> pair) {
-        SwingUtilities.invokeLater(() -> highlighter.removeAllHighlights());
+        ProgressDialog dialog = new ProgressDialog()
+                .setText("Rendering Selected File...")
+                .setTitle("File Selected");
+        
+        SwingUtilities.invokeLater(() -> {
+            highlighter.removeAllHighlights();
+            dialog.show();
+        });
         highlightMap.clear();
         
         return Observable
@@ -432,7 +441,10 @@ public class MarkupView extends javax.swing.JPanel implements EventProcessor {
                         .map(p::setAt0)
                 )
                 // Display syntax highlighted code on UI Thread
-                .doOnNext(p -> SwingUtilities.invokeLater(() -> setText(p.getValue0())))
+                .doOnNext(p -> SwingUtilities.invokeLater(() -> {
+                    setText(p.getValue0());
+                    dialog.done();
+                }))
                 // Set highlights
                 .map(Pair::getValue1)
                 .flatMap(Observable::fromIterable)

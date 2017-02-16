@@ -31,8 +31,12 @@
 package edu.bloomu.codeglosser.Model;
 
 import edu.bloomu.codeglosser.Globals;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -64,11 +68,44 @@ public class ProjectBranch implements TreeViewBranch {
                     children.add(dir);
                 }
             } else {
-                children.add(new ProjectLeaf(f));
+                if (isValidFile(f.toPath())) { 
+                    children.add(new ProjectLeaf(f));
+                }
             }
         }
         
+        children.sort((node1, node2) -> {
+            if (node1 instanceof ProjectBranch) {
+                if (node2 instanceof ProjectBranch) {
+                    return node1.toString().compareTo(node2.toString());
+                } else {
+                    return -1;
+                }
+            } else if (node2 instanceof ProjectBranch) {
+              return 1;  
+            } else {
+                return node1.toString().compareTo(node2.toString()); 
+            }
+        });
+        
         this.children = children.toArray(new TreeViewNode[children.size()]);
+    }
+    
+    /**
+     * The file is considered "valid" if and only if it can be opened by us, meaning
+     * it has a UTF-8 encoding. We prod each file to ensure it can be opened
+     * as such, and if not ignore it.
+     * @param path
+     * @return 
+     */
+    public static boolean isValidFile(Path path) {
+    try {
+        BufferedReader reader = Files.newBufferedReader(path, Charset.forName("UTF-8"));
+        reader.read();
+    } catch (IOException ex) {
+        return false;
+    }
+        return true;
     }
 
     @Override

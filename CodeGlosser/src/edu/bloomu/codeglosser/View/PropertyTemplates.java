@@ -53,6 +53,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import edu.bloomu.codeglosser.Events.EventProcessor;
+import edu.bloomu.codeglosser.Utils.ProgressDialog;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
@@ -67,6 +68,8 @@ public class PropertyTemplates extends javax.swing.JPanel implements EventProces
     private static final Logger LOG = Globals.LOGGER;
     private final EventBus engine = new EventBus(this, Event.PROPERTY_TEMPLATES);
 
+    private boolean initialized = false;
+    
     /**
      * Creates new form PropertyTemplates
      */
@@ -87,12 +90,18 @@ public class PropertyTemplates extends javax.swing.JPanel implements EventProces
     }
     
     private void initTemplateTree() {
+        templateTree.setModel(null);
+        ProgressDialog dialog = new ProgressDialog()
+                .setText("Setting Up Template Tree...")
+                .setTitle("Initializing Templates");
+        
         // Construct template tree (in background)
         Observable
                 .just(Globals.TEMPLATE_FILE)
                 .subscribeOn(Globals.WORKER_THREAD)
                 // Only do so if it exists
                 .filter(path -> path.toFile().exists())
+                .doOnNext(ignored -> dialog.show())
                 // Convert from JSON to JSONObject
                 .map(path -> Files.lines(path).collect(Collectors.joining("\n")))
                 .map(json -> (JSONObject) new JSONParser().parse(json))
@@ -106,7 +115,8 @@ public class PropertyTemplates extends javax.swing.JPanel implements EventProces
                 .buffer(Integer.MAX_VALUE)
                 .observeOn(SwingScheduler.getInstance())
                 // Set the root to a dummy which returns the parsed information above.
-                .subscribe(list ->
+                .subscribe(list -> {
+                    dialog.done();
                     setRoot(new TreeViewBranch() {
                         @Override
                         public TreeViewNode[] getChildren() {
@@ -118,8 +128,8 @@ public class PropertyTemplates extends javax.swing.JPanel implements EventProces
                         public String toString() {
                             return "Templates";
                         }     
-                    }
-                ));
+                    });
+                });
     }
     
     public void setRoot(TreeViewBranch root) {
@@ -130,8 +140,8 @@ public class PropertyTemplates extends javax.swing.JPanel implements EventProces
             LOG.severe("Error attempting to populate tree: " + ex.getMessage());
             JOptionPane.showMessageDialog(null, "Error attempting to populate tree", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        DefaultTreeModel model = (DefaultTreeModel) templateTree.getModel();
-        model.setRoot(rootNode);
+        DefaultTreeModel model = new DefaultTreeModel(rootNode);
+        templateTree.setModel(model);
     }
     
     private void populateTree(TreeViewBranch branch, DefaultMutableTreeNode root) throws IOException {
@@ -177,6 +187,8 @@ public class PropertyTemplates extends javax.swing.JPanel implements EventProces
         jScrollPane1 = new javax.swing.JScrollPane();
         templateTree = new javax.swing.JTree();
 
+        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Empty");
+        templateTree.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
         jScrollPane1.setViewportView(templateTree);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
