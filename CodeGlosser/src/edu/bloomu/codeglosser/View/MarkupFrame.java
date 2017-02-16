@@ -37,6 +37,7 @@ import java.awt.BorderLayout;
 import java.io.File;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -59,12 +60,23 @@ public class MarkupFrame extends javax.swing.JFrame {
         jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         jfc.setAcceptAllFileFilterUsed(false);
         
-        if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            LOG.info("Current Directory: " + jfc.getCurrentDirectory().getName() + ", Selected File: " + jfc.getSelectedFile().getName());
-            project = jfc.getSelectedFile();
-        } else {
-            LOG.severe("User Did Not Select File!!!");
-            System.exit(0);
+        while (true) {
+            if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                LOG.info("Current Directory: " + jfc.getCurrentDirectory().getName() + ", Selected File: " + jfc.getSelectedFile().getName());
+                project = jfc.getSelectedFile();
+                
+                // We only accept directories...
+                if (!project.isDirectory()) {
+                    JOptionPane.showMessageDialog(null, "The selected file: \"" + project.getName()
+                    + "\" is not a valid directory...", "Not Directory", JOptionPane.ERROR_MESSAGE);
+                    continue;
+                }
+                
+                break;
+            } else {
+                LOG.severe("User Did Not Select File!!!");
+                System.exit(0);
+            }
         }
         
         // Setup global data
