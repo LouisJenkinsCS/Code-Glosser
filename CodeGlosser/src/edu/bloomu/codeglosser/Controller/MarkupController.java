@@ -64,6 +64,7 @@ import java.util.stream.Collectors;
 import org.javatuples.Pair;
 import org.javatuples.Unit;
 import edu.bloomu.codeglosser.Events.EventProcessor;
+import edu.bloomu.codeglosser.Utils.Toast;
 import javax.swing.JOptionPane;
 
 /**
@@ -317,6 +318,7 @@ public class MarkupController implements EventProcessor {
     
     private Observable<Event> exportProject() {
         LOG.fine("Exporting project...");
+        Toast.displayText("Exporting project to directory: " + Globals.PROJECT_FOLDER);
         
         HTMLGenerator.generateAll();
         return Observable.empty();

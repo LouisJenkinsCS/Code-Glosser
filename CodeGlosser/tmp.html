@@ -129,82 +129,104 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
   position: absolute;
   display:block;
   z-index: 99;
-}</style><meta charset="UTF-8"></head><body><pre><code><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"Game.h"</span></span>
-<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;cstdlib&gt;</span></span>
+}</style><meta charset="UTF-8"></head><body><pre><code><span class="hljs-comment">/* BSD 3-Clause License
+ *
+ * Copyright (c) 2017, Louis Jenkins &lt;LouisJenkinsCS@hotmail.com&gt;
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     - Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *
+ *     - Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *
+ *     - Neither the name of Louis Jenkins, Bloomsburg University nor the names of its 
+ *       contributors may be used to endorse or promote products derived
+ *       from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */</span>
+<span class="hljs-keyword">package</span> edu.bloomu.codeglosser;
 
-<span class="note" msg="Namespace names are all lower-case, and based on project names and possibly their directory structure: google_awesome_project."><span class="hljs-keyword">namespace</span> ns_game</span>
-{
-    <span class="hljs-keyword">void</span> Game::start() 
-    {
-        <span class="hljs-keyword">while</span>(<span class="hljs-literal">true</span>)
-        {
-            reset();
-            <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; print(board) &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span> &lt;&lt; <span class="hljs-built_in">std</span>::flush;
+<span class="hljs-keyword">import</span> io.reactivex.Scheduler;
+<span class="hljs-keyword">import</span> io.reactivex.schedulers.Schedulers;
+<span class="hljs-keyword">import</span> java.io.IOException;
+<span class="hljs-keyword">import</span> java.net.URI;
+<span class="hljs-keyword">import</span> java.nio.file.Path;
+<span class="hljs-keyword">import</span> java.nio.file.Paths;
+<span class="hljs-keyword">import</span> java.util.concurrent.Executors;
+<span class="hljs-keyword">import</span> java.util.logging.FileHandler;
+<span class="hljs-keyword">import</span> java.util.logging.Handler;
+<span class="hljs-keyword">import</span> java.util.logging.Level;
+<span class="hljs-keyword">import</span> java.util.logging.Logger;
+<span class="hljs-keyword">import</span> java.util.logging.SimpleFormatter;
 
-            <span class="hljs-keyword">while</span>(<span class="hljs-literal">true</span>) 
-            {
-                process_turn(board, turn);
-                turns++;
-                <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; print(board) &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span> &lt;&lt; <span class="hljs-built_in">std</span>::flush;
-
-                <span class="hljs-keyword">if</span>(has_player_won(board, turn)) 
-                {
-                    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span>
-                            &lt;&lt; (turn == AI ? <span class="hljs-string">"AI "</span> : <span class="hljs-string">"PLAYER "</span>)
-                            &lt;&lt; <span class="hljs-string">"wins..."</span> &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span>;
-                    <span class="hljs-keyword">break</span>;
-                }
-                <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(turns &gt; board.size()) 
-                {
-                    <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span> &lt;&lt; <span class="hljs-string">"Number of turns has"</span>
-                            <span class="hljs-string">" exceeded the amount of free spaces on the"</span>
-                            <span class="hljs-string">" board! DRAW!"</span> &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span>;
-                    <span class="hljs-keyword">break</span>;
-                }
-
-                change_turn();
-            }
-
-            <span class="hljs-keyword">if</span>(!repeat())
-                <span class="hljs-keyword">break</span>;
+<span class="hljs-comment">/**
+ *
+ * <span class="hljs-doctag">@author</span> Louis Jenkins
+ * 
+ * Global Variables which are accessed across the program. All access to non-final 
+ * field MUST be performed on the WORKER_THREAD scheduler.
+ */</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Globals</span> </span>{
+    
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> FileHandler handler;
+    
+    <span class="hljs-comment">// The application's central logger. It logs to a particular log file.</span>
+    <span class="note" msg="char"><span class="hljs-keyword">p</span></span><span class="hljs-keyword">ublic</span> <span class="hljs-keyword">s</span><span class="note" msg="multi-char"><span class="hljs-keyword">tat</span></span><span class="hljs-keyword">ic</span> <span class="hljs-keyword">final</span> Logger LOGGER = Logger.getLogger(<span class="hljs-string">"Code-Glosser"</span>);
+    
+    <span class="hljs-comment">// Scheduler for our background worker thread. The worker thread handles all</span>
+    <span class="hljs-comment">// IO and CPU Bound processing.</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="note" msg="Word"><span class="hljs-keyword">final</span></span> Scheduler WORKER_THREAD = Schedulers.from(Executors.newSingleThreadScheduledExecutor());
+    
+    <span class="hljs-comment">// The project folder selected by the user.</span>
+    <span class="note" msg="Line"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Path PROJECT_FOLDER = <span class="hljs-keyword">null</span>;</span>
+    
+    <span class="note" msg="Multi-line"><span class="hljs-comment">// The URI used for obtaining the relative path to the file. This URI is used</span></span>
+    <span class="note" msg="Multi-line"><span class="hljs-comment">// for generating the file tree as well as saving session data.</span></span>
+    <span class="note" msg="Multi-line"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> URI URI_PREFIX = <span class="hljs-keyword">null</span>;</span>
+    
+    <span class="hljs-comment">// The location of the templates file</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Path TEMPLATE_FILE = Paths.get(<span class="hljs-string">"templates.json"</span>);
+    
+    <span class="hljs-comment">// The path to current file</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Path CURRENT_FILE = <span class="hljs-keyword">null</span>;
+    
+    <span class="hljs-comment">/**
+     * Initializes all globals to a default state. Used so that in the case of a
+     * memory leak, the previous values are not accidentally used.
+     */</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">initGlobals</span><span class="hljs-params">()</span> </span>{
+        System.setProperty(<span class="hljs-string">"java.util.logging.SimpleFormatter.format"</span>, 
+            <span class="hljs-string">"(%1$tc) [%4$s] ~%2$s~%nMessage: \"%5$s\"%n"</span>);
+        <span class="hljs-keyword">try</span> {
+            handler = <span class="hljs-keyword">new</span> FileHandler(<span class="hljs-string">"log.txt"</span>);
+            handler.setLevel(Level.INFO);
+            handler.setFormatter(<span class="hljs-keyword">new</span> SimpleFormatter());
+            
+            <span class="hljs-comment">// Ensure we only log to log file.</span>
+            LOGGER.setUseParentHandlers(<span class="hljs-keyword">false</span>);
+            LOGGER.addHandler(handler);
+            
+            LOGGER.setLevel(Level.INFO);
+        } <span class="hljs-keyword">catch</span> (IOException | SecurityException ex) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">"Failed to initialized logger... "</span> + ex.getMessage());
         }
+        PROJECT_FOLDER = <span class="hljs-keyword">null</span>;
+        URI_PREFIX = <span class="hljs-keyword">null</span>;
+        CURRENT_FILE = <span class="hljs-keyword">null</span>;
     }
-    
-    <span class="hljs-keyword">bool</span> Game::is_game_over(<span class="hljs-keyword">const</span> ns_matrix::Matrix&lt;<span class="hljs-keyword">int</span>&gt;&amp; board)
-    {
-        <span class="hljs-keyword">return</span> has_player_won(board, AI) || has_player_won(board, PLAYER)
-                || turns &gt; board.size();
-    }
-    
-    <span class="hljs-keyword">void</span> Game::reset() 
-    {
-        turns = <span class="hljs-number">0</span>;
-        board.clear();
-
-        <span class="hljs-comment">// Seed and randomly set player turn.</span>
-        <span class="hljs-built_in">std</span>::srand(<span class="hljs-built_in">std</span>::time(<span class="hljs-literal">nullptr</span>));
-        turn = (<span class="hljs-built_in">std</span>::rand() % <span class="hljs-number">1</span>) ? AI : PLAYER;
-    }
-    
-    <span class="hljs-keyword">void</span> Game::change_turn()
-    {
-        turn = (turn == AI ? PLAYER : AI);
-    }
-    
-    <span class="hljs-keyword">bool</span> Game::repeat() <span class="hljs-keyword">const</span> 
-    {     
-        <span class="hljs-keyword">char</span> c;
-        <span class="hljs-keyword">while</span>(<span class="hljs-literal">true</span>)
-        {
-            c = <span class="hljs-string">'\0'</span>;
-            <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span> &lt;&lt; <span class="hljs-string">"Play again?[\'Y\'|\'N\']"</span> 
-                    &lt;&lt; <span class="hljs-built_in">std</span>::<span class="hljs-built_in">endl</span> &lt;&lt; <span class="hljs-string">"=&gt; "</span>;
-            <span class="hljs-built_in">std</span>::<span class="hljs-built_in">cin</span> &gt;&gt; c;
-
-            <span class="hljs-keyword">if</span>(<span class="hljs-built_in">std</span>::<span class="hljs-built_in">tolower</span>(c) != <span class="hljs-string">'y'</span> || <span class="hljs-built_in">std</span>::<span class="hljs-built_in">tolower</span>(c) != <span class="hljs-string">'n'</span>)
-                <span class="hljs-keyword">break</span>;
-        }
-
-        <span class="hljs-keyword">return</span> <span class="hljs-built_in">std</span>::<span class="hljs-built_in">tolower</span>(c) == <span class="hljs-string">'y'</span>;
-    };
 }</code></pre></body></html>
